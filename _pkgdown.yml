@@ -1,0 +1,45 @@
+url: https://gosukehommaEX.github.io/DesignComplexSurvival/
+template:
+  bootstrap: 5
+
+reference:
+  - title: Model and scenario
+    contents:
+      - ms_model
+      - ms_fleischer
+      - ms_accrual
+      - ms_scenario
+      - ms_null
+  - title: Endpoint distributions
+    contents:
+      - ms_surv
+      - ms_prob
+  - title: Events and the log-rank statistic
+    contents:
+      - ms_events
+      - ms_event_time
+      - lr_moments
+      - lr_cov
+  - title: Group sequential bounds and probabilities
+    contents:
+      - gs_spend
+      - gs_bounds
+      - gs_prob
+  - title: Design
+    contents:
+      - ms_looks
+      - ms_test
+      - ms_power
+      - ms_size
+  - title: Methods
+    contents:
+      - print.ms_model
+      - print.ms_accrual
+      - print.ms_scenario
+      - print.ms_looks
+      - print.ms_test
+      - print.ms_power
+      - summary.ms_power
+      - print.summary.ms_power
+      - as.data.frame.ms_power
+      - print.ms_size

@@ -1,0 +1,136 @@
+---
+title: "Designing complex time-to-event trials without simulation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Designing complex time-to-event trials without simulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(DesignComplexSurvival)
+```
+
+DesignComplexSurvival computes the operating characteristics of two-group
+time-to-event trials analysed with the log-rank test, without patient-level
+simulation. Each group follows a four-state model (progression-free,
+progressed, switched, dead) with piecewise constant intensities. This
+vignette shows a single endpoint with a delayed treatment effect, and then
+overall survival (OS) with treatment switching after progression.
+
+## A delayed treatment effect
+
+The control group has exponential survival with a median of 12 months. In
+the treatment group the hazard ratio is 1 for the first 6 months and 0.65
+afterwards. Patients are enrolled at 10 per month for 3 months and at 30 per
+month afterwards, and the dropout hazard is 0.003 per month in both groups.
+
+```{r delayed-scenario}
+lam <- log(2) / 12
+ctl <- ms_model(death = lam, dropout = 0.003)
+trt <- ms_model(time = c(0, 6), death = c(lam, 0.65 * lam), dropout = 0.003)
+acc <- ms_accrual(time = c(0, 3), rate = c(10, 30))
+scn <- ms_scenario(ctl, trt, allocation = 1, accrual = acc)
+ev <- ms_events(scn, n = 700, calendar_time = c(12, 24, 36))
+ev[, c("time", "enrolled", "events_control", "events_treatment", "events")]
+```
+
+With 700 patients, `r round(ev$events[3])` events are expected by month 36.
+
+The design has interim analyses at 50 and 75 percent of the events, an
+efficacy bound of O'Brien-Fleming type and a non-binding futility bound by
+beta spending. `ms_size()` finds the number of events for a power of 90
+percent.
+
+```{r delayed-size}
+looks <- ms_looks("os", fraction = c(0.5, 0.75, 1))
+test <- ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2)
+des <- ms_size(scn, looks = looks, test = test, power = 0.9,
+               solve_for = "events", n = 700)
+des
+```
+
+The accrual ends at month `r round(des$accrual_duration, 1)`. The final
+analysis needs `r des$events` events and takes place at month
+`r round(des$study_duration, 1)`. The type I error is
+`r signif(des$type1[["nonbinding"]], 3)` when the futility bounds are
+ignored.
+
+The mean of the standardized statistic can be computed directly from the
+hazards (default) or with the Schoenfeld approximation, which uses the
+event-weighted average of the log hazard ratio.
+
+```{r delayed-mean}
+t_fin <- des$study_duration
+rbind(direct = lr_moments(scn, 700, t_fin)$z_mean,
+      schoenfeld = lr_moments(scn, 700, t_fin, mean = "schoenfeld")$z_mean)
+```
+
+## Overall survival with switching after progression
+
+In the control group the hazard of progression is 0.10 per month in the
+first 4 months and 0.08 afterwards. At progression, 30 percent of the
+patients switch to the experimental treatment; the others may switch later
+with a hazard of 0.04 per month. After progression the hazard of death is
+0.06 without switch and 0.035 after a switch. The treatment group has a
+lower hazard of progression and no switching.
+
+```{r switch-models}
+ctl_sw <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,
+                   switch_prob = 0.3, death_prog = 0.06, switch_rate = 0.04,
+                   death_switch = 0.035, dropout = 0.003)
+trt_sw <- ms_model(time = c(0, 4), prog = c(0.06, 0.05), death = 0.008,
+                   death_prog = 0.055, dropout = 0.003)
+ms_prob(ctl_sw, time = c(6, 12, 24))
+```
+
+The post-progression intensities are measured from the time of progression
+(`clock = "reset"`, the default). OS and progression-free survival (PFS) of
+the control group at 12 months are
+`r round(ms_surv(ctl_sw, 12, "os")$surv, 3)` and
+`r round(ms_surv(ctl_sw, 12, "pfs")$surv, 3)`.
+
+```{r switch-power}
+scn_sw <- ms_scenario(ctl_sw, trt_sw, accrual = ms_accrual(rate = 25))
+pw <- ms_power(scn_sw, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
+               test = ms_test(), events = 300)
+pw
+```
+
+With 300 OS events the power is `r round(pw$power, 3)`. Switching to the
+experimental treatment in the control group moves the hazard ratio for OS
+towards 1. For comparison, the same design without switching (all switching
+intensities set to zero) has the power
+
+```{r switch-none}
+ctl_ns <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,
+                   death_prog = 0.06, dropout = 0.003)
+scn_ns <- ms_scenario(ctl_ns, trt_sw, accrual = ms_accrual(rate = 25))
+pw_ns <- ms_power(scn_ns, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
+                  test = ms_test(), events = 300)
+pw_ns$power
+```
+
+## Variance under the alternative
+
+By default the standardized statistics have unit variances. With
+`variance = "alternative"`, the variance and covariance of the score under
+the alternative hypothesis (Luo et al. 2019) are used instead.
+
+```{r alt-var}
+mo_alt <- lr_moments(scn, n = 700, calendar_time = c(24, t_fin),
+                     variance = "alternative")
+mo_alt
+```
+
+Here the largest difference of the variances from 1 is
+`r signif(max(abs(mo_alt$z_var - 1)), 2)`.
+
+## References
+
+Luo X, Mao X, Chen X, Qiu J, Bai S, Quan H (2019). Design and monitoring of
+survival trials in complex scenarios. Statistics in Medicine 38:192-209.
