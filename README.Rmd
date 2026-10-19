@@ -58,7 +58,45 @@ ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
 
 ## Validation
 
+```{r validation-counts, include = FALSE}
+judgements <- c("PASS", "EXPLAINED", "FAIL", "INFO")
+reproduce <- utils::read.csv("inst/reproduce/results/summary.csv")
+validation <- utils::read.csv("inst/validation/results/summary.csv")
+count_judgements <- function(x) {
+  as.vector(table(factor(x$judgement, levels = judgements)))
+}
+counts <- rbind(count_judgements(reproduce), count_judgements(validation))
+colnames(counts) <- judgements
+counts <- data.frame(Folder = c("`inst/reproduce/`", "`inst/validation/`"),
+                     counts, Total = rowSums(counts), check.names = FALSE)
+n_sources <- length(unique(reproduce$source))
+n_simulated <- length(unique(validation$scenario[validation$source != "pweall"]))
+n_pweall <- length(unique(validation$scenario[validation$source == "pweall"]))
+```
+
 The tests compare the results with an independent Python implementation
 (`inst/validation/python/`, using matrix exponentials and adaptive
 quadrature) and, when the packages are installed, with gsDesign, gsDesign2,
 rpact and lrstat.
+
+The scripts in `inst/reproduce/` recompute sample sizes, numbers of events,
+analysis times, bounds and powers printed in `r n_sources` sources (articles
+and a statistical analysis plan). The scripts in `inst/validation/` compare
+the package with patient-level simulations of `r n_simulated` scenarios
+(FastSurvival and a Python simulation) and with the package PWEALL in
+`r n_pweall` designs. Each folder is run by its `run_all.R`, which judges
+every value as PASS (the criterion is met), EXPLAINED (the criterion is met
+after a registered explanation, such as an apparent misprint), FAIL, or INFO
+(not judged: a published value computed by a method that the package does
+not reproduce, or an asymptotic approximation compared with simulation):
+
+```{r validation-table, echo = FALSE}
+knitr::kable(counts, row.names = FALSE)
+```
+
+`run_all.R` also multiplies the compared values by 1.1 and checks that the
+judgements change as expected. The criteria are described in the
+`README.md` of each folder and the registered explanations in its
+`explained.csv`. Every compared value is listed with its judgement in
+`results/summary.csv`, and `results/summary.md` summarizes the results.
+FastSurvival and PWEALL are needed only to rerun `inst/validation/`.

@@ -24,3 +24,8 @@
 * Tests compare the results with an independent Python implementation
   (`inst/validation/python/`) and, when installed, with gsDesign, gsDesign2,
   rpact and lrstat.
+* Scripts that reproduce published sample sizes, numbers of events, analysis
+  times, bounds and powers (`inst/reproduce/`) and compare the package with
+  patient-level simulations (FastSurvival and Python) and with PWEALL
+  (`inst/validation/`). Each folder writes its judgements to
+  `results/summary.csv` and `results/summary.md`.

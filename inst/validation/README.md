@@ -14,6 +14,10 @@ devtools::load_all()
 source("inst/validation/run_all.R")
 ```
 
+FastSurvival and PWEALL are used only by these scripts, so they are not
+declared in DESCRIPTION. `run_all.R` records their versions in
+`results/summary.md`.
+
 `python/simulate_ms.py` (scenarios V6-V8, about 15 minutes) is run in Python
 beforehand; its result `results/sim_python.csv` is part of the folder and was
 computed with Python 3.13, numpy 2.5.3 and scipy 1.18.1:
