@@ -1,0 +1,6 @@
+FastSurvival 1.2.0
+time_s V1 30.5
+time_s V2 19.1
+time_s V3 53.9
+time_s V4 60.7
+time_s V5 17.8

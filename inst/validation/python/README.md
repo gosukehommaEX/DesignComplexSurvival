@@ -25,12 +25,15 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
 * `ref_gsd.py`: spending functions, bounds and stopping probabilities.
 * `expected_values.py`: computes all expected values and writes
   `results/*.csv`.
+* `simulate_ms.py`: patient-level simulation of the validation scenarios
+  V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 
 ## Running
 
 ```
 python3 expected_values.py            # all parts (about 30 minutes)
 python3 expected_values.py gs power   # selected parts
+python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and
