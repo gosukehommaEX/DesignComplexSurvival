@@ -41,7 +41,6 @@ test_that("beta-spending futility bounds match the reference values", {
 
 test_that("gs_bounds agrees with gsDesign::gsDesign()", {
   skip_if_not_installed("gsDesign")
-  message("gsDesign is available: comparing gs_bounds() with gsDesign::gsDesign()")
   x1 <- gsDesign::gsDesign(k = 3, test.type = 1, alpha = 0.025,
                            sfu = gsDesign::sfLDOF, timing = tf3)
   expect_lt(max(abs(gs_bounds(tf3)$upper - x1$upper$bound)), 1e-4)
@@ -58,7 +57,6 @@ test_that("gs_bounds agrees with gsDesign::gsDesign()", {
 
 test_that("gs_bounds agrees with rpact::getDesignGroupSequential()", {
   skip_if_not_installed("rpact")
-  message("rpact is available: comparing gs_bounds() with rpact")
   d <- rpact::getDesignGroupSequential(kMax = 3, alpha = 0.025, sided = 1,
                                        typeOfDesign = "asOF", informationRates = tf3)
   expect_lt(max(abs(gs_bounds(tf3)$upper - d$criticalValues)), 1e-4)
@@ -70,7 +68,6 @@ test_that("gs_bounds agrees with rpact::getDesignGroupSequential()", {
 test_that("gs_bounds agrees with gsDesign2 under a non-constant effect", {
   skip_if_not_installed("gsDesign2")
   skip_if_not_installed("gsDesign")
-  message("gsDesign2 is available: comparing gs_bounds() with gsDesign2::gs_power_npe()")
   info <- 100 * tf3
   mu <- c(0.8, 1.9, 2.8)
   g2 <- as.data.frame(gsDesign2::gs_power_npe(

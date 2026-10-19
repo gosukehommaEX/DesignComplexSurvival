@@ -37,7 +37,6 @@ test_that("ms_events matches the reference values with progression (scenario C)"
 
 test_that("ms_events agrees with lrstat::lrstat()", {
   skip_if_not_installed("lrstat")
-  message("lrstat is available: comparing ms_events() with lrstat::lrstat()")
   lr <- lrstat::lrstat(time = c(15, 25), allocationRatioPlanned = 2,
                        accrualTime = c(0, 3), accrualIntensity = c(10, 30),
                        piecewiseSurvivalTime = c(0, 6),

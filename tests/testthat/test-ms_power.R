@@ -28,7 +28,6 @@ test_that("ms_power matches the reference design for scenario B", {
 
 test_that("ms_power with follow-up agrees with lrstat::lrpower()", {
   skip_if_not_installed("lrstat")
-  message("lrstat is available: comparing ms_power() with lrstat::lrpower()")
   common <- list(kMax = 3, informationRates = c(0.5, 0.75, 1), alpha = 0.025,
                  typeAlphaSpending = "sfOF", allocationRatioPlanned = 2,
                  accrualTime = c(0, 3), accrualIntensity = c(10, 30),

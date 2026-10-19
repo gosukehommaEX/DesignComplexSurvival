@@ -49,7 +49,6 @@ test_that("lr_moments with the alternative variance matches Luo et al. (2019)", 
 
 test_that("lr_moments agrees with lrstat::lrstat()", {
   skip_if_not_installed("lrstat")
-  message("lrstat is available: comparing lr_moments() with lrstat::lrstat()")
   lr <- lrstat::lrstat(time = c(15, 25), allocationRatioPlanned = 2,
                        accrualTime = c(0, 3), accrualIntensity = c(10, 30),
                        piecewiseSurvivalTime = c(0, 6),
