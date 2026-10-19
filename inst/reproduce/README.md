@@ -1,0 +1,94 @@
+# Reproduction of published results
+
+The scripts in this folder recompute published sample sizes, numbers of
+events, analysis times, bounds and powers with DesignComplexSurvival and
+compare them with the values printed in the articles.
+
+## How to run
+
+With the working directory at the package root:
+
+```r
+devtools::load_all()
+source("inst/reproduce/run_all.R")
+```
+
+A single script can also be run, for example
+`source("inst/reproduce/reproduce_Barthel2006.R")`; it writes its own
+results file.
+
+## Files
+
+| File | Content |
+|---|---|
+| `published_values.csv` | Published values: id, source, file and page, location, quantity, printed value, search pattern, rounding, criterion, explained_id, note |
+| `explained.csv` | Registered explanations: id, source, reason, evidence and the judgement expected in the perturbation check |
+| `helpers.R` | Judgement, output, common model parts and the SIZE algorithm (discrete-time Markov chain of Lakatos 1988) |
+| `reproduce_<Source>.R` | One script per source |
+| `run_all.R` | Runs all scripts and writes the summaries |
+| `results/` | Outputs (generated; do not edit) |
+
+| Script | Source |
+|---|---|
+| `reproduce_Barthel2006.R` | Barthel et al. (2006), Statistics in Medicine 25:2521-2542, Tables II-V (ART) |
+| `reproduce_Lakatos1988.R` | Lakatos (1988), Biometrics 44:229-241, Section 3 example and Tables 2-3 |
+| `reproduce_Lakatos2002.R` | Lakatos (2002), Statistics in Medicine 21:1969-1989, Tables VIII-IX |
+| `reproduce_Lu2021.R` | Lu (2021), Pharmaceutical Statistics, doi:10.1002/pst.2069, Tables 1-3 (lrstat) |
+| `reproduce_Luo2019.R` | Luo et al. (2019), Statistics in Medicine 38:192-209, Examples 1-3 (PWEALL) |
+| `reproduce_Porcher2002.R` | Porcher et al. (2002), Controlled Clinical Trials 23:650-661, Tables 1-2 and the MAG90 example |
+| `reproduce_Shih1995.R` | Shih (1995), Controlled Clinical Trials 16:395-407, examples computed with SIZE |
+| `reproduce_Tang2022.R` | Tang (2022), Statistics in Medicine, doi:10.1002/sim.9256, Example 4 |
+| `reproduce_Vergote2024.R` | innovaTV 301 statistical analysis plan, version 2.0 (Vergote et al. 2024, doi:10.1056/NEJMoa2313811), Sections 6.2 and 6.7 (EAST) |
+| `reproduce_Xia2016.R` | Xia et al. (2016), Statistics in Biopharmaceutical Research 8:12-21, CALGB 30607 example |
+
+## Judgements
+
+Each published value is judged by the criterion in `published_values.csv`
+(P is the published value and x the computed value):
+
+| Criterion | Pass when |
+|---|---|
+| `ceil` | P - 1.05 < x <= P + 0.05 (values rounded up) |
+| `even_ceil` | P - 2.05 < x <= P + 0.05 (values rounded up to even numbers) |
+| `abs:tol` | abs(x - P) <= tol |
+| `power_at_time:target:tol` | the power at the published time P is within tol of target |
+| `round_n_from_d` | x rounded to the nearest integer equals P |
+| `info` | not judged |
+
+- PASS: the criterion is met.
+- EXPLAINED: the criterion is not met, the row has an `explained_id`, and the
+  evidence registered in `explained.csv`, computed by the script, meets the
+  criterion (and any additional condition stated there).
+- FAIL: the criterion is not met and there is no registered explanation, or
+  the evidence does not meet the criterion.
+- INFO: the published value was computed by a method that the package does
+  not reproduce (for example simulation or a discrete-time approximation);
+  the difference is reported without a judgement.
+
+Where the article prints an input or a heading that appears to be a misprint
+(Tang2022-Ex4-lag, Luo2019-Ex2-labels), the rows are computed as printed and
+the corrected reading is the evidence.
+
+## Checks made by run_all.R
+
+The run stops with an error, after writing the outputs, when a published
+value does not have exactly one result row, when an `explained_id` is not
+registered, when a registered explanation never gives EXPLAINED, when a
+diagnostic is outside its tolerance, or when the perturbation check fails.
+
+In the perturbation check, each judged published value is multiplied by 1.1,
+one row at a time, and judged again; for the criterion `power_at_time` the
+power is recomputed at 1.1 times the published time. Every row is expected
+to FAIL, except Barthel2006-T2-r2, whose evidence is the value printed for the
+same design in another row and is therefore expected to stay EXPLAINED.
+
+## Outputs (results/)
+
+| File | Content |
+|---|---|
+| `<Source>.csv` | All rows of a source: published and computed values, difference, evidence, judgement, perturbed values, note |
+| `summary.csv` | All rows of all sources |
+| `summary.md` | Counts by source and judgement, FAIL, EXPLAINED (with reasons) and INFO rows, perturbation check, diagnostics, run times |
+| `perturb.csv` | Judgements of the perturbation check |
+| `diagnostics.csv` | Checks of the approximation of simultaneous entry by uniform accrual over 1e-6 times the study length |
+| `helpers_<Source>.csv` | Values of the article-specific algorithms (SIZE chain, the K-interval formula of Porcher et al.) for an independent check |

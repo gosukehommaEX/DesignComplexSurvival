@@ -1,0 +1,4 @@
+"id","value","reference","rel_diff","tol","status","note"
+"Porcher2002-simultaneous-events-F0",574.99982150655,575,3.10423391436387e-07,1e-05,"OK","expected events at T with accrual over 1e-6 T versus the closed form"
+"Porcher2002-simultaneous-gamma-eps1e-5",1.68387984288152,1.68388123980475,8.29585364736651e-07,1e-04,"OK","gamma (pi2 0.50, pi1 0.35, F3 0.50) with accrual over 1e-6 T versus 1e-5 T"
+"Porcher2002-simultaneous-gamma-eps1e-7",1.68387984288152,1.68387970441458,8.22308969805619e-08,1e-04,"OK","gamma (pi2 0.50, pi1 0.35, F3 0.50) with accrual over 1e-6 T versus 1e-7 T"
