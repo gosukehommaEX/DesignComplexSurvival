@@ -37,5 +37,16 @@ scn_c <- function(clock = "reset") {
                                    duration = 18))
 }
 
+# F: Fleischer-type model (exponential PFS and OS, death hazard unchanged by
+# progression), 2:1, piecewise accrual, group-specific dropout; defined
+# identically in inst/validation/python/expected_zeta.py
+scn_f <- function() {
+  b0 <- log(2) / 9
+  b1 <- log(2) / 12.9
+  ms_scenario(ms_model(prog = log(2) / 3 - b0, death = b0, death_prog = b0, dropout = 0.004),
+              ms_model(prog = log(2) / 4.3 - b1, death = b1, death_prog = b1, dropout = 0.006),
+              allocation = 2, accrual = ms_accrual(time = c(0, 4), rate = c(10, 25)))
+}
+
 # Relative difference
 rel_diff <- function(x, y) max(abs(x - y) / pmax(abs(y), 1e-300))

@@ -17,7 +17,7 @@ ms_test(
   beta = 0.1,
   binding = FALSE,
   mean = c("direct", "schoenfeld"),
-  variance = c("null", "alternative"),
+  variance = c("null", "alternative", "studentized"),
   spending_time = c("events", "information")
 )
 }
@@ -50,7 +50,8 @@ power instead.}
 \code{"direct"} or \code{"schoenfeld"} (see \code{\link{lr_moments}}).}
 
 \item{variance}{Approximation of the covariance of the statistics:
-\code{"null"} or \code{"alternative"} (see \code{\link{lr_cov}}).}
+\code{"null"}, \code{"alternative"} or \code{"studentized"} (see
+\code{\link{lr_cov}}).}
 
 \item{spending_time}{\code{"events"} or \code{"information"}.}
 }

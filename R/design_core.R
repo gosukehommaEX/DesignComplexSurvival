@@ -49,7 +49,14 @@
     }
   }
   core <- .lr_core(scenario, acc, times, ep, test$mean)
-  sigma <- .z_cov(scenario, acc, times, ep, core, test$variance)
+  trig <- NULL
+  if (looks$trigger != "calendar") {
+    trig <- rep(looks$trigger, k_max)
+    if (!is.null(t_final)) {
+      trig[k_max] <- NA_character_
+    }
+  }
+  sigma <- .z_cov(scenario, acc, times, ep, core, test$variance, trig)
   d <- core$events
   t_frac <- if (test$spending_time == "events") d / d[k_max] else core$info / core$info[k_max]
   corr0 <- sqrt(outer(d, d, pmin) / outer(d, d, pmax))

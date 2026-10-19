@@ -37,7 +37,8 @@
 #' @param mean Approximation of the mean of the statistic:
 #'   \code{"direct"} or \code{"schoenfeld"} (see \code{\link{lr_moments}}).
 #' @param variance Approximation of the covariance of the statistics:
-#'   \code{"null"} or \code{"alternative"} (see \code{\link{lr_cov}}).
+#'   \code{"null"}, \code{"alternative"} or \code{"studentized"} (see
+#'   \code{\link{lr_cov}}).
 #' @param spending_time \code{"events"} or \code{"information"}.
 #'
 #' @return An object of class \code{ms_test}.
@@ -55,7 +56,7 @@ ms_test <- function(alpha = 0.025, endpoints = "os", sf_eff = "OF",
                     fut_bound = NULL, fut_scale = c("z", "hr"), sf_fut = "OF",
                     param_fut = NULL, beta = 0.1, binding = FALSE,
                     mean = c("direct", "schoenfeld"),
-                    variance = c("null", "alternative"),
+                    variance = c("null", "alternative", "studentized"),
                     spending_time = c("events", "information")) {
   futility <- match.arg(futility)
   fut_scale <- match.arg(fut_scale)

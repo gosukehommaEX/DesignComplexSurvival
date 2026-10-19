@@ -26,14 +26,23 @@
 #' score under the alternative divided by V, from Luo et al. (2019), which
 #' accounts for the variability of the numbers at risk. This variance
 #' assumes simple randomization; Yung and Liu (2020) show that block
-#' randomization gives a variance that is not larger.
+#' randomization gives a variance that is not larger. For
+#' \code{variance = "studentized"} it is the asymptotic variance of Z itself,
+#' which also accounts for the variability of V and, for times determined by
+#' the observed number of events of an endpoint (\code{trigger}), of the
+#' analysis time (see \code{\link{lr_cov}}).
 #'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.
 #' @param calendar_time Calendar times (positive).
 #' @param endpoint \code{"os"} or \code{"pfs"}.
 #' @param mean \code{"direct"} or \code{"schoenfeld"}.
-#' @param variance \code{"null"} or \code{"alternative"}.
+#' @param variance \code{"null"}, \code{"alternative"} or
+#'   \code{"studentized"}.
+#' @param trigger Endpoint whose observed number of events determines each
+#'   calendar time (\code{"os"} or \code{"pfs"}; one value or one per time),
+#'   or \code{NULL} or \code{NA} for fixed calendar times. Used only with
+#'   \code{variance = "studentized"}.
 #'
 #' @return A data frame with \code{time}, \code{events_control},
 #'   \code{events_treatment}, \code{events}, \code{score_mean},
@@ -62,20 +71,25 @@
 #' @export
 lr_moments <- function(scenario, n, calendar_time, endpoint = c("os", "pfs"),
                        mean = c("direct", "schoenfeld"),
-                       variance = c("null", "alternative")) {
+                       variance = c("null", "alternative", "studentized"),
+                       trigger = NULL) {
   endpoint <- match.arg(endpoint)
   mean <- match.arg(mean)
   variance <- match.arg(variance)
   .check_scenario(scenario)
   .check_positive(n, "n")
   .check_times(calendar_time, "calendar_time", positive = TRUE)
+  trigger <- .check_trigger(trigger, length(calendar_time))
   acc <- .acc_setup(scenario$accrual, n)
   core <- .lr_core(scenario, acc, calendar_time, endpoint, mean)
   if (variance == "null") {
     z_var <- rep(1, length(calendar_time))
-  } else {
+  } else if (variance == "alternative") {
     cv <- .lr_alt_cov(scenario, acc, calendar_time, endpoint, core$score_mean / n)
     z_var <- diag(cv) / (core$info / n)
+  } else {
+    z_var <- diag(.zeta_cov(scenario, acc, rep(endpoint, length(calendar_time)),
+                            calendar_time, trigger, "studentized")$sigma)
   }
   data.frame(time = calendar_time, events_control = core$events_control,
              events_treatment = core$events_treatment, events = core$events,

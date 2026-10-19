@@ -60,3 +60,23 @@ test_that("lr_moments agrees with lrstat::lrstat()", {
   expect_lt(rel_diff(mb$score_mean, lr$uscore), 1e-5)
   expect_lt(rel_diff(mb$info, lr$vscore), 1e-5)
 })
+
+test_that("lr_moments with the studentized variance matches the reference", {
+  # Expected values: diagonal of zeta_cov.csv (scenario F, ref_zeta.py)
+  ex <- expected_csv("zeta_cov.csv")
+  ex <- ex[ex$row == ex$col & ex$trigger == "calendar", ]
+  for (ep in c("pfs", "os")) {
+    e <- ex[ex$endpoint_row == ep, ]
+    m <- lr_moments(scn_f(), n = 400, calendar_time = e$time_row, endpoint = ep,
+                    variance = "studentized")
+    expect_equal(m$z_var, e$value, tolerance = 1e-8)
+  }
+  expect_error(lr_moments(scn_f(), n = 400, calendar_time = 12, trigger = "dfs"),
+               "trigger")
+})
+
+test_that("lr_moments with the studentized variance is 1 under the null", {
+  m0 <- lr_moments(ms_null(scn_f()), n = 400, calendar_time = c(12, 20),
+                   endpoint = "pfs", variance = "studentized", trigger = "os")
+  expect_equal(m0$z_var, c(1, 1), tolerance = 1e-8)
+})

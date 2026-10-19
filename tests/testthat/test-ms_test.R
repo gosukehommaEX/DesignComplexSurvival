@@ -22,3 +22,7 @@ test_that("ms_test checks its input", {
   expect_error(ms_test(futility = "fixed", fut_bound = -1, fut_scale = "hr"), "fut_bound")
   expect_error(ms_test(binding = NA), "binding")
 })
+
+test_that("ms_test accepts the studentized variance", {
+  expect_identical(ms_test(variance = "studentized")$variance, "studentized")
+})

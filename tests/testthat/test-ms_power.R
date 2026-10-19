@@ -76,3 +76,14 @@ test_that("ms_power with the alternative variance runs and differs little", {
   expect_lt(abs(r1$power - r0$power), 0.02)
   expect_equal(r1$looks$z_upper, r0$looks$z_upper)
 })
+
+test_that("ms_power with the studentized variance uses the event-driven covariance", {
+  te <- ms_test(variance = "studentized")
+  lk <- ms_looks("os", fraction = c(0.6, 1))
+  res <- ms_power(scn_f(), n = 400, looks = lk, test = te, events = 200)
+  lc <- lr_cov(scn_f(), n = 400, calendar_time = res$looks$time, endpoint = "os",
+               variance = "studentized", trigger = "os")
+  expect_equal(res$looks$z_sd, sqrt(diag(lc$sigma)), tolerance = 1e-10)
+  r0 <- ms_power(ms_null(scn_f()), n = 400, looks = lk, test = te, events = 200)
+  expect_equal(r0$looks$z_sd, c(1, 1), tolerance = 1e-8)
+})

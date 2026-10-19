@@ -10,7 +10,8 @@ lr_moments(
   calendar_time,
   endpoint = c("os", "pfs"),
   mean = c("direct", "schoenfeld"),
-  variance = c("null", "alternative")
+  variance = c("null", "alternative", "studentized"),
+  trigger = NULL
 )
 }
 \arguments{
@@ -24,7 +25,13 @@ lr_moments(
 
 \item{mean}{\code{"direct"} or \code{"schoenfeld"}.}
 
-\item{variance}{\code{"null"} or \code{"alternative"}.}
+\item{variance}{\code{"null"}, \code{"alternative"} or
+\code{"studentized"}.}
+
+\item{trigger}{Endpoint whose observed number of events determines each
+calendar time (\code{"os"} or \code{"pfs"}; one value or one per time),
+or \code{NULL} or \code{NA} for fixed calendar times. Used only with
+\code{variance = "studentized"}.}
 }
 \value{
 A data frame with \code{time}, \code{events_control},
@@ -58,7 +65,11 @@ The variance of Z is 1 for \code{variance = "null"}. For
 score under the alternative divided by V, from Luo et al. (2019), which
 accounts for the variability of the numbers at risk. This variance
 assumes simple randomization; Yung and Liu (2020) show that block
-randomization gives a variance that is not larger.
+randomization gives a variance that is not larger. For
+\code{variance = "studentized"} it is the asymptotic variance of Z itself,
+which also accounts for the variability of V and, for times determined by
+the observed number of events of an endpoint (\code{trigger}), of the
+analysis time (see \code{\link{lr_cov}}).
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)
