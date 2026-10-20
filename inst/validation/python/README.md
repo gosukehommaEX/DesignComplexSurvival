@@ -14,6 +14,7 @@ different numerical methods:
 | Moments of the score, the observed variance and the event indicator (studentized covariance, stage 2) | cumulative functions on Gauss-Legendre rules, entry by Gauss-Legendre rules | cumulative functions by an ODE solver (`solve_ivp`), entry by adaptive quadrature |
 | Products of the PFS and OS functionals | four terms of counting-process integrals over the PFS and OS times (covariance note, equations (6)-(9)) | Fleischer model: conditioning on the death time; scenarios with switching: Monte Carlo with 10 million patients |
 | Time derivatives of the score mean, information and events | integrals against the accrual density | central differences of the reference moments |
+| Rejection probabilities of two endpoints (`gs_prob_mtp()`) | sums of rectangle probabilities over the outcomes of the first endpoint (Miwa algorithm) | numerical integration over the analyses of the joint density, with the decisions applied on the sample path (canonical joint distribution); for two looks, the formulas of Glimm et al. (2010) as one-dimensional integrals; Monte Carlo with 2 million trials |
 
 The influence-function derivation used in the R code was checked against the
 formulas of Luo et al. (2019) in Python (function `influence_cov()` in
@@ -35,6 +36,14 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
 * `expected_zeta.py`: expected values for the studentized and PFS-OS
   covariance, written to `results/zeta_*.csv` and read by the tests through
   `tests/testthat/helper-expected.R`.
+* `ref_mtp.py`: rejection probabilities of two endpoints under the
+  Bonferroni and fixed-sequence procedures (recursive integration, Monte
+  Carlo simulation and the formulas of Glimm et al. 2010 and Tamhane et
+  al. 2010; the last are also used by tools/reproduce_python.py in the
+  project folder).
+* `expected_mtp.py`: expected values for `gs_prob_mtp()`, written to
+  `results/gs_prob_mtp_configs.csv`, `results/gs_prob_mtp.csv` and the Monte
+  Carlo check `results/gs_prob_mtp_mc.csv`.
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 
@@ -44,6 +53,7 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
 python3 expected_values.py            # all parts (about 30 minutes)
 python3 expected_values.py gs power   # selected parts
 python3 expected_zeta.py              # stage 2 moments (about 10 minutes)
+python3 expected_mtp.py               # rejection probabilities of two endpoints (about 2 minutes)
 python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
 ```
 

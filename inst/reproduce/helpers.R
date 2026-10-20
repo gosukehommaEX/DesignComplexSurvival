@@ -106,6 +106,17 @@ repro_power_fixed <- function(scn, n, t, alpha, variance = "null",
   stats::pnorm((m$z_mean - stats::qnorm(1 - alpha)) / sqrt(m$z_var))
 }
 
+# Classical bounds of a design with two looks at information fractions t1
+# and 1 and one-sided level alpha: O'Brien-Fleming (c / sqrt(t1), c) or
+# Pocock (c, c)
+repro_classical2 <- function(type = c("OF", "PO"), alpha, t1) {
+  type <- match.arg(type)
+  corr <- matrix(c(1, sqrt(t1), sqrt(t1), 1), 2)
+  bnd <- function(cc) if (type == "OF") c(cc / sqrt(t1), cc) else c(cc, cc)
+  f <- function(cc) sum(gs_prob(c(-Inf, -Inf), bnd(cc), 0, corr)$prob_upper) - alpha
+  bnd(stats::uniroot(f, c(1, 5), tol = 1e-12)$root)
+}
+
 # Rounding half up (for printed values rounded by hand)
 repro_round_half_up <- function(x, digits) {
   floor(x * 10^digits + 0.5 + 1e-9) / 10^digits
@@ -214,6 +225,7 @@ size_calc <- function(hc, k, sbdv, din = 0, dout = 0, loss = 0, ratio_ce = 1,
 # Criteria (published value P, computed value x):
 #   ceil                    P - 1.05 < x <= P + 0.05
 #   even_ceil               P - 2.05 < x <= P + 0.05
+#   ceil_to:step            P - 1.05 step < x <= P + 0.05 step (rounded up to a multiple of step)
 #   abs:tol                 |x - P| <= tol
 #   power_at_time:target:tol  x is the power at the published time P, |x - target| <= tol
 #   round_n_from_d          x rounded to the nearest integer equals P
@@ -232,6 +244,12 @@ repro_check <- function(criterion, published, computed) {
   }
   if (type == "even_ceil") {
     return(list(pass = computed > published - 2.05 && computed <= published + 0.05 + eps,
+                diff = computed - published))
+  }
+  if (type == "ceil_to") {
+    step <- as.numeric(parts[2L])
+    return(list(pass = computed > published - 1.05 * step &&
+                  computed <= published + 0.05 * step + eps,
                 diff = computed - published))
   }
   if (type == "abs") {

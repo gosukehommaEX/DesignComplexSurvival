@@ -25,6 +25,7 @@ reference:
       - gs_spend
       - gs_bounds
       - gs_prob
+      - gs_prob_mtp
   - title: Design
     contents:
       - ms_looks
