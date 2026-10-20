@@ -66,7 +66,7 @@ test_that("ms_size solves for the sample size with two endpoints", {
   te <- ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence")
   lo <- ms_looks("os")
   res <- ms_size(scn_f(), looks = lo, test = te, power = 0.8, solve_for = "n",
-                 followup = 6, target = "each")
+                 followup = 6, interval = c(450, 520), target = "each")
   expect_identical(res$target, "each")
   expect_equal(res$n, ceiling(res$solution))
   expect_gte(min(res$power[c("pfs", "os")]), 0.8)

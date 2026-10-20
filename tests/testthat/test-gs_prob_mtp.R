@@ -3,7 +3,10 @@
 # density, with the decisions of the procedure applied on the sample path)
 # and, for two looks, by the formulas of Glimm et al. (2010, equations (1)
 # and (2)) written as one-dimensional integrals (ref_mtp.glimm_two_look()).
-# Configurations: gs_prob_mtp_configs.csv.
+# Configurations: gs_prob_mtp_configs.csv. Rectangles over both endpoints
+# with four or more coordinates are computed by the Genz-Bretz algorithm
+# with the error tolerance 1e-6 (with_abseps()), and the probabilities,
+# sums of up to ten such rectangles, are compared at a tolerance of 1e-5.
 
 mtp_check_config <- function(id, method, mtp = NULL) {
   cf <- expected_csv("gs_prob_mtp_configs.csv")
@@ -22,12 +25,13 @@ mtp_check_config <- function(id, method, mtp = NULL) {
               ex$hypothesis == runs$hypothesis[r], ]
     cn <- mtp_canonical(mtp_num(cf$tau1), mtp_num(cf$tau2), cf$rho, e$theta1[1],
                         e$theta2[1], a1, a2)
-    res <- gs_prob_mtp(list(mtp_num(cf$u1), mtp_num(cf$u2)), lower = mtp_num(cf$l1),
-                       mean = cn$mean, sigma = cn$sigma, analysis = list(a1, a2),
-                       mtp = runs$mtp[r], hierarchical = runs$hierarchical[r])
+    res <- with_abseps(gs_prob_mtp(list(mtp_num(cf$u1), mtp_num(cf$u2)),
+                                   lower = mtp_num(cf$l1), mean = cn$mean,
+                                   sigma = cn$sigma, analysis = list(a1, a2),
+                                   mtp = runs$mtp[r], hierarchical = runs$hierarchical[r]))
     q <- mtp_quantities(res)
     expect_true(all(e$quantity %in% names(q)))
-    expect_lt(max(abs(q[e$quantity] - e$value)), 1e-6)
+    expect_lt(max(abs(q[e$quantity] - e$value)), 1e-5)
     n <- n + nrow(e)
   }
   n
@@ -46,12 +50,29 @@ test_that("gs_prob_mtp matches the recursion with three looks (Bonferroni)", {
   expect_identical(mtp_check_config("three_looks", "recursion", "bonferroni overall"), 39L)
 })
 
-test_that("gs_prob_mtp matches the recursion with different analyses", {
-  expect_identical(mtp_check_config("unequal", "recursion"), 99L)
+test_that("gs_prob_mtp matches the recursion with different analyses (overall)", {
+  expect_identical(mtp_check_config("unequal", "recursion", "fixed_sequence overall"), 33L)
 })
 
-test_that("gs_prob_mtp matches the recursion when the second endpoint starts later", {
-  expect_identical(mtp_check_config("late_second", "recursion"), 108L)
+test_that("gs_prob_mtp matches the recursion with different analyses (stagewise)", {
+  expect_identical(mtp_check_config("unequal", "recursion", "fixed_sequence stagewise"), 33L)
+})
+
+test_that("gs_prob_mtp matches the recursion with different analyses (Bonferroni)", {
+  expect_identical(mtp_check_config("unequal", "recursion", "bonferroni overall"), 33L)
+})
+
+test_that("gs_prob_mtp matches the recursion when the second endpoint starts later (overall)", {
+  expect_identical(mtp_check_config("late_second", "recursion", "fixed_sequence overall"), 36L)
+})
+
+test_that("gs_prob_mtp matches the recursion when the second endpoint starts later (stagewise)", {
+  expect_identical(mtp_check_config("late_second", "recursion", "fixed_sequence stagewise"),
+                   36L)
+})
+
+test_that("gs_prob_mtp matches the recursion when the second endpoint starts later (Bonferroni)", {
+  expect_identical(mtp_check_config("late_second", "recursion", "bonferroni overall"), 36L)
 })
 
 test_that("gs_prob_mtp matches the formulas of Glimm et al. for two looks", {
@@ -77,11 +98,12 @@ test_that("gs_prob_mtp agrees with gs_prob for the marginal probabilities", {
                  unname(r$reject["first"] + r$reject["second"] - r$reject["both"]))
   }
   # Bonferroni without futility: the second endpoint is tested at all looks
-  rb <- gs_prob_mtp(list(u1, u2), NULL, cn$mean, cn$sigma, mtp = "bonferroni")
-  expect_equal(rb$looks$prob_upper[4:6], m2$prob_upper, tolerance = 1e-7)
+  # (sums of rectangles over both endpoints: tolerance 1e-5)
+  rb <- with_abseps(gs_prob_mtp(list(u1, u2), NULL, cn$mean, cn$sigma, mtp = "bonferroni"))
+  expect_lt(max(abs(rb$looks$prob_upper[4:6] - m2$prob_upper)), 1e-5)
   # fixed sequence with the first hypothesis always rejected at the first look
-  ro <- gs_prob_mtp(list(c(-Inf, u1[2:3]), u2), NULL, cn$mean, cn$sigma)
-  expect_equal(ro$looks$prob_upper[4:6], m2$prob_upper, tolerance = 1e-7)
+  ro <- with_abseps(gs_prob_mtp(list(c(-Inf, u1[2:3]), u2), NULL, cn$mean, cn$sigma))
+  expect_lt(max(abs(ro$looks$prob_upper[4:6] - m2$prob_upper)), 1e-5)
   expect_equal(unname(ro$reject["both"]), unname(ro$reject["second"]), tolerance = 1e-7)
   # rejection of the second hypothesis: stagewise <= overall <= Bonferroni
   # (Glimm et al. 2010, inequality (5))

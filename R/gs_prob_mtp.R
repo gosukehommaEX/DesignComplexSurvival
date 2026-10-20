@@ -33,8 +33,16 @@
 #' normal distribution, one for each combination of the outcome of the first
 #' endpoint (rejection or stop for futility at a look, or no rejection) and
 #' the look at which the second hypothesis is rejected. They are computed
-#' with \code{mvtnorm::pmvnorm()} and the Miwa algorithm, which limits the
-#' total number of looks to 20.
+#' with \code{mvtnorm::pmvnorm()}, with the Miwa algorithm, which limits the
+#' total number of looks to 20, for the rectangles of the first endpoint alone
+#' and those with at most three coordinates, and with the Genz-Bretz
+#' algorithm for the rectangles that involve both endpoints and have four or
+#' more coordinates, for which the Miwa algorithm can be inaccurate. The
+#' Genz-Bretz algorithm uses a fixed seed, so that the results are
+#' reproducible and the random number generator of the session is not
+#' changed, and an absolute error tolerance of 1e-5 for each rectangle,
+#' which can be changed with
+#' \code{options(DesignComplexSurvival.mtp_abseps = ...)}.
 #'
 #' @param upper List of two numeric vectors: the efficacy bounds of the first
 #'   and of the second endpoint at their looks (\code{Inf} for no efficacy
@@ -149,7 +157,8 @@ gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
   a2 <- analysis[[2L]]
 
   # probability of a rectangle on the coordinates idx; coordinates without
-  # finite limits are left out
+  # finite limits are left out, and rectangles over both endpoints with four
+  # or more coordinates use the Genz-Bretz algorithm
   box <- function(idx, lo, hi) {
     if (any(lo >= hi)) {
       return(0)
@@ -159,6 +168,9 @@ gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
       return(1)
     }
     i <- idx[keep]
+    if (length(i) >= 4L && any(i <= k1) && any(i > k1)) {
+      return(.pmvn_genz(lo[keep], hi[keep], mean[i], sigma[i, i, drop = FALSE]))
+    }
     .pmvn(lo[keep], hi[keep], mean[i], sigma[i, i, drop = FALSE])
   }
 

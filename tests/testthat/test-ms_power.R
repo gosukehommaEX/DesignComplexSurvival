@@ -90,9 +90,12 @@ test_that("ms_power with the studentized variance uses the event-driven covarian
 
 # Expected values: inst/validation/python/results/design2.csv (designs D1 to
 # D4 of helper-designs.R; analysis times, moments, covariance, bounds and
-# rejection probabilities computed independently in expected_design.py)
+# rejection probabilities computed independently in expected_design.py).
+# Designs with two endpoints are run with the error tolerance 1e-6 of the
+# Genz-Bretz algorithm (with_abseps()) and their probabilities are compared
+# at a tolerance of 1e-5; design D4 (one endpoint) at 1e-6.
 
-compare_design <- function(name, res) {
+compare_design <- function(name, res, tol_prob = 1e-5) {
   lk <- res$looks
   e <- design_expected(name, "time")
   expect_equal(lk$time[match(e$look, lk$look)], e$value, tolerance = 1e-8)
@@ -108,24 +111,24 @@ compare_design <- function(name, res) {
   }
   for (q in c("prob_upper", "prob_lower")) {
     e <- design_expected(name, q)
-    expect_lt(max(abs(looks_value(res, e, q) - e$value)), 1e-6, label = q)
+    expect_lt(max(abs(looks_value(res, e, q) - e$value)), tol_prob, label = q)
   }
 }
 
 test_that("ms_power with two endpoints matches the reference design D1", {
-  res <- run_design("D1")
+  res <- with_abseps(run_design("D1"))
   compare_design("D1", res)
   e <- design_expected("D1", "sigma")
   expect_equal(res$sigma[cbind(e$row, e$col)], e$value, tolerance = 1e-6)
   e <- design_expected("D1", "power")
-  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-5)
   e <- design_expected("D1", "cum_alpha")
-  expect_lt(max(abs(looks_value(res, e, "cum_alpha") - e$value)), 1e-6)
+  expect_lt(max(abs(looks_value(res, e, "cum_alpha") - e$value)), 1e-5)
   e <- design_expected("D1", "final_events")
   expect_equal(res$final_events[e$endpoint], stats::setNames(e$value, e$endpoint))
   for (b in c("nonbinding", "binding")) {
     e <- design_expected("D1", paste0("fwer_", b))
-    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-6)
+    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-5)
   }
   expect_identical(res$fwer$null_endpoints, c("PFS, OS", "OS"))
   expect_identical(res$looks$endpoint, c("pfs", "pfs", "os", "os"))
@@ -136,16 +139,16 @@ test_that("ms_power with two endpoints matches the reference design D1", {
 })
 
 test_that("ms_power with two endpoints matches the reference design D2", {
-  res <- run_design("D2")
+  res <- with_abseps(run_design("D2"))
   compare_design("D2", res)
   e <- design_expected("D2", "power")
-  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-5)
   e <- design_expected("D2", "final_events")
   expect_equal(res$final_events[e$endpoint], stats::setNames(e$value, e$endpoint),
                tolerance = 1e-8)
   for (b in c("nonbinding", "binding")) {
     e <- design_expected("D2", paste0("fwer_", b))
-    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-6)
+    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-5)
   }
   expect_lt(res$type1[["binding"]], res$type1[["nonbinding"]])
   # the final analysis takes place 12 months after the end of accrual
@@ -154,19 +157,19 @@ test_that("ms_power with two endpoints matches the reference design D2", {
 })
 
 test_that("ms_power with two endpoints matches the reference design D3", {
-  res <- run_design("D3")
+  res <- with_abseps(run_design("D3"))
   compare_design("D3", res)
   e <- design_expected("D3", "sigma")
   expect_equal(res$sigma[cbind(e$row, e$col)], e$value, tolerance = 1e-6)
   e <- design_expected("D3", "power")
-  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-5)
   e <- design_expected("D3", "fwer_nonbinding")
-  expect_lt(abs(res$type1[["nonbinding"]] - e$value), 1e-6)
+  expect_lt(abs(res$type1[["nonbinding"]] - e$value), 1e-5)
 })
 
 test_that("ms_power with looks driven by the events of PFS and OS matches design D4", {
   res <- run_design("D4")
-  compare_design("D4", res)
+  compare_design("D4", res, tol_prob = 1e-6)
   e <- design_expected("D4", "power")
   expect_lt(abs(res$power - e$value), 1e-6)
   for (b in c("nonbinding", "binding")) {
