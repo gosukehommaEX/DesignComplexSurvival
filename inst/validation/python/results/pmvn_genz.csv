@@ -1,0 +1,5 @@
+rectangle,method,value,three_se
+D1,recursive_quadrature,0.22710652488131736,
+D1_first_look1,recursive_quadrature,0.12708345860555498,
+D1,quasi_monte_carlo,0.22710652456351768,1.47e-10
+F6,quasi_monte_carlo,0.05845214941591478,2.93e-09

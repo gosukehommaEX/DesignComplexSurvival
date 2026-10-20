@@ -51,6 +51,11 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   the Monte Carlo check of the rejection probabilities
   `results/design2_mc.csv` (`ref_mtp.simulate()` with the mean vector and
   covariance matrix of each design).
+* `expected_genz.py`: exact probabilities of rectangles over both endpoints
+  for the tests of the Genz-Bretz algorithm in `gs_prob_mtp()`
+  (`tests/testthat/test-pmvn_genz.R`), by recursive conditioning and by
+  quasi-Monte Carlo with scrambled Sobol points, written to
+  `results/pmvn_genz.csv`.
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 
@@ -62,6 +67,7 @@ python3 expected_values.py gs power   # selected parts
 python3 expected_zeta.py              # stage 2 moments (about 10 minutes)
 python3 expected_mtp.py               # rejection probabilities of two endpoints (about 2 minutes)
 python3 expected_design.py            # designs with two endpoints (about 30 minutes)
+python3 expected_genz.py              # rectangles over both endpoints (about 2 minutes)
 python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
 ```
 

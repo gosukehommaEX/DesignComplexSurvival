@@ -1,11 +1,10 @@
-# Expected values: rectangles of designs with two endpoints computed
-# independently in Python. D1 (four coordinates): recursive conditioning with
-# adaptive quadrature (inst/validation/python/ref_gsd.py, mvn_box()). F6 (six
+# Expected values: inst/validation/python/results/pmvn_genz.csv, computed
+# independently by expected_genz.py. D1 (four coordinates): recursive
+# conditioning with adaptive quadrature (ref_gsd.mvn_box()). F6 (six
 # coordinates, three looks of each endpoint): quasi-Monte Carlo with the
 # separation of variables of Genz and 24 scramblings of 2^20 Sobol points
-# (three standard errors 3e-9), agreeing with
-# scipy.stats.multivariate_normal.cdf() to 5e-10. With 128 grid points, the
-# Miwa algorithm of .pmvn() is off by 9.6e-5 (D1) and 4.5e-4 (F6).
+# (three standard errors 3e-9). With 128 grid points, the Miwa algorithm of
+# .pmvn() is off by 9.6e-5 (D1) and 4.5e-4 (F6).
 
 genz_d1 <- list(
   m = c(2.141636271, 2.748018643, 2.034474618, 2.609699421),
@@ -34,7 +33,7 @@ genz_f6 <- list(
                0.903700658043, 1.07679256746), 6),
   lo = c(-Inf, -Inf, 2.02976766455, -Inf, -Inf, 2.00053906808),
   hi = c(2.93857575243, 2.25655974097, Inf, 3.35686935609, 2.44454228117, Inf),
-  exact = 0.058452149416263734)
+  exact = 0.05845214941591478)
 
 genz_value <- function(x) .pmvn_genz(x$lo, x$hi, x$m, x$S)
 
