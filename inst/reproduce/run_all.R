@@ -23,9 +23,9 @@ local({
   sys.source(file.path(dir, "helpers.R"), envir = henv)
 
   reproduce_all <- function(perturb = TRUE) {
-    sources <- c("Barthel2006", "Glimm2010", "Lakatos1988", "Lakatos2002", "Lu2021",
-                 "Luo2019", "Porcher2002", "Shih1995", "Tamhane2010", "Tang2022",
-                 "Vergote2024", "Xia2016")
+    sources <- c("Barthel2006", "Erdmann2025", "Glimm2010", "Lakatos1988", "Lakatos2002",
+                 "Lu2021", "Luo2019", "Porcher2002", "Shih1995", "Sugimoto2017",
+                 "Tamhane2010", "Tang2022", "Vergote2024", "Xia2016")
     res <- list()
     diag <- list()
     timing <- numeric(0)

@@ -31,6 +31,7 @@ results file.
 | Script | Source |
 |---|---|
 | `reproduce_Barthel2006.R` | Barthel et al. (2006), Statistics in Medicine 25:2521-2542, Tables II-V (ART) |
+| `reproduce_Erdmann2025.R` | Erdmann et al. (2025), Biometrical Journal 67:e70017, Tables 2 and 3 (illness-death model; settings of the authors' R code) |
 | `reproduce_Glimm2010.R` | Glimm et al. (2010), Statistics in Medicine 29:219-228, Sections 2-5 (strategies (a), (b) and (d) by `gs_prob_mtp()`) |
 | `reproduce_Lakatos1988.R` | Lakatos (1988), Biometrics 44:229-241, Section 3 example and Tables 2-3 |
 | `reproduce_Lakatos2002.R` | Lakatos (2002), Statistics in Medicine 21:1969-1989, Tables VIII-IX |
@@ -38,6 +39,7 @@ results file.
 | `reproduce_Luo2019.R` | Luo et al. (2019), Statistics in Medicine 38:192-209, Examples 1-3 (PWEALL) |
 | `reproduce_Porcher2002.R` | Porcher et al. (2002), Controlled Clinical Trials 23:650-661, Tables 1-2 and the MAG90 example |
 | `reproduce_Shih1995.R` | Shih (1995), Controlled Clinical Trials 16:395-407, examples computed with SIZE |
+| `reproduce_Sugimoto2017.R` | Sugimoto et al. (2017), Statistics in Medicine 36:1363-1382, Tables III and VI (PFS and OS, rows with rho = 0) |
 | `reproduce_Tamhane2010.R` | Tamhane et al. (2010), Biometrics 66:1174-1184, Table 1 (by `gs_prob_mtp()`), Sections 3.2 and 5 |
 | `reproduce_Tang2022.R` | Tang (2022), Statistics in Medicine, doi:10.1002/sim.9256, Example 4 |
 | `reproduce_Vergote2024.R` | innovaTV 301 statistical analysis plan, version 2.0 (Vergote et al. 2024, doi:10.1056/NEJMoa2313811), Sections 6.2 and 6.7 (EAST) |
@@ -99,4 +101,4 @@ therefore expected to stay EXPLAINED.
 | `summary.md` | Counts by source and judgement, FAIL, EXPLAINED (with reasons) and INFO rows, perturbation check, diagnostics, run times |
 | `perturb.csv` | Judgements of the perturbation check |
 | `diagnostics.csv` | Checks of the approximation of simultaneous entry by uniform accrual over 1e-6 times the study length |
-| `helpers_<Source>.csv` | Values of the article-specific algorithms (SIZE chain, the K-interval formula of Porcher et al.) for an independent check |
+| `helpers_<Source>.csv` | Values of the article-specific algorithms (SIZE chain, the K-interval formula of Porcher et al., formula (2) of Sugimoto et al.) for an independent check |
