@@ -19,8 +19,9 @@ DesignComplexSurvival computes the operating characteristics of two-group
 time-to-event trials analysed with the log-rank test, without patient-level
 simulation. Each group follows a four-state model (progression-free,
 progressed, switched, dead) with piecewise constant intensities. This
-vignette shows a single endpoint with a delayed treatment effect, and then
-overall survival (OS) with treatment switching after progression.
+vignette shows a single endpoint with a delayed treatment effect, then
+overall survival (OS) with treatment switching after progression, and
+finally progression-free survival (PFS) and OS tested together.
 
 ## A delayed treatment effect
 
@@ -115,22 +116,103 @@ pw_ns <- ms_power(scn_ns, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
 pw_ns$power
 ```
 
-## Variance under the alternative
+## PFS and OS tested together
 
-By default the standardized statistics have unit variances. With
-`variance = "alternative"`, the variance and covariance of the score under
-the alternative hypothesis (Luo et al. 2019) are used instead.
+Both groups follow the model of Fleischer et al. (2009): the times to
+progression and to death are exponential and the hazard of death does not
+change at progression, so that PFS and OS are exponential. The medians of
+PFS and OS are 4 and 12 months in the control group and 6 and 16 months in
+the treatment group, and patients are enrolled at 25 per month.
+
+PFS is tested at 300 PFS events, where OS is also tested, and OS is tested
+again at 220 OS events. With the fixed-sequence procedure, both hypotheses
+are tested at level 0.025 and OS is tested only after PFS has been rejected
+(procedure (b) of Glimm et al. 2010). Each endpoint has its own efficacy
+bounds of O'Brien-Fleming type.
+
+```{r two-design}
+fl <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
+                  ms_fleischer(median_pfs = 6, median_os = 16),
+                  accrual = ms_accrual(rate = 25))
+lk2 <- ms_looks(c("pfs", "os"), fraction = c(1, 1),
+                test = list(c("pfs", "os"), "os"))
+fs <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+               events = c(pfs = 300, os = 220))
+fs
+```
+
+The power is `r round(fs$power[["pfs"]], 3)` for PFS and
+`r round(fs$power[["os"]], 3)` for OS, and both hypotheses are rejected
+with probability `r round(fs$power[["both"]], 3)`. The final OS analysis
+takes place at month `r round(fs$study_duration, 1)`.
+
+The Bonferroni procedure tests PFS at level 0.02 and OS at level 0.005,
+whatever happens to the other hypothesis.
+
+```{r two-bonferroni}
+bf <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+                              weights = c(0.8, 0.2)),
+               events = c(pfs = 300, os = 220))
+rbind(fixed_sequence = fs$power, bonferroni = bf$power)
+```
+
+The familywise error rate is computed under the global null hypothesis,
+where the correlation between the PFS and OS statistics is that of Danzer
+et al. (2025). A partial null hypothesis, in which OS is the same in both
+groups but PFS is not, can be given through `null_scenarios`:
+
+```{r two-fwer}
+os_null <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
+                       ms_fleischer(median_pfs = 6, median_os = 12),
+                       accrual = ms_accrual(rate = 25))
+ms_power(fl, n = 450, looks = lk2,
+         test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+         events = c(pfs = 300, os = 220), null_scenarios = list(os = os_null))$fwer
+```
+
+## Choice of the covariance
+
+The argument `variance` of `ms_test()` (and of `lr_moments()` and
+`lr_cov()`) chooses the covariance of the standardized statistics. By
+default (`"null"`) the statistics of one endpoint have unit variances and
+the correlations of independent increments. With `"alternative"`, the
+variance and covariance of the score under the alternative hypothesis (Luo
+et al. 2019) are used instead. With `"studentized"`, the covariance is the
+asymptotic covariance of the statistic that is computed in practice,
+standardized by the estimated variance and, for event-driven analyses,
+taken at a random analysis time.
 
 ```{r alt-var}
-mo_alt <- lr_moments(scn, n = 700, calendar_time = c(24, t_fin),
-                     variance = "alternative")
-mo_alt
+mo <- lapply(c(alternative = "alternative", studentized = "studentized"),
+             function(v) lr_moments(scn, n = 700, calendar_time = c(24, t_fin),
+                                    variance = v))
+sapply(mo, function(m) m$z_var)
 ```
 
 Here the largest difference of the variances from 1 is
-`r signif(max(abs(mo_alt$z_var - 1)), 2)`.
+`r signif(max(abs(mo$alternative$z_var - 1)), 2)` with `"alternative"` and
+`r signif(max(abs(mo$studentized$z_var - 1)), 2)` with `"studentized"`.
+The choice affects the power and the futility bounds by beta spending, but
+not the efficacy bounds or the non-binding type I error. In the simulations
+of `inst/validation/` with PFS and OS tested together, `"studentized"`
+agreed best with the simulated standard deviations and correlations of the
+statistics, and the powers with `"null"` and `"studentized"` agreed with
+the simulated powers within the Monte Carlo error.
 
 ## References
+
+Danzer MF, Rufibach K, Beyersmann J, Schmidt R (2025). Exhausting the type I
+error level in event-driven group-sequential designs with a closed testing
+procedure for progression-free and overall survival. arXiv:2512.08658.
+
+Fleischer F, Gaschler-Markefski B, Bluhmki E (2009). A statistical model for
+the dependence between progression-free survival and overall survival.
+Statistics in Medicine 28:2669-2686.
+
+Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
+endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
 
 Luo X, Mao X, Chen X, Qiu J, Bai S, Quan H (2019). Design and monitoring of
 survival trials in complex scenarios. Statistics in Medicine 38:192-209.

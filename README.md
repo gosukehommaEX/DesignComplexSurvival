@@ -18,10 +18,13 @@ patient-level simulation:
   statistic over calendar time, group sequential bounds by alpha and
   beta spending (binding or non-binding futility), power, type I error,
   and the number of events, sample size, accrual duration or follow-up
-  for a target power.
-
-This version tests one endpoint (PFS or OS). Designs that test both PFS
-and OS with multiplicity adjustment are planned.
+  for a target power;
+- progression-free survival (PFS) and overall survival (OS) can be
+  tested together with a group sequential fixed-sequence or Bonferroni
+  procedure, with analyses driven by the events of either endpoint or by
+  calendar time; the joint distribution of the two log-rank statistics
+  gives the power of each endpoint, the probability of rejecting both or
+  at least one hypothesis, and the familywise error rate.
 
 ## Installation
 
@@ -30,7 +33,7 @@ and OS with multiplicity adjustment are planned.
 remotes::install_github("gosukehommaEX/DesignComplexSurvival")
 ```
 
-## Example
+## Examples
 
 A delayed treatment effect: the hazard ratio is 1 for 6 months and 0.65
 afterwards. The number of events for 90 percent power with interim
@@ -64,6 +67,39 @@ ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
 #>     0.37413    0.04536   0.90014
 ```
 
+PFS and OS tested together: PFS and OS are exponential in both groups
+(the model of Fleischer et al. 2009), with medians of 4 and 12 months in
+the control group and 6 and 16 months in the treatment group. PFS is
+tested at 300 PFS events, where OS is also tested, and OS again at 220
+OS events. OS is tested only after PFS has been rejected (fixed
+sequence):
+
+``` r
+fl <- ms_scenario(
+  control = ms_fleischer(median_pfs = 4, median_os = 12),
+  treatment = ms_fleischer(median_pfs = 6, median_os = 16),
+  accrual = ms_accrual(rate = 25)
+)
+ms_power(fl, n = 450,
+         looks = ms_looks(c("pfs", "os"), fraction = c(1, 1),
+                          test = list(c("pfs", "os"), "os")),
+         test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+         events = c(pfs = 300, os = 220))
+#> Group sequential log-rank design with two endpoints
+#>   Endpoints: PFS, then OS (fixed sequence, overall); looks driven by PFS events and OS events
+#>   Sample size: 450; accrual duration: 18; final analysis at: 23.05
+#>   Power: PFS 0.9387, OS 0.5452; both 0.5452; at least one 0.9387
+#>   FWER under global null: 0.025 (non-binding), 0.025 (binding)
+#>  endpoint look  time events info_frac z_upper  p_upper hr_upper z_lower
+#>       PFS    1 18.62    300    1.0000   1.960 0.025000   0.7975   1.960
+#>        OS    1 18.62    163    0.7407   2.357 0.009207   0.6912    -Inf
+#>        OS    2 23.05    220    1.0000   2.009 0.022243   0.7626   2.009
+#>  hr_lower prob_upper prob_lower cum_power
+#>    0.7975     0.9387          0    0.9387
+#>        NA     0.2966          0    0.2966
+#>    0.7626     0.2486          0    0.5452
+```
+
 ## Validation
 
 The tests compare the results with an independent Python implementation
@@ -72,21 +108,23 @@ quadrature) and, when the packages are installed, with gsDesign,
 gsDesign2, rpact and lrstat.
 
 The scripts in `inst/reproduce/` recompute sample sizes, numbers of
-events, analysis times, bounds and powers printed in 10 sources
+events, analysis times, bounds and powers printed in 14 sources
 (articles and a statistical analysis plan). The scripts in
 `inst/validation/` compare the package with patient-level simulations of
-8 scenarios (FastSurvival and a Python simulation) and with the package
-PWEALL in 8 designs. Each folder is run by its `run_all.R`, which judges
-every value as PASS (the criterion is met), EXPLAINED (the criterion is
-met after a registered explanation, such as an apparent misprint), FAIL,
-or INFO (not judged: a published value computed by a method that the
-package does not reproduce, or an asymptotic approximation compared with
-simulation):
+8 scenarios (FastSurvival and a Python simulation; PFS and OS analysed
+together in 4 of them), with the covariance estimator of Danzer et
+al. (2025) applied to large simulated trials under the null hypothesis,
+and with the package PWEALL in 8 designs. Each folder is run by its
+`run_all.R`, which judges every value as PASS (the criterion is met),
+EXPLAINED (the criterion is met after a registered explanation, such as
+an apparent misprint), FAIL, or INFO (not judged: a published value
+computed by a method that the package does not reproduce, or an
+asymptotic approximation compared with simulation):
 
 | Folder             | PASS | EXPLAINED | FAIL | INFO | Total |
 |:-------------------|-----:|----------:|-----:|-----:|------:|
-| `inst/reproduce/`  |  144 |        44 |    0 |  149 |   337 |
-| `inst/validation/` |  737 |         0 |    0 |  838 |  1575 |
+| `inst/reproduce/`  |  243 |        75 |    0 |  191 |   509 |
+| `inst/validation/` |  849 |         0 |    0 | 1366 |  2215 |
 
 `run_all.R` also multiplies the compared values by 1.1 and checks that
 the judgements change as expected. The criteria are described in the

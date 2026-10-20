@@ -25,10 +25,13 @@ simulation:
   statistic over calendar time, group sequential bounds by alpha and beta
   spending (binding or non-binding futility), power, type I error, and the
   number of events, sample size, accrual duration or follow-up for a target
-  power.
-
-This version tests one endpoint (PFS or OS). Designs that test both PFS and
-OS with multiplicity adjustment are planned.
+  power;
+* progression-free survival (PFS) and overall survival (OS) can be tested
+  together with a group sequential fixed-sequence or Bonferroni procedure,
+  with analyses driven by the events of either endpoint or by calendar
+  time; the joint distribution of the two log-rank statistics gives the
+  power of each endpoint, the probability of rejecting both or at least one
+  hypothesis, and the familywise error rate.
 
 ## Installation
 
@@ -37,7 +40,7 @@ OS with multiplicity adjustment are planned.
 remotes::install_github("gosukehommaEX/DesignComplexSurvival")
 ```
 
-## Example
+## Examples
 
 A delayed treatment effect: the hazard ratio is 1 for 6 months and 0.65
 afterwards. The number of events for 90 percent power with interim analyses
@@ -56,6 +59,25 @@ ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
         power = 0.9, solve_for = "events", n = 700)
 ```
 
+PFS and OS tested together: PFS and OS are exponential in both groups (the
+model of Fleischer et al. 2009), with medians of 4 and 12 months in the
+control group and 6 and 16 months in the treatment group. PFS is tested at
+300 PFS events, where OS is also tested, and OS again at 220 OS events. OS
+is tested only after PFS has been rejected (fixed sequence):
+
+```{r example-two}
+fl <- ms_scenario(
+  control = ms_fleischer(median_pfs = 4, median_os = 12),
+  treatment = ms_fleischer(median_pfs = 6, median_os = 16),
+  accrual = ms_accrual(rate = 25)
+)
+ms_power(fl, n = 450,
+         looks = ms_looks(c("pfs", "os"), fraction = c(1, 1),
+                          test = list(c("pfs", "os"), "os")),
+         test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+         events = c(pfs = 300, os = 220))
+```
+
 ## Validation
 
 ```{r validation-counts, include = FALSE}
@@ -72,6 +94,7 @@ counts <- data.frame(Folder = c("`inst/reproduce/`", "`inst/validation/`"),
 n_sources <- length(unique(reproduce$source))
 n_simulated <- length(unique(validation$scenario[validation$source != "pweall"]))
 n_pweall <- length(unique(validation$scenario[validation$source == "pweall"]))
+n_two <- length(unique(validation$scenario[validation$source == "python_two"]))
 ```
 
 The tests compare the results with an independent Python implementation
@@ -83,12 +106,15 @@ The scripts in `inst/reproduce/` recompute sample sizes, numbers of events,
 analysis times, bounds and powers printed in `r n_sources` sources (articles
 and a statistical analysis plan). The scripts in `inst/validation/` compare
 the package with patient-level simulations of `r n_simulated` scenarios
-(FastSurvival and a Python simulation) and with the package PWEALL in
-`r n_pweall` designs. Each folder is run by its `run_all.R`, which judges
-every value as PASS (the criterion is met), EXPLAINED (the criterion is met
-after a registered explanation, such as an apparent misprint), FAIL, or INFO
-(not judged: a published value computed by a method that the package does
-not reproduce, or an asymptotic approximation compared with simulation):
+(FastSurvival and a Python simulation; PFS and OS analysed together in
+`r n_two` of them), with the covariance estimator of Danzer et al. (2025)
+applied to large simulated trials under the null hypothesis, and with the
+package PWEALL in `r n_pweall` designs. Each folder is run by its
+`run_all.R`, which judges every value as PASS (the criterion is met),
+EXPLAINED (the criterion is met after a registered explanation, such as an
+apparent misprint), FAIL, or INFO (not judged: a published value computed
+by a method that the package does not reproduce, or an asymptotic
+approximation compared with simulation):
 
 ```{r validation-table, echo = FALSE}
 knitr::kable(counts, row.names = FALSE)

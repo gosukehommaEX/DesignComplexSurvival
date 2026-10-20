@@ -114,6 +114,17 @@ endpoints; with them the familywise error rate is at most \code{alpha}
 the first endpoint only: the trial stops when its statistic falls below
 the futility bound at an interim look at which it has not been rejected.
 See \code{\link{gs_prob_mtp}} for the stopping rules.
+
+The efficacy bounds and the non-binding type I error (with two endpoints,
+the familywise error rate under the global null hypothesis) do not depend
+on \code{variance}; the power, the futility bounds by beta spending and
+the familywise error rate under \code{null_scenarios} of
+\code{\link{ms_power}} do. In the simulations of \code{inst/validation/}
+with PFS and OS tested together, the powers with \code{"null"} and
+\code{"studentized"} agreed with the simulated powers within the Monte
+Carlo error, \code{"alternative"} gave slightly larger powers, and
+\code{"studentized"} agreed best with the simulated standard deviations
+and correlations of the statistics.
 }
 \examples{
 ms_test()

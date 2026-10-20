@@ -1,7 +1,7 @@
 Package: DesignComplexSurvival
 Type: Package
 Title: Simulation-Free Design of Complex Time-to-Event Trials
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person(
       "Gosuke", "Homma",
@@ -19,9 +19,12 @@ Description: Computes the expected numbers of events, the mean, variance and
     covers progression-free survival, overall survival and treatment
     switching at or after progression, together with piecewise uniform
     accrual, piecewise exponential dropout and group sequential designs with
-    efficacy bounds and binding or non-binding futility bounds. The variance
-    and covariance of the log-rank score under the alternative follow Luo
-    et al. (2019) <doi:10.1002/sim.7975>.
+    efficacy bounds and binding or non-binding futility bounds.
+    Progression-free and overall survival can be tested together with a
+    group sequential fixed-sequence or Bonferroni procedure, using the joint
+    distribution of the two log-rank statistics over calendar time. The
+    variance and covariance of the log-rank score under the alternative
+    follow Luo et al. (2019) <doi:10.1002/sim.7975>.
 License: GPL (>= 2)
 URL: https://github.com/gosukehommaEX/DesignComplexSurvival
 BugReports: https://github.com/gosukehommaEX/DesignComplexSurvival/issues
