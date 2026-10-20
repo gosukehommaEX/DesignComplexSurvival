@@ -21,8 +21,22 @@ print.ms_size <- function(x, digits = 4, ...) {
     n = "sample size",
     accrual_duration = "accrual duration",
     followup = "follow-up after the end of accrual")
-  cat(sprintf("Solved for the %s: %s (target power %s)\n\n", lab,
-              format(signif(x$solution, digits + 2)), format(x$target_power)))
+  sol <- format(signif(x$solution, digits + 2))
+  if (length(x$solution) > 1L) {
+    lab <- "final numbers of events"
+    sol <- paste(toupper(names(x$solution)), sol, collapse = ", ")
+  }
+  tgt <- if (is.null(x[["target"]])) {
+    "target power"
+  } else {
+    ep <- toupper(x$settings$endpoint)
+    switch(x[["target"]],
+      first = sprintf("target power of %s", ep[1L]),
+      each = sprintf("target power of %s and of %s", ep[1L], ep[2L]),
+      both = "target probability of rejecting both",
+      any = "target probability of rejecting at least one")
+  }
+  cat(sprintf("Solved for the %s: %s (%s %s)\n\n", lab, sol, tgt, format(x$target_power)))
   print.ms_power(x, digits = digits, ...)
   invisible(x)
 }

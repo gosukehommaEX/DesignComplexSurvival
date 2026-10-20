@@ -16,8 +16,12 @@
 #'
 #' @export
 print.ms_power <- function(x, digits = 4, ...) {
+  if (length(x$settings$endpoint) == 2L) {
+    .print_power2(x, digits)
+    return(invisible(x))
+  }
   s <- x$settings
-  trig <- if (s$trigger == "calendar") "calendar time" else paste(toupper(s$trigger), "events")
+  trig <- .trigger_label(s$trigger)
   cat("Group sequential log-rank design\n")
   cat(sprintf("  Tested endpoint: %s; looks driven by %s\n", toupper(s$endpoint), trig))
   cat(sprintf("  Sample size: %s; accrual duration: %s; final analysis at: %s\n",
@@ -29,9 +33,9 @@ print.ms_power <- function(x, digits = 4, ...) {
                 format(signif(x$type1[["nonbinding"]], digits)),
                 format(signif(x$type1[["binding"]], digits))))
   }
-  cols <- c("look", "time", "events", "info_frac", "z_upper", "p_upper",
-            "hr_upper", "z_lower", "hr_lower", "prob_upper", "prob_lower",
-            "cum_power")
+  cols <- intersect(c("look", "trigger", "time", "events", "info_frac", "z_upper",
+                      "p_upper", "hr_upper", "z_lower", "hr_lower", "prob_upper",
+                      "prob_lower", "cum_power"), names(x$looks))
   print(format(x$looks[, cols], digits = digits), row.names = FALSE)
   invisible(x)
 }

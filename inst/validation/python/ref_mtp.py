@@ -199,9 +199,12 @@ def recursion(cfg):
                 any=p1.sum() + p2.sum() - both)
 
 
-def simulate(cfg, n, seed):
-    """Monte Carlo simulation of the procedure (decisions applied analysis by analysis)."""
-    m, s = canonical(cfg)
+def simulate(cfg, n, seed, mean=None, sigma=None):
+    """Monte Carlo simulation of the procedure (decisions applied analysis by analysis).
+
+    The statistics have the canonical joint distribution of cfg, or the given mean vector and covariance matrix.
+    """
+    m, s = canonical(cfg) if mean is None else (np.asarray(mean, float), np.asarray(sigma, float))
     rng = np.random.default_rng(seed)
     z = rng.multivariate_normal(m, s, size=n, method="cholesky")
     a1 = list(cfg["a1"]); a2 = list(cfg["a2"])

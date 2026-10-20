@@ -19,5 +19,6 @@ Print an ms_test object
 }
 \examples{
 print(ms_test(futility = "beta"))
+print(ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"))
 
 }

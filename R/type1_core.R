@@ -8,20 +8,17 @@
 #' @param scenario An \code{ms_scenario} object.
 #' @param acc Output of \code{.acc_setup()}.
 #' @param looks An \code{ms_looks} object.
-#' @param targets Event targets of the trigger endpoint (event-driven looks).
-#' @param times Calendar times of the looks under the design scenario.
+#' @param targets Event targets of the trigger endpoints of the looks
+#'   (\code{NA} for calendar-driven looks).
 #' @param endpoint Tested endpoint.
 #' @param bnd Output of \code{gs_bounds()}.
 #' @return A list with \code{type1} (non-binding and binding) and the
 #'   cumulative non-binding type I error \code{cum_nonbinding}.
 #' @noRd
-.type1_core <- function(scenario, acc, looks, targets, times, endpoint, bnd) {
+.type1_core <- function(scenario, acc, looks, targets, endpoint, bnd) {
   s0 <- ms_null(scenario)
-  times0 <- if (looks$trigger == "calendar") {
-    times
-  } else {
-    .event_times(s0, acc, targets, looks$trigger)
-  }
+  times0 <- .look_times(s0, acc, .looks_table(looks), targets = targets,
+                        what = "the null scenario")$time
   core0 <- .lr_core(s0, acc, times0, endpoint, "direct")
   v0 <- core0$info
   corr <- sqrt(outer(v0, v0, pmin) / outer(v0, v0, pmax))

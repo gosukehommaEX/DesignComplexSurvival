@@ -5,7 +5,8 @@
 #'
 #' @return An object of class \code{summary.ms_power}: a list with the
 #'   design overview (\code{overview}), the per-look table (\code{looks}) and
-#'   the settings (\code{settings}).
+#'   the settings (\code{settings}); for two endpoints also the familywise
+#'   error rates (\code{fwer}).
 #'
 #' @examples
 #' ctl <- ms_model(death = log(2) / 12)
@@ -17,6 +18,18 @@
 #'
 #' @export
 summary.ms_power <- function(object, ...) {
+  if (length(object$settings$endpoint) == 2L) {
+    eps <- object$settings$endpoint
+    overview <- c(n = object$n, accrual_duration = object$accrual_duration,
+                  study_duration = object$study_duration,
+                  stats::setNames(object$events, paste0("events_", eps)),
+                  stats::setNames(object$power, paste0("power_", names(object$power))),
+                  fwer_nonbinding = object$type1[["nonbinding"]],
+                  fwer_binding = object$type1[["binding"]])
+    return(structure(list(overview = overview, looks = object$looks, fwer = object$fwer,
+                          settings = object$settings),
+                     class = "summary.ms_power"))
+  }
   overview <- c(n = object$n, accrual_duration = object$accrual_duration,
                 study_duration = object$study_duration, events = object$events,
                 power = object$power, type1_nonbinding = object$type1[["nonbinding"]],

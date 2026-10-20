@@ -13,7 +13,9 @@ ms_size(
   n = NULL,
   followup = NULL,
   interval = NULL,
-  round_up = TRUE
+  round_up = TRUE,
+  target = c("first", "each", "both", "any"),
+  null_scenarios = NULL
 )
 }
 \arguments{
@@ -41,11 +43,19 @@ of the final analysis).}
 
 \item{round_up}{Whether to round the number of events or the sample size
 up to an integer.}
+
+\item{target}{For two endpoints, \code{"first"}, \code{"each"},
+\code{"both"} or \code{"any"} (see Details).}
+
+\item{null_scenarios}{For two endpoints, null scenarios for the familywise
+error rate of the solved design (see \code{\link{ms_power}}).}
 }
 \value{
 An object of class \code{c("ms_size", "ms_power")}: the result of
   \code{\link{ms_power}} for the solved design, with \code{solve_for},
-  the unrounded \code{solution} and the \code{target_power}.
+  the unrounded \code{solution} (named by endpoint for the final numbers
+  of events of two trigger endpoints), the \code{target_power} and, for
+  two endpoints, the \code{target}.
 }
 \description{
 Solves for one design parameter so that the design of
@@ -76,6 +86,20 @@ brackets the target, evaluates the power on a grid within the bracket
 the target is reached, so that the smallest solution is returned when the
 power is not monotone. Beta spending uses one minus \code{power} as the
 total type II error.
+
+When the looks are driven by the events of two endpoints, the final
+numbers of events of both are their expected numbers at the final
+analysis (see \code{\link{ms_power}}), so that the looks driven by the
+endpoint other than that of the final look need fractions below 1. With
+\code{"events"} the solution then has the final numbers of events of both
+trigger endpoints, each rounded up with \code{round_up = TRUE}.
+
+With two endpoints, \code{target} chooses the quantity that reaches
+\code{power}: the power of the first endpoint (\code{"first"}), the
+smaller of the powers of the two endpoints (\code{"each"}), the
+probability of rejecting both hypotheses (\code{"both"}) or that of
+rejecting at least one (\code{"any"}), all under the multiple testing
+procedure of \code{test}.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)
@@ -83,6 +107,16 @@ trt <- ms_model(death = 0.7 * log(2) / 12)
 scn <- ms_scenario(ctl, trt, accrual = ms_accrual(rate = 20))
 ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 1)),
         test = ms_test(), power = 0.9, solve_for = "events", n = 500)
+
+\donttest{
+# Sample size for a power of 80 per cent for both PFS and OS, tested in
+# this order at one analysis 12 months after the end of accrual
+fl <- ms_scenario(ms_fleischer(4, 12), ms_fleischer(6, 16),
+                  accrual = ms_accrual(rate = 25))
+ms_size(fl, looks = ms_looks("os"),
+        test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+        power = 0.8, solve_for = "n", followup = 12, target = "each")
+}
 
 }
 \seealso{

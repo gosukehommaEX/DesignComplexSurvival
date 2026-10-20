@@ -14,7 +14,8 @@
 \value{
 An object of class \code{summary.ms_power}: a list with the
   design overview (\code{overview}), the per-look table (\code{looks}) and
-  the settings (\code{settings}).
+  the settings (\code{settings}); for two endpoints also the familywise
+  error rates (\code{fwer}).
 }
 \description{
 Summarize an ms_power object

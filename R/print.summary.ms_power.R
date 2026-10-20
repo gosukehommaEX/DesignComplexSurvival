@@ -18,13 +18,27 @@
 print.summary.ms_power <- function(x, digits = 4, ...) {
   s <- x$settings
   cat("Group sequential log-rank design: summary\n")
-  cat(sprintf("  Tested endpoint: %s; trigger: %s; mean: \"%s\"; variance: \"%s\"\n",
-              toupper(s$endpoint), s$trigger, s$mean, s$variance))
+  if (length(s$endpoint) == 2L) {
+    proc <- if (s$mtp == "bonferroni") {
+      sprintf("Bonferroni (weights %s)", paste(format(s$weights), collapse = ", "))
+    } else {
+      sprintf("fixed sequence (%s)", s$hierarchical)
+    }
+    cat(sprintf("  Endpoints: %s; %s\n", paste(toupper(s$endpoint), collapse = ", "), proc))
+  }
+  cat(sprintf("  Tested endpoint%s: %s; trigger: %s; mean: \"%s\"; variance: \"%s\"\n",
+              if (length(s$endpoint) == 2L) "s" else "",
+              paste(toupper(s$endpoint), collapse = ", "),
+              paste(s$trigger, collapse = ", "), s$mean, s$variance))
   cat(sprintf("  Futility: %s%s; spending time: \"%s\"; alpha: %s\n", s$futility,
               if (s$futility == "none") "" else if (s$binding) " (binding)" else " (non-binding)",
               s$spending_time, format(s$alpha)))
   cat("\nOverview:\n")
   print(signif(x$overview, digits))
+  if (!is.null(x$fwer)) {
+    cat("\nFamilywise error rate:\n")
+    print(format(x$fwer, digits = digits), row.names = FALSE)
+  }
   cat("\nBy look:\n")
   print(format(x$looks, digits = digits), row.names = FALSE)
   invisible(x)

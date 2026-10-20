@@ -61,3 +61,38 @@ test_that("ms_size checks its input", {
                        n = 400, followup = 6), "prop")
   expect_error(ms_size(scn_a(), ms_looks("os"), ms_test(), solve_for = "events"), "'n'")
 })
+
+test_that("ms_size solves for the sample size with two endpoints", {
+  te <- ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence")
+  lo <- ms_looks("os")
+  res <- ms_size(scn_f(), looks = lo, test = te, power = 0.8, solve_for = "n",
+                 followup = 6, target = "each")
+  expect_identical(res$target, "each")
+  expect_equal(res$n, ceiling(res$solution))
+  expect_gte(min(res$power[c("pfs", "os")]), 0.8)
+  p_sol <- ms_power(scn_f(), n = res$solution, looks = lo, test = te, followup = 6)$power
+  expect_lt(abs(min(p_sol[c("pfs", "os")]) - 0.8), 1e-6)
+  p_less <- ms_power(scn_f(), n = res$n - 1, looks = lo, test = te, followup = 6)$power
+  expect_lt(min(p_less[c("pfs", "os")]), 0.8)
+})
+
+test_that("ms_size solves for the final numbers of events of two trigger endpoints", {
+  te <- ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence")
+  lo <- ms_looks(c("pfs", "os"), fraction = c(0.8, 1), test = list("pfs", c("pfs", "os")))
+  res <- ms_size(scn_f(), looks = lo, test = te, power = 0.8, solve_for = "events", n = 400)
+  expect_named(res$solution, c("pfs", "os"))
+  expect_equal(res$final_events, ceiling(res$solution))
+  expect_gte(res$power[["pfs"]], 0.8)
+  p_sol <- ms_power(scn_f(), n = 400, looks = lo, test = te, events = res$solution)$power
+  expect_lt(abs(p_sol[["pfs"]] - 0.8), 1e-6)
+})
+
+test_that("ms_size checks the target and the null scenarios", {
+  expect_error(ms_size(scn_a(), ms_looks("os"), ms_test(), solve_for = "events", n = 500,
+                       target = "both"), "two endpoints")
+  expect_error(ms_size(scn_a(), ms_looks("os"), ms_test(), solve_for = "events", n = 500,
+                       null_scenarios = list(os = scn_a())), "two endpoints")
+  lm <- ms_looks(c("os", "calendar"), fraction = c(0.5, NA), time = c(NA, 40))
+  expect_error(ms_size(scn_a(), lm, ms_test(), solve_for = "events", n = 500),
+               "event-driven final look")
+})

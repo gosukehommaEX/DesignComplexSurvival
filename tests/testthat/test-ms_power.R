@@ -87,3 +87,116 @@ test_that("ms_power with the studentized variance uses the event-driven covarian
   r0 <- ms_power(ms_null(scn_f()), n = 400, looks = lk, test = te, events = 200)
   expect_equal(r0$looks$z_sd, c(1, 1), tolerance = 1e-8)
 })
+
+# Expected values: inst/validation/python/results/design2.csv (designs D1 to
+# D4 of helper-designs.R; analysis times, moments, covariance, bounds and
+# rejection probabilities computed independently in expected_design.py)
+
+compare_design <- function(name, res) {
+  lk <- res$looks
+  e <- design_expected(name, "time")
+  expect_equal(lk$time[match(e$look, lk$look)], e$value, tolerance = 1e-8)
+  for (q in c("events", "z_mean", "z_sd")) {
+    e <- design_expected(name, q)
+    expect_equal(looks_value(res, e, q), e$value, tolerance = 1e-6, label = q)
+  }
+  for (q in c("z_upper", "z_lower")) {
+    e <- design_expected(name, q)
+    v <- looks_value(res, e, q)
+    expect_identical(is.finite(v), is.finite(e$value), label = q)
+    expect_lt(max(abs(v - e$value)[is.finite(v)]), 1e-5, label = q)
+  }
+  for (q in c("prob_upper", "prob_lower")) {
+    e <- design_expected(name, q)
+    expect_lt(max(abs(looks_value(res, e, q) - e$value)), 1e-6, label = q)
+  }
+}
+
+test_that("ms_power with two endpoints matches the reference design D1", {
+  res <- run_design("D1")
+  compare_design("D1", res)
+  e <- design_expected("D1", "sigma")
+  expect_equal(res$sigma[cbind(e$row, e$col)], e$value, tolerance = 1e-6)
+  e <- design_expected("D1", "power")
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  e <- design_expected("D1", "cum_alpha")
+  expect_lt(max(abs(looks_value(res, e, "cum_alpha") - e$value)), 1e-6)
+  e <- design_expected("D1", "final_events")
+  expect_equal(res$final_events[e$endpoint], stats::setNames(e$value, e$endpoint))
+  for (b in c("nonbinding", "binding")) {
+    e <- design_expected("D1", paste0("fwer_", b))
+    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-6)
+  }
+  expect_identical(res$fwer$null_endpoints, c("PFS, OS", "OS"))
+  expect_identical(res$looks$endpoint, c("pfs", "pfs", "os", "os"))
+  expect_identical(res$looks$look, c(1L, 2L, 2L, 3L))
+  expect_identical(res$looks$trigger, c("pfs", "pfs", "pfs", "os"))
+  expect_equal(res$looks$events_trigger, c(150, 250, 250, 220))
+  expect_equal(res$type1[["nonbinding"]], res$fwer$nonbinding[1])
+})
+
+test_that("ms_power with two endpoints matches the reference design D2", {
+  res <- run_design("D2")
+  compare_design("D2", res)
+  e <- design_expected("D2", "power")
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  e <- design_expected("D2", "final_events")
+  expect_equal(res$final_events[e$endpoint], stats::setNames(e$value, e$endpoint),
+               tolerance = 1e-8)
+  for (b in c("nonbinding", "binding")) {
+    e <- design_expected("D2", paste0("fwer_", b))
+    expect_lt(max(abs(res$fwer[[b]] - e$value)), 1e-6)
+  }
+  expect_lt(res$type1[["binding"]], res$type1[["nonbinding"]])
+  # the final analysis takes place 12 months after the end of accrual
+  expect_equal(res$study_duration, 18.4 + 12)
+  expect_true(all(is.na(res$looks$events_trigger[res$looks$look == 1])))
+})
+
+test_that("ms_power with two endpoints matches the reference design D3", {
+  res <- run_design("D3")
+  compare_design("D3", res)
+  e <- design_expected("D3", "sigma")
+  expect_equal(res$sigma[cbind(e$row, e$col)], e$value, tolerance = 1e-6)
+  e <- design_expected("D3", "power")
+  expect_lt(max(abs(res$power[e$endpoint] - e$value)), 1e-6)
+  e <- design_expected("D3", "fwer_nonbinding")
+  expect_lt(abs(res$type1[["nonbinding"]] - e$value), 1e-6)
+})
+
+test_that("ms_power with looks driven by the events of PFS and OS matches design D4", {
+  res <- run_design("D4")
+  compare_design("D4", res)
+  e <- design_expected("D4", "power")
+  expect_lt(abs(res$power - e$value), 1e-6)
+  for (b in c("nonbinding", "binding")) {
+    e <- design_expected("D4", paste0("type1_", b))
+    expect_lt(abs(res$type1[[b]] - e$value), 1e-6)
+  }
+  expect_identical(res$looks$trigger, c("pfs", "os"))
+  expect_equal(res$looks$events_trigger, c(250, 220))
+})
+
+test_that("ms_power with two endpoints checks its input", {
+  scn <- scn_f()
+  te <- ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence")
+  lk <- ms_looks(c("pfs", "os"), fraction = c(1, 1))
+  expect_error(ms_power(scn, 400, lk, te, events = 250), "named")
+  expect_error(ms_power(scn, 400, lk, te, events = c(os = 220)), "PFS and OS")
+  expect_error(ms_power(scn, 400, lk, te, events = c(pfs = 380, os = 100)), "not increasing")
+  expect_error(ms_power(scn, 400, lk, te, followup = 6), "not increasing")
+  expect_error(ms_power(scn, 400, lk, te, events = c(pfs = -1, os = 220)), "events")
+  expect_error(ms_power(scn, 400, lk, ms_test(), events = c(pfs = 250, os = 220),
+                        null_scenarios = list(os = scn_f_null("os"))), "two endpoints")
+  expect_error(ms_power(scn, 400, lk, te, events = c(pfs = 250, os = 220),
+                        null_scenarios = list(dfs = scn_f_null("os"))), "named by")
+  s_acc <- scn_f_null("os")
+  s_acc$accrual <- ms_accrual(rate = 20)
+  expect_error(ms_power(scn, 400, lk, te, events = c(pfs = 250, os = 220),
+                        null_scenarios = list(os = s_acc)), "allocation and accrual")
+  lp <- ms_looks(c("pfs", "os"), fraction = c(1, 1), test = list("pfs", "pfs"))
+  expect_error(ms_power(scn, 400, lp, te, events = c(pfs = 250, os = 220)),
+               "OS is not tested")
+  lo <- ms_looks("os", fraction = c(0.5, 1), test = list("os", c("pfs", "os")))
+  expect_error(ms_power(scn, 400, lo, ms_test(), events = 220), "PFS")
+})

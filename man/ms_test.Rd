@@ -18,20 +18,30 @@ ms_test(
   binding = FALSE,
   mean = c("direct", "schoenfeld"),
   variance = c("null", "alternative", "studentized"),
-  spending_time = c("events", "information")
+  spending_time = c("events", "information"),
+  mtp = c("none", "bonferroni", "fixed_sequence"),
+  weights = NULL,
+  hierarchical = c("overall", "stagewise")
 )
 }
 \arguments{
-\item{alpha}{One-sided type I error.}
+\item{alpha}{One-sided type I error (with two endpoints, the familywise
+error rate).}
 
-\item{endpoints}{Tested endpoint, \code{"os"} or \code{"pfs"} (one
-endpoint in this version).}
+\item{endpoints}{Tested endpoint, \code{"os"} or \code{"pfs"}, or both in
+the order of testing (for example \code{c("pfs", "os")}). With two
+endpoints the futility bounds are placed on the first, and with
+\code{mtp = "fixed_sequence"} the first is tested first.}
 
 \item{sf_eff, param_eff}{Alpha spending function and its parameter (see
 \code{\link{gs_spend}}). For \code{"user"}, \code{param_eff} gives the
-cumulative proportions of \code{alpha} at the looks.}
+cumulative proportions of \code{alpha} at the looks. With two
+endpoints, \code{sf_eff} has one value or one value per endpoint, and
+\code{param_eff} is a list with one element per endpoint, or a number or
+one number per endpoint.}
 
-\item{futility}{\code{"none"}, \code{"fixed"} or \code{"beta"}.}
+\item{futility}{\code{"none"}, \code{"fixed"} or \code{"beta"} (for the
+first endpoint).}
 
 \item{fut_bound}{Fixed futility bounds at the interim looks (for
 \code{futility = "fixed"}).}
@@ -54,6 +64,15 @@ power instead.}
 \code{\link{lr_cov}}).}
 
 \item{spending_time}{\code{"events"} or \code{"information"}.}
+
+\item{mtp}{Multiple testing procedure: \code{"none"} (one endpoint),
+\code{"bonferroni"} or \code{"fixed_sequence"} (two endpoints).}
+
+\item{weights}{Bonferroni weights of the two endpoints (positive, adding
+up to 1; defaults to equal weights).}
+
+\item{hierarchical}{\code{"overall"} or \code{"stagewise"} (for
+\code{mtp = "fixed_sequence"}).}
 }
 \value{
 An object of class \code{ms_test}.
@@ -77,13 +96,43 @@ on the hazard ratio scale (\code{fut_scale = "hr"}, converted with
 \code{z = -log(hr) sqrt(p0 p1 d)}), or obtained by beta spending under
 the design scenario. With \code{binding = FALSE} the efficacy bounds
 ignore the futility bounds.
+
+With two endpoints, each endpoint has its own efficacy bounds, computed as
+above from the looks at which it is tested (see \code{\link{ms_looks}}).
+With \code{mtp = "bonferroni"}, the endpoint k is tested at level
+\code{weights[k] * alpha}; the levels are not recycled after a rejection.
+With \code{mtp = "fixed_sequence"}, both endpoints are tested at level
+\code{alpha} and the second endpoint is tested only after the first has
+been rejected: with \code{hierarchical = "overall"} at the analysis at
+which the first is rejected and at its later looks until it is rejected
+(procedure (b) of Glimm et al. 2010), and with \code{"stagewise"} only at
+the analysis at which the first is rejected, where the trial stops
+(procedure (a) of Glimm et al. 2010, Tamhane et al. 2010). The bounds of
+the second endpoint do not depend on the correlation between the
+endpoints; with them the familywise error rate is at most \code{alpha}
+(Glimm et al. 2010, Tamhane et al. 2010). Futility bounds are placed on
+the first endpoint only: the trial stops when its statistic falls below
+the futility bound at an interim look at which it has not been rejected.
+See \code{\link{gs_prob_mtp}} for the stopping rules.
 }
 \examples{
 ms_test()
 ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2)
 ms_test(futility = "fixed", fut_bound = 1, fut_scale = "hr")
+# PFS first, then OS, with Pocock-type spending for OS
+ms_test(endpoints = c("pfs", "os"), sf_eff = c("OF", "Pocock"),
+        mtp = "fixed_sequence")
+ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", weights = c(0.8, 0.2))
 
 }
+\references{
+Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
+endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
+
+Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
+endpoint in a group sequential design. Biometrics 66:1174-1184.
+}
 \seealso{
-\code{\link{ms_power}}, \code{\link{gs_bounds}}
+\code{\link{ms_power}}, \code{\link{gs_bounds}},
+  \code{\link{gs_prob_mtp}}
 }

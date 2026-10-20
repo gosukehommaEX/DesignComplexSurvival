@@ -6,3 +6,12 @@ test_that("print.ms_power shows the overview and the table", {
   expect_output(print(res), "z_upper")
   expect_output(expect_invisible(print(res)), "Power:")
 })
+
+test_that("print.ms_power shows a design with two endpoints", {
+  res <- run_design("D2")
+  expect_output(print(res), "two endpoints")
+  expect_output(print(res), "Bonferroni")
+  expect_output(print(res), "FWER under global null")
+  expect_output(print(res), "null_scenarios\\[\\[1\\]\\] \\(PFS null\\)")
+  expect_output(expect_invisible(print(res)), "at least one")
+})

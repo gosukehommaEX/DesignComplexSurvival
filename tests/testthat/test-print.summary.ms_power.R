@@ -4,3 +4,9 @@ test_that("print.summary.ms_power prints all columns", {
   expect_output(print(summary(res)), "Overview")
   expect_output(print(summary(res)), "cum_alpha")
 })
+
+test_that("print.summary.ms_power prints a design with two endpoints", {
+  res <- run_design("D3")
+  expect_output(print(summary(res)), "fixed sequence \\(stagewise\\)")
+  expect_output(print(summary(res)), "Familywise error rate")
+})

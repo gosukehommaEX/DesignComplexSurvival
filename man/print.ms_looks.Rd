@@ -19,5 +19,6 @@ Print an ms_looks object
 }
 \examples{
 print(ms_looks("os", fraction = c(0.5, 1)))
+print(ms_looks(c("pfs", "os"), fraction = c(1, 1), test = list(c("pfs", "os"), "os")))
 
 }

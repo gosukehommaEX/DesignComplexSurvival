@@ -2,13 +2,14 @@
 #'
 #' Determines the analysis times, the moments of the tested statistic, the
 #' bounds and the stopping probabilities under the design scenario, and
-#' optionally the type I error under the null scenario.
+#' optionally the type I error under the null scenario (one endpoint).
 #'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.
 #' @param looks An \code{ms_looks} object.
-#' @param test An \code{ms_test} object.
-#' @param events Final number of events of the trigger endpoint.
+#' @param test An \code{ms_test} object with one endpoint.
+#' @param events Final number of events of the trigger endpoint (named by
+#'   endpoint when the looks are driven by the events of two endpoints).
 #' @param followup Time from the end of accrual to the final analysis.
 #' @param beta Total type II error for beta spending (defaults to
 #'   \code{test$beta}).
@@ -20,43 +21,14 @@
   acc <- .acc_setup(scenario$accrual, n)
   k_max <- looks$k
   ep <- test$endpoints
-  targets <- NULL
-  if (looks$trigger == "calendar") {
-    if (!is.null(events) || !is.null(followup)) {
-      stop("'events' and 'followup' are not used with calendar-driven looks.",
-           call. = FALSE)
-    }
-    times <- looks$time
-  } else {
-    if (is.null(events) == is.null(followup)) {
-      stop("Give exactly one of 'events' and 'followup' for event-driven looks.",
-           call. = FALSE)
-    }
-    t_final <- NULL
-    if (is.null(events)) {
-      t_final <- acc$duration + followup
-      if (!(t_final > 0)) {
-        stop("The final analysis must take place after the start of the study.",
-             call. = FALSE)
-      }
-      ev <- .events_core(scenario, acc, t_final, looks$trigger)
-      events <- ev$ev0 + ev$ev1
-    }
-    targets <- looks$fraction * events
-    times <- .event_times(scenario, acc, targets, looks$trigger)
-    if (!is.null(t_final)) {
-      times[k_max] <- t_final
-    }
-  }
+  .tested_looks(looks, ep)
+  lk <- .looks_table(looks)
+  lt <- .look_times(scenario, acc, lk, events = events, followup = followup,
+                    what = "the design scenario")
+  times <- lt$time
+  targets <- lt$target
   core <- .lr_core(scenario, acc, times, ep, test$mean)
-  trig <- NULL
-  if (looks$trigger != "calendar") {
-    trig <- rep(looks$trigger, k_max)
-    if (!is.null(t_final)) {
-      trig[k_max] <- NA_character_
-    }
-  }
-  sigma <- .z_cov(scenario, acc, times, ep, core, test$variance, trig)
+  sigma <- .z_cov(scenario, acc, times, ep, core, test$variance, lt$trigger)
   d <- core$events
   t_frac <- if (test$spending_time == "events") d / d[k_max] else core$info / core$info[k_max]
   corr0 <- sqrt(outer(d, d, pmin) / outer(d, d, pmax))
@@ -99,8 +71,11 @@
                     prob_upper = pr$prob_upper, prob_lower = pr$prob_lower,
                     cum_power = cumsum(pr$prob_upper),
                     alpha_spent = bnd$alpha_spent)
-  if (looks$trigger != "calendar" && looks$trigger != ep) {
+  if (any(!is.na(targets) & lk$trigger != ep)) {
     out$events_trigger <- targets
+  }
+  if (length(unique(lk$trigger)) > 1L) {
+    out <- cbind(out[1L], trigger = lk$trigger, out[-1L], stringsAsFactors = FALSE)
   }
   res <- list(looks = out, power = sum(pr$prob_upper), n = n,
               accrual_duration = acc$duration, study_duration = times[k_max],
@@ -113,7 +88,7 @@
                               alpha = test$alpha),
               scenario = scenario, looks_def = looks, test = test)
   if (type1) {
-    t1 <- .type1_core(scenario, acc, looks, targets, times, ep, bnd)
+    t1 <- .type1_core(scenario, acc, looks, targets, ep, bnd)
     res$type1 <- t1$type1
     res$looks$cum_alpha <- t1$cum_nonbinding
   }

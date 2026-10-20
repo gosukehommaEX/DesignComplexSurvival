@@ -15,6 +15,7 @@ different numerical methods:
 | Products of the PFS and OS functionals | four terms of counting-process integrals over the PFS and OS times (covariance note, equations (6)-(9)) | Fleischer model: conditioning on the death time; scenarios with switching: Monte Carlo with 10 million patients |
 | Time derivatives of the score mean, information and events | integrals against the accrual density | central differences of the reference moments |
 | Rejection probabilities of two endpoints (`gs_prob_mtp()`) | sums of rectangle probabilities over the outcomes of the first endpoint (Miwa algorithm) | numerical integration over the analyses of the joint density, with the decisions applied on the sample path (canonical joint distribution); for two looks, the formulas of Glimm et al. (2010) as one-dimensional integrals; Monte Carlo with 2 million trials |
+| Designs with two endpoints or with looks driven by the events of different endpoints (`ms_power()`, stage 2) | `.look_times()`, `.design_core2()` and `.fwer_core()` with the functions above | analysis times by root finding on the reference events, moments and covariance from the references above, bounds by recursive conditioning, rejection probabilities as sums over the sample-path outcomes of rectangle probabilities by recursive conditioning with adaptive quadrature (any covariance matrix); Monte Carlo with 4 million trials |
 
 The influence-function derivation used in the R code was checked against the
 formulas of Luo et al. (2019) in Python (function `influence_cov()` in
@@ -44,6 +45,12 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
 * `expected_mtp.py`: expected values for `gs_prob_mtp()`, written to
   `results/gs_prob_mtp_configs.csv`, `results/gs_prob_mtp.csv` and the Monte
   Carlo check `results/gs_prob_mtp_mc.csv`.
+* `expected_design.py`: expected values for `ms_power()` with two endpoints
+  and with looks driven by the events of PFS and OS (designs D1 to D4 of
+  `tests/testthat/helper-designs.R`), written to `results/design2.csv`, and
+  the Monte Carlo check of the rejection probabilities
+  `results/design2_mc.csv` (`ref_mtp.simulate()` with the mean vector and
+  covariance matrix of each design).
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 
@@ -54,6 +61,7 @@ python3 expected_values.py            # all parts (about 30 minutes)
 python3 expected_values.py gs power   # selected parts
 python3 expected_zeta.py              # stage 2 moments (about 10 minutes)
 python3 expected_mtp.py               # rejection probabilities of two endpoints (about 2 minutes)
+python3 expected_design.py            # designs with two endpoints (about 30 minutes)
 python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
 ```
 
