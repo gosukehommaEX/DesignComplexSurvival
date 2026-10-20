@@ -219,12 +219,14 @@ def run(name, reps, chunk_patients=2_000_000, base_seed=20261019):
                 enr = f >= 0
                 out = {}
                 for ep, tt in (("os", os_), ("pfs", pfs)):
-                    obs_ev = enr & (tt <= drop) & (tt <= f)
+                    # compared on the calendar scale, as in kth_time(), so that the event at an event-driven cut is
+                    # counted (cut - entry may round below the event time)
+                    obs_ev = enr & (tt <= drop) & (entry + tt <= cut[rep])
                     obs_do = enr & (drop < tt) & (drop <= f)
                     for gname, flag in (("control", False), ("treatment", True)):
                         out["events_%s_%s" % (ep, gname)] = np.bincount(rep, weights=obs_ev & (trt == flag), minlength=nr)
                         out["dropouts_%s_%s" % (ep, gname)] = np.bincount(rep, weights=obs_do & (trt == flag), minlength=nr)
-                    ti = np.minimum(np.minimum(tt, drop), np.maximum(f, 0))
+                    ti = np.where(obs_ev, tt, np.minimum(np.minimum(tt, drop), np.maximum(f, 0)))
                     out["z_%s" % ep] = logrank_z(rep[enr], ti[enr], obs_ev[enr], trt[enr], nr)
                 for k, v in out.items():
                     acc.setdefault((tag, k), []).append(v)

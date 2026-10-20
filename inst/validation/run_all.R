@@ -11,12 +11,16 @@
 #    a new simulation.
 # 2. compare_simulation.R compares results/sim_python.csv (V6-V8, written by
 #    python/simulate_ms.py) and results/sim_fastsurvival.csv with the package.
-# 3. compare_pweall.R compares with PWEALL.
+# 3. compare_two_endpoints.R compares results/sim_python_two.csv (V3, V4, V6
+#    and V7 with PFS and OS together, written by python/simulate_two.py) and
+#    results/danzer_check.csv (python/danzer_check.py) with the package.
+# 4. compare_pweall.R compares with PWEALL.
 # Outputs in inst/validation/results/: compare_simulation.csv,
-# compare_pweall.csv, summary.csv, summary.md and perturb.csv. The run stops
-# with an error (after writing the outputs) when the Python results are
-# missing, when the perturbation check does not give the expected judgements,
-# or when an id of explained.csv is not judged EXPLAINED.
+# compare_two_endpoints.csv, compare_pweall.csv, summary.csv, summary.md and
+# perturb.csv. The run stops with an error (after writing the outputs) when
+# the Python results are missing, when the perturbation check does not give
+# the expected judgements, or when an id of explained.csv is not judged
+# EXPLAINED.
 
 local({
   dir <- if (dir.exists(file.path("inst", "validation"))) {
@@ -54,6 +58,12 @@ local({
   if (!file.exists(file.path(rd, "sim_python.csv"))) {
     problems <- c(problems, "results/sim_python.csv (python/simulate_ms.py) is missing.")
   }
+  if (!file.exists(file.path(rd, "sim_python_two.csv"))) {
+    problems <- c(problems, "results/sim_python_two.csv (python/simulate_two.py) is missing.")
+  }
+  if (!file.exists(file.path(rd, "danzer_check.csv"))) {
+    problems <- c(problems, "results/danzer_check.csv (python/danzer_check.py) is missing.")
+  }
 
   # 2. simulations versus the package
   t0 <- proc.time()[["elapsed"]]
@@ -63,7 +73,18 @@ local({
   cs$note <- ""
   timing["compare_simulation"] <- proc.time()[["elapsed"]] - t0
 
-  # 3. PWEALL
+  # 3. PFS and OS together versus the package
+  t0 <- proc.time()[["elapsed"]]
+  tenv <- new.env(parent = henv)
+  sys.source(file.path(dir, "compare_two_endpoints.R"), envir = tenv)
+  ct <- tenv$compare_two_endpoints()
+  if (!is.null(ct)) {
+    ct$note <- ""
+  }
+  timing["compare_two_endpoints"] <- proc.time()[["elapsed"]] - t0
+  two_src <- c("python_two", "danzer")
+
+  # 4. PWEALL
   t0 <- proc.time()[["elapsed"]]
   penv <- new.env(parent = henv)
   sys.source(file.path(dir, "compare_pweall.R"), envir = penv)
@@ -72,11 +93,16 @@ local({
   if (is.null(cp)) {
     notes <- c(notes, "PWEALL is not installed: the comparison with PWEALL is not made.")
   }
-  all <- rbind(cs, cp)
+  all <- rbind(cs, ct, cp)
   ex <- henv$val_explained()
   j <- henv$val_judge(all, explained = ex$id)
   all <- cbind(all, j)
-  utils::write.csv(all[all$source != "pweall", ], file.path(rd, "compare_simulation.csv"), row.names = FALSE)
+  utils::write.csv(all[!(all$source %in% c("pweall", two_src)), ], file.path(rd, "compare_simulation.csv"),
+                   row.names = FALSE)
+  if (!is.null(ct)) {
+    utils::write.csv(all[all$source %in% two_src, ], file.path(rd, "compare_two_endpoints.csv"),
+                     row.names = FALSE)
+  }
   if (!is.null(cp)) {
     utils::write.csv(all[all$source == "pweall", ], file.path(rd, "compare_pweall.csv"), row.names = FALSE)
   }
@@ -114,6 +140,8 @@ local({
                  ver("FastSurvival"), ver("PWEALL")),
          sprintf("- sim_python.csv md5 %s; sim_fastsurvival.csv md5 %s", md5(file.path(rd, "sim_python.csv")),
                  md5(fs_file)),
+         sprintf("- sim_python_two.csv md5 %s; danzer_check.csv md5 %s",
+                 md5(file.path(rd, "sim_python_two.csv")), md5(file.path(rd, "danzer_check.csv"))),
          sprintf("- Status: %s", if (length(problems)) "CHECKS FAILED" else "all checks passed"),
          if (length(notes)) paste("- Note:", notes), "")
   if (length(problems)) {
@@ -144,7 +172,7 @@ local({
   }
   inf <- all[all$judgement == "INFO" & all$source != "pweall", , drop = FALSE]
   l <- c(l, "## INFO (asymptotic approximations)", "",
-         "Simulated mean (or standard deviation, correlation, rejection rate) and package value; Diff / SE is the difference divided by the Monte Carlo standard error.", "",
+         "Simulated mean (or standard deviation, correlation, rejection rate, or the estimate of Danzer et al. 2025) and package value; Diff / SE is the difference divided by the Monte Carlo standard error.", "",
          hdr, line(inf), "")
   l <- c(l, "## Perturbation check", "",
          sprintf("Package values of the %d judged rows multiplied by 1.1: %d sensitive rows (the 10%% change exceeds the tolerance plus the observed difference), all expected to FAIL; %d other rows (not required to change).",

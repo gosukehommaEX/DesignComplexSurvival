@@ -58,6 +58,13 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   `results/pmvn_genz.csv`.
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
+* `simulate_two.py`: patient-level simulation of PFS and OS together in
+  the validation scenarios V3, V4, V6 and V7 (designs with two endpoints,
+  per-patient covariances from 10 million patients), written to
+  `../results/sim_python_two.csv` (see `../README.md`).
+* `danzer_check.py`: covariance estimator of Danzer et al. (2025) applied
+  to large simulated trials under the global null hypothesis, written to
+  `../results/danzer_check.csv`.
 
 ## Running
 
@@ -69,6 +76,8 @@ python3 expected_mtp.py               # rejection probabilities of two endpoints
 python3 expected_design.py            # designs with two endpoints (about 30 minutes)
 python3 expected_genz.py              # rectangles over both endpoints (about 2 minutes)
 python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
+python3 simulate_two.py               # PFS and OS together, V3, V4, V6, V7 (about 30 minutes)
+python3 danzer_check.py               # estimator of Danzer et al. (2025) (about 2 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and
