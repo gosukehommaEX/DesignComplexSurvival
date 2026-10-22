@@ -10,11 +10,11 @@ different numerical methods:
 | State probabilities, reset clock | closed-form transitions and Gauss-Legendre rules | adaptive quadrature (`scipy.integrate.quad`) over the progression time, transitions by `expm` |
 | Expected events, log-rank mean and information | accrual handled through cumulative integrals and Gauss-Legendre rules | adaptive quadrature with the enrolled fraction inside the integrand |
 | Score covariance under the alternative | per-patient influence functions | formulas of Luo et al. (2019, Section 3.1) as printed, by nested quadrature |
-| Bounds and stopping probabilities | `mvtnorm::pmvnorm()` (Miwa algorithm) | recursive conditioning with adaptive quadrature |
+| Bounds and stopping probabilities | `mvtnorm::pmvnorm()` (Miwa algorithm; Genz-Bretz algorithm with a fixed seed for four or more coordinates whose covariance is not Markov) | recursive conditioning with adaptive quadrature; for covariance matrices that are not Markov, exact recursion for a Markov control plus a quasi-Monte Carlo correction (`ref_markov.py`) |
 | Moments of the score, the observed variance and the event indicator (studentized covariance, stage 2) | cumulative functions on Gauss-Legendre rules, entry by Gauss-Legendre rules | cumulative functions by an ODE solver (`solve_ivp`), entry by adaptive quadrature |
 | Products of the PFS and OS functionals | four terms of counting-process integrals over the PFS and OS times (covariance note, equations (6)-(9)) | Fleischer model: conditioning on the death time; scenarios with switching: Monte Carlo with 10 million patients |
 | Time derivatives of the score mean, information and events | integrals against the accrual density | central differences of the reference moments |
-| Rejection probabilities of two endpoints (`gs_prob_mtp()`) | sums of rectangle probabilities over the outcomes of the first endpoint (Miwa algorithm; Genz-Bretz algorithm with a fixed seed for rectangles over both endpoints with four or more coordinates) | numerical integration over the analyses of the joint density, with the decisions applied on the sample path (canonical joint distribution); for two looks, the formulas of Glimm et al. (2010) as one-dimensional integrals; Monte Carlo with 2 million trials |
+| Rejection probabilities of two endpoints (`gs_prob_mtp()`) | sums of rectangle probabilities over the outcomes of the first endpoint (Miwa algorithm; Genz-Bretz algorithm with a fixed seed for rectangles over both endpoints with four or more coordinates and for other rectangles of four or more coordinates whose covariance is not Markov) | numerical integration over the analyses of the joint density, with the decisions applied on the sample path (canonical joint distribution); for two looks, the formulas of Glimm et al. (2010) as one-dimensional integrals; Monte Carlo with 2 million trials |
 | Designs with two endpoints or with looks driven by the events of different endpoints (`ms_power()`, stage 2) | `.look_times()`, `.design_core2()` and `.fwer_core()` with the functions above | analysis times by root finding on the reference events, moments and covariance from the references above, bounds by recursive conditioning, rejection probabilities as sums over the sample-path outcomes of rectangle probabilities by recursive conditioning with adaptive quadrature (any covariance matrix); Monte Carlo with 4 million trials |
 
 The influence-function derivation used in the R code was checked against the
@@ -56,6 +56,16 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   (`tests/testthat/test-pmvn_genz.R`), by recursive conditioning and by
   quasi-Monte Carlo with scrambled Sobol points, written to
   `results/pmvn_genz.csv`.
+* `ref_markov.py`: stopping probabilities for covariance matrices that need
+  not be Markov (exact recursion for Markov matrices; otherwise the exact
+  values for the Markov completion plus a quasi-Monte Carlo correction with
+  scrambled Sobol points), tensor-product Gauss-Legendre quadrature for at
+  most four looks, and bounds by alpha and beta spending. Also used by
+  tools/check_miwa_accuracy.py in the project folder.
+* `expected_pmvn.py`: expected values for the tests of a covariance that is
+  not Markov (`tests/testthat/helper-pmvn.R`, design V2_K5_T2_alternative of
+  tools/miwa_accuracy.R) and of a binding futility bound that reaches the
+  efficacy bound, written to `results/pmvn.csv`.
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 * `simulate_two.py`: patient-level simulation of PFS and OS together in

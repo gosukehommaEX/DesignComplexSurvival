@@ -5,6 +5,20 @@
 #' efficacy bound (\code{prob_upper}) or falling below the futility bound
 #' (\code{prob_lower}).
 #'
+#' @details
+#' Rectangle probabilities are computed with \code{mvtnorm::pmvnorm()}. The
+#' Miwa algorithm, which is deterministic, is used for rectangles of at most
+#' three coordinates and when the covariance matrix is that of a Markov
+#' sequence (its inverse is tridiagonal), as for statistics with independent
+#' increments. For four or more coordinates with other covariance matrices,
+#' such as those of \code{variance = "alternative"} and \code{"studentized"}
+#' in \code{\link{ms_test}}, the Miwa algorithm was found to be inaccurate,
+#' and the Genz-Bretz algorithm is used, with a fixed seed, so that the
+#' results are reproducible and the random number generator of the session
+#' is not changed, and with an absolute error tolerance of 1e-5 for each
+#' rectangle, which can be changed with
+#' \code{options(DesignComplexSurvival.genz_abseps = ...)}.
+#'
 #' @param lower Futility bounds (\code{-Inf} for none). At the last look the
 #'   bound is usually equal to the efficacy bound.
 #' @param upper Efficacy bounds (\code{Inf} for none).

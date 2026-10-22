@@ -3,8 +3,8 @@
 # conditioning with adaptive quadrature (ref_gsd.mvn_box()). F6 (six
 # coordinates, three looks of each endpoint): quasi-Monte Carlo with the
 # separation of variables of Genz and 24 scramblings of 2^20 Sobol points
-# (three standard errors 3e-9). With 128 grid points, the Miwa algorithm of
-# .pmvn() is off by 9.6e-5 (D1) and 4.5e-4 (F6).
+# (three standard errors 3e-9). With 128 grid points, the Miwa algorithm is
+# off by 9.6e-5 (D1) and 4.5e-4 (F6).
 
 genz_d1 <- list(
   m = c(2.141636271, 2.748018643, 2.034474618, 2.609699421),

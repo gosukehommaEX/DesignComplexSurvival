@@ -48,6 +48,11 @@
 #' \code{"studentized"} agreed best with the simulated standard deviations
 #' and correlations of the statistics.
 #'
+#' With \code{"alternative"} and \code{"studentized"}, the covariance matrix
+#' of the statistics of an endpoint is not that of independent increments,
+#' and the probabilities over four or more of its looks are computed with the
+#' Genz-Bretz algorithm (see \code{\link{gs_prob}}).
+#'
 #' @param alpha One-sided type I error (with two endpoints, the familywise
 #'   error rate).
 #' @param endpoints Tested endpoint, \code{"os"} or \code{"pfs"}, or both in

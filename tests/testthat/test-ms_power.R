@@ -77,6 +77,24 @@ test_that("ms_power with the alternative variance runs and differs little", {
   expect_equal(r1$looks$z_upper, r0$looks$z_upper)
 })
 
+test_that("ms_power with the alternative variance and five looks matches the exact design", {
+  # design V2_K5_T2_alternative of tools/miwa_accuracy.R (helper-pmvn.R);
+  # version 0.2.0 (Miwa algorithm) gave a power of 0.2762 against 0.2724, a
+  # beta spent at look 4 off by 7.4e-5 and a futility bound at look 4 off by
+  # 1.0e-3. The futility bound at look 4 (four coordinates, Genz-Bretz
+  # algorithm with abseps 1e-5) moves by about 1.4e-4 per 1e-5 of beta
+  res <- ms_power(scn_b(), n = 300, looks = ms_looks("os", fraction = (1:5) / 5),
+                  test = ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2,
+                                 beta = 0.1, variance = "alternative"),
+                  events = 150)
+  x <- pmvn_v2k5
+  expect_lt(max(abs(res$looks$z_upper - x$bounds_upper)), 1e-5)
+  expect_lt(max(abs(res$looks$z_lower - x$bounds_lower)), 5e-4)
+  expect_lt(max(abs(res$looks$prob_upper - x$bounds_prob_upper)), 5e-5)
+  expect_lt(max(abs(res$looks$prob_lower - x$bounds_prob_lower)), 5e-5)
+  expect_lt(abs(res$power - x$bounds_power), 5e-5)
+})
+
 test_that("ms_power with the studentized variance uses the event-driven covariance", {
   te <- ms_test(variance = "studentized")
   lk <- ms_looks("os", fraction = c(0.6, 1))

@@ -39,6 +39,32 @@ test_that("beta-spending futility bounds match the reference values", {
                                   2.0140836682405148))), 1e-5)
 })
 
+test_that("beta-spending futility bounds are exact with a covariance that is not Markov", {
+  # design V2_K5_T2_alternative (helper-pmvn.R)
+  x <- pmvn_v2k5
+  b <- with_abseps(gs_bounds(x$info_frac, futility = "beta", sf_fut = "HSD",
+                             param_fut = -2, beta = 0.1, mean = x$mean,
+                             sigma_alt = x$sigma), 1e-6)
+  expect_lt(max(abs(b$upper - x$bounds_upper)), 1e-5)
+  expect_lt(max(abs(b$lower - x$bounds_lower)), 1e-4)
+})
+
+test_that("a binding futility bound that reaches the efficacy bound gives a clear error", {
+  # inst/validation/python/results/pmvn.csv (case CAP): at look 2 a futility
+  # bound equal to the efficacy bound spends 0.00266 of beta, less than the
+  # 0.0167 to spend, so that the futility bound is set to the efficacy bound
+  tf4 <- c(0.25, 0.5, 0.75, 1)
+  mu <- c(2, 5, 7, 9)
+  expect_error(gs_bounds(tf4, sf_eff = "Pocock", futility = "beta", sf_fut = "HSD",
+                         param_fut = -2, beta = 0.1, binding = TRUE, mean = mu),
+               "binding futility bound equals the efficacy bound at look 2")
+  b <- gs_bounds(tf4, sf_eff = "Pocock", futility = "beta", sf_fut = "HSD",
+                 param_fut = -2, beta = 0.1, binding = FALSE, mean = mu)
+  expect_lt(b$lower[1], b$upper[1])
+  expect_equal(b$lower[2], b$upper[2])
+  expect_lt(abs(b$upper[2] - 2.367524295428508), 1e-5)
+})
+
 test_that("gs_bounds agrees with gsDesign::gsDesign()", {
   skip_if_not_installed("gsDesign")
   x1 <- gsDesign::gsDesign(k = 3, test.type = 1, alpha = 0.025,

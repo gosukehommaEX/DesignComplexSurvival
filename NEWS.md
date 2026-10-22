@@ -1,3 +1,25 @@
+# DesignComplexSurvival 0.2.1
+
+* Bug fix: with `variance = "alternative"` or `"studentized"` and four or
+  more looks of an endpoint, the stopping probabilities, the power, the
+  futility bounds by beta spending and the familywise error rates under
+  `null_scenarios` were computed with the Miwa algorithm, which is
+  inaccurate for covariance matrices that are not those of statistics with
+  independent increments (errors of about 1e-3 with four looks and above 0.1
+  with six or more looks, found by comparison with exact values). Rectangle
+  probabilities of four or more coordinates with such a covariance matrix
+  now use the Genz-Bretz algorithm with a fixed seed, in `gs_prob()`,
+  `gs_bounds()` and `gs_prob_mtp()` as well. The default
+  `variance = "null"`, the efficacy bounds, the type I error and designs with
+  at most three looks per endpoint are unchanged.
+* The option for the absolute error tolerance of the Genz-Bretz algorithm is
+  renamed `DesignComplexSurvival.genz_abseps` (formerly
+  `DesignComplexSurvival.mtp_abseps`); the default remains 1e-5.
+* With binding futility bounds, a futility bound that reaches the efficacy
+  bound at an interim look stops every trial there, so that the efficacy
+  bounds of the later looks cannot be computed; the error message now names
+  that look.
+
 # DesignComplexSurvival 0.2.0
 
 * Stage 2 of the development plan: designs that test progression-free

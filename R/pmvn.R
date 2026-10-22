@@ -1,9 +1,17 @@
 #' Multivariate normal probability of a rectangle
 #'
 #' Uses \code{mvtnorm::pmvnorm()} with the Miwa algorithm, which is
-#' deterministic, so that root finding on the bounds is stable. The number
-#' of grid points can be changed with
-#' \code{options(DesignComplexSurvival.miwa_steps = ...)} (default 128).
+#' deterministic, so that root finding on the bounds is stable, for
+#' rectangles of at most three coordinates and for covariance matrices of
+#' Markov sequences (\code{.is_markov()}), such as the correlation of
+#' statistics with independent increments. The number of grid points can be
+#' changed with \code{options(DesignComplexSurvival.miwa_steps = ...)}
+#' (default 128). Rectangles of four or more coordinates with other
+#' covariance matrices, such as those of \code{variance = "alternative"} and
+#' \code{"studentized"}, are computed by \code{.pmvn_genz()}: for them the
+#' Miwa algorithm was found to be inaccurate (errors of about 1e-3 with four
+#' looks and above 0.1 with six or more looks, against exact values computed
+#' in Python by tools/check_miwa_accuracy.py in the project folder).
 #'
 #' When some coordinates have two finite limits and others only one, the
 #' Miwa algorithm of mvtnorm replaces the infinite limits by plus or minus
@@ -27,6 +35,9 @@
       return(stats::pnorm(upper, mean, sd))
     }
     return(max(stats::pnorm(upper, mean, sd) - stats::pnorm(lower, mean, sd), 0))
+  }
+  if (k >= 4L && !.is_markov(sigma)) {
+    return(.pmvn_genz(lower, upper, mean, sigma))
   }
   lo_inf <- is.infinite(lower)
   up_inf <- is.infinite(upper)

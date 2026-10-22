@@ -77,10 +77,18 @@ equation that the probability of continuing to look k and then falling
 below the bound equals the beta spent at look k. The mean may take any
 value at each look, so that non-proportional hazards are allowed. A
 futility bound above the efficacy bound is set to the efficacy bound. At
-the last look the futility bound equals the efficacy bound.
+the last look the futility bound equals the efficacy bound. With
+\code{binding = TRUE}, a futility bound set to the efficacy bound at an
+interim look stops every trial at that look, so that no alpha can be
+spent at the later looks; the function then stops with an error that
+names that look.
 
-All probabilities are computed with \code{mvtnorm::pmvnorm()} and the
-Miwa algorithm.
+The probabilities are computed as in \code{\link{gs_prob}}: with the Miwa
+algorithm for rectangles of at most three coordinates and for covariance
+matrices of Markov sequences, such as the default \code{corr}, and with
+the Genz-Bretz algorithm otherwise (for example for \code{sigma_alt} of
+\code{variance = "alternative"} or \code{"studentized"} with four or more
+looks).
 }
 \examples{
 # O'Brien-Fleming type efficacy bounds at 50, 75 and 100 percent

@@ -18,6 +18,16 @@ test_that("gs_prob matches the reference stopping probabilities", {
                                       0.39769279642227906))), 1e-6)
 })
 
+test_that("gs_prob is exact with five looks and a covariance that is not Markov", {
+  # design V2_K5_T2_alternative (helper-pmvn.R); with the Miwa algorithm
+  # (version 0.2.0) the probabilities of looks 4 and 5 were off by up to
+  # 4.0e-3
+  x <- pmvn_v2k5
+  p <- with_abseps(gs_prob(x$lower, x$upper, x$mean, x$sigma), 1e-6)
+  expect_lt(max(abs(p$prob_upper - x$gs_prob_upper)), 2e-6)
+  expect_lt(max(abs(p$prob_lower - x$gs_prob_lower)), 2e-6)
+})
+
 test_that("gs_prob without futility spends exactly alpha under the null", {
   b <- gs_bounds(c(0.5, 0.75, 1))
   tt <- c(0.5, 0.75, 1)

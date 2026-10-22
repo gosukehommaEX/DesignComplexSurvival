@@ -1,7 +1,9 @@
 #' Efficacy bound at one look under the null hypothesis
 #'
 #' Solves for c so that the probability, under the null hypothesis, of
-#' continuing to look k and then crossing c equals \code{spend}.
+#' continuing to look k and then crossing c equals \code{spend}. Stops with
+#' an error when a binding futility bound at an earlier look equals the
+#' efficacy bound, so that no trial continues to look k.
 #'
 #' @param k Look index.
 #' @param lower_prev,upper_prev Bounds at looks 1 to k - 1 (lower bounds are
@@ -13,6 +15,12 @@
 .solve_upper <- function(k, lower_prev, upper_prev, spend, corr) {
   if (!(spend > 0)) {
     return(Inf)
+  }
+  capped <- which(lower_prev >= upper_prev)
+  if (length(capped) > 0L) {
+    stop(sprintf(paste("Cannot find an efficacy bound at look %d: the binding futility bound",
+                       "equals the efficacy bound at look %d, so that no trial continues to",
+                       "look %d."), k, capped[1L], k), call. = FALSE)
   }
   if (k == 1L) {
     return(stats::qnorm(spend, lower.tail = FALSE))

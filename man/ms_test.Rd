@@ -125,6 +125,11 @@ with PFS and OS tested together, the powers with \code{"null"} and
 Carlo error, \code{"alternative"} gave slightly larger powers, and
 \code{"studentized"} agreed best with the simulated standard deviations
 and correlations of the statistics.
+
+With \code{"alternative"} and \code{"studentized"}, the covariance matrix
+of the statistics of an endpoint is not that of independent increments,
+and the probabilities over four or more of its looks are computed with the
+Genz-Bretz algorithm (see \code{\link{gs_prob}}).
 }
 \examples{
 ms_test()
