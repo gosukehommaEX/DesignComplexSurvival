@@ -34,3 +34,35 @@ pmvn_v2k5 <- list(
   bounds_prob_lower = c(0.007697924232087868, 0.011483953489999895,
                         0.017132045457208218, 0.02555800884360692, 0.6657114824292399),
   bounds_power = 0.27241658554785725)
+
+# Rectangles of 9 and 10 coordinates of tools/miwa_accuracy.R in the project
+# folder: looks at equal information fractions with the correlation of
+# independent increments, mean 2.8 sqrt(t), O'Brien-Fleming type efficacy
+# bounds and, for nine coordinates, continuation intervals from mean - 2 at
+# the first eight looks and crossing of the efficacy bound at the ninth;
+# for ten coordinates, crossing of the efficacy bound at the tenth look
+# without futility bounds. Limits and means rounded to 10 significant
+# digits. Exact probabilities by the Markov recursion of
+# inst/validation/python/expected_pmvn.py (results/pmvn.csv, cases K9 and
+# K10).
+pmvn_corr <- function(k) {
+  tt <- seq_len(k) / k
+  sqrt(outer(tt, tt, pmin) / outer(tt, tt, pmax))
+}
+pmvn_k9 <- list(
+  lower = c(-1.066666667, -0.6800673418, -0.3834192463, -0.1333333333, 0.086996779,
+            0.2861904266, 0.4693678903, 0.6398653164, 2.074017588),
+  upper = c(6.622531106, 4.61271216, 3.712056021, 3.178855076, 2.821696693, 2.562388399,
+            2.363415838, 2.204586649, Inf),
+  mean = c(0.9333333333, 1.319932658, 1.616580754, 1.866666667, 2.086996779, 2.286190427,
+           2.46936789, 2.639865316, 2.8),
+  corr = pmvn_corr(9),
+  exact = 0.089061312288082)
+pmvn_k10 <- list(
+  lower = c(rep(-Inf, 9), 2.081175108),
+  upper = c(6.991351707, 4.87680179, 3.929682519, 3.367079025, 2.989329537, 2.714808617,
+            2.504076879, 2.335828578, 2.197502745, Inf),
+  mean = c(0.8854377448, 1.252198067, 1.533623161, 1.77087549, 1.979898987, 2.168870674,
+           2.342648074, 2.504396135, 2.656313235, 2.8),
+  corr = pmvn_corr(10),
+  exact = 0.08654380846621315)

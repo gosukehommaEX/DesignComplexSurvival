@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,16 @@
       <small>Source: <a href="https://github.com/gosukehommaEX/DesignComplexSurvival/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.2" id="designcomplexsurvival-022">DesignComplexSurvival 0.2.2<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-022"></a></h2>
+<ul><li>Bug fix: rectangle probabilities of nine or more coordinates with two finite limits for some coordinate (designs with futility bounds and nine or more looks of an endpoint) were wrong with the Miwa algorithm of mvtnorm, which leaves out the terms of nine or more coordinates of the inclusion-exclusion over the limits (errors of 7.5e-4 with nine and 6.9e-3 with ten coordinates under the correlation of independent increments, so also with the default <code>variance = "null"</code>). They now use the Genz-Bretz algorithm with a fixed seed. Rectangles with one-sided limits only (no futility bounds) and designs with at most eight looks per endpoint are unchanged.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="designcomplexsurvival-021">DesignComplexSurvival 0.2.1<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-021"></a></h2>
+<ul><li>Bug fix: with <code>variance = "alternative"</code> or <code>"studentized"</code> and four or more looks of an endpoint, the stopping probabilities, the power, the futility bounds by beta spending and the familywise error rates under <code>null_scenarios</code> were computed with the Miwa algorithm, which is inaccurate for covariance matrices that are not those of statistics with independent increments (errors of about 1e-3 with four looks and above 0.1 with six or more looks, found by comparison with exact values). Rectangle probabilities of four or more coordinates with such a covariance matrix now use the Genz-Bretz algorithm with a fixed seed, in <code><a href="../reference/gs_prob.html">gs_prob()</a></code>, <code><a href="../reference/gs_bounds.html">gs_bounds()</a></code> and <code><a href="../reference/gs_prob_mtp.html">gs_prob_mtp()</a></code> as well. The default <code>variance = "null"</code>, the efficacy bounds, the type I error and designs with at most three looks per endpoint are unchanged.</li>
+<li>The option for the absolute error tolerance of the Genz-Bretz algorithm is renamed <code>DesignComplexSurvival.genz_abseps</code> (formerly <code>DesignComplexSurvival.mtp_abseps</code>); the default remains 1e-5.</li>
+<li>With binding futility bounds, a futility bound that reaches the efficacy bound at an interim look stops every trial there, so that the efficacy bounds of the later looks cannot be computed; the error message now names that look.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="designcomplexsurvival-020">DesignComplexSurvival 0.2.0<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-020"></a></h2>
 <ul><li>Stage 2 of the development plan: designs that test progression-free survival (PFS) and overall survival (OS) together.</li>

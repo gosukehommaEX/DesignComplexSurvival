@@ -13,7 +13,7 @@ efficacy bound (prob_upper) or falling below the futility bound
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,6 +78,24 @@ bound is usually equal to the efficacy bound.</p></dd>
     <p>A data frame with <code>look</code>, <code>prob_upper</code>,
   <code>prob_lower</code> and their cumulative sums <code>cum_upper</code> and
   <code>cum_lower</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Rectangle probabilities are computed with <code><a href="https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html" class="external-link">mvtnorm::pmvnorm()</a></code>. The
+Miwa algorithm, which is deterministic, is used for rectangles of at most
+three coordinates and when the covariance matrix is that of a Markov
+sequence (its inverse is tridiagonal), as for statistics with independent
+increments. For four or more coordinates with other covariance matrices,
+such as those of <code>variance = "alternative"</code> and <code>"studentized"</code>
+in <code><a href="ms_test.html">ms_test</a></code>, the Miwa algorithm was found to be inaccurate,
+and for nine or more coordinates with two finite limits for some
+coordinate (futility bounds at eight or more earlier looks), for which
+mvtnorm leaves out terms of the inclusion-exclusion of the Miwa algorithm,
+the Genz-Bretz algorithm is used, with a fixed seed, so that the
+results are reproducible and the random number generator of the session
+is not changed, and with an absolute error tolerance of 1e-5 for each
+rectangle, which can be changed with
+<code>options(DesignComplexSurvival.genz_abseps = ...)</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

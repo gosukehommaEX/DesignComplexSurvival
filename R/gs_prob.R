@@ -13,7 +13,10 @@
 #' increments. For four or more coordinates with other covariance matrices,
 #' such as those of \code{variance = "alternative"} and \code{"studentized"}
 #' in \code{\link{ms_test}}, the Miwa algorithm was found to be inaccurate,
-#' and the Genz-Bretz algorithm is used, with a fixed seed, so that the
+#' and for nine or more coordinates with two finite limits for some
+#' coordinate (futility bounds at eight or more earlier looks), for which
+#' mvtnorm leaves out terms of the inclusion-exclusion of the Miwa algorithm,
+#' the Genz-Bretz algorithm is used, with a fixed seed, so that the
 #' results are reproducible and the random number generator of the session
 #' is not changed, and with an absolute error tolerance of 1e-5 for each
 #' rectangle, which can be changed with

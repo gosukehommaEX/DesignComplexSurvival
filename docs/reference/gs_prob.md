@@ -35,6 +35,26 @@ gs_prob(lower, upper, mean = 0, sigma)
 A data frame with `look`, `prob_upper`, `prob_lower` and their
 cumulative sums `cum_upper` and `cum_lower`.
 
+## Details
+
+Rectangle probabilities are computed with
+[`mvtnorm::pmvnorm()`](https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html).
+The Miwa algorithm, which is deterministic, is used for rectangles of at
+most three coordinates and when the covariance matrix is that of a
+Markov sequence (its inverse is tridiagonal), as for statistics with
+independent increments. For four or more coordinates with other
+covariance matrices, such as those of `variance = "alternative"` and
+`"studentized"` in
+[`ms_test`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md),
+the Miwa algorithm was found to be inaccurate, and for nine or more
+coordinates with two finite limits for some coordinate (futility bounds
+at eight or more earlier looks), for which mvtnorm leaves out terms of
+the inclusion-exclusion of the Miwa algorithm, the Genz-Bretz algorithm
+is used, with a fixed seed, so that the results are reproducible and the
+random number generator of the session is not changed, and with an
+absolute error tolerance of 1e-5 for each rectangle, which can be
+changed with `options(DesignComplexSurvival.genz_abseps = ...)`.
+
 ## See also
 
 [`gs_bounds`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_bounds.md)

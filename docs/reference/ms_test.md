@@ -159,6 +159,12 @@ simulated powers within the Monte Carlo error, `"alternative"` gave
 slightly larger powers, and `"studentized"` agreed best with the
 simulated standard deviations and correlations of the statistics.
 
+With `"alternative"` and `"studentized"`, the covariance matrix of the
+statistics of an endpoint is not that of independent increments, and the
+probabilities over four or more of its looks are computed with the
+Genz-Bretz algorithm (see
+[`gs_prob`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob.md)).
+
 ## References
 
 Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple

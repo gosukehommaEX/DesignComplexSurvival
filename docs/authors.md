@@ -11,13 +11,13 @@ Source:
 [`DESCRIPTION`](https://github.com/gosukehommaEX/DesignComplexSurvival/blob/HEAD/DESCRIPTION)
 
 Homma G (2026). *DesignComplexSurvival: Simulation-Free Design of
-Complex Time-to-Event Trials*. R package version 0.2.0,
+Complex Time-to-Event Trials*. R package version 0.2.2,
 <https://github.com/gosukehommaEX/DesignComplexSurvival>.
 
     @Manual{,
       title = {DesignComplexSurvival: Simulation-Free Design of Complex Time-to-Event Trials},
       author = {Gosuke Homma},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.2.2},
       url = {https://github.com/gosukehommaEX/DesignComplexSurvival},
     }

@@ -99,11 +99,19 @@ probability of continuing to look k and then falling below the bound
 equals the beta spent at look k. The mean may take any value at each
 look, so that non-proportional hazards are allowed. A futility bound
 above the efficacy bound is set to the efficacy bound. At the last look
-the futility bound equals the efficacy bound.
+the futility bound equals the efficacy bound. With `binding = TRUE`, a
+futility bound set to the efficacy bound at an interim look stops every
+trial at that look, so that no alpha can be spent at the later looks;
+the function then stops with an error that names that look.
 
-All probabilities are computed with
-[`mvtnorm::pmvnorm()`](https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html) and
-the Miwa algorithm.
+The probabilities are computed as in
+[`gs_prob`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob.md):
+with the Miwa algorithm for rectangles of at most three coordinates and
+for covariance matrices of Markov sequences, such as the default `corr`,
+and with the Genz-Bretz algorithm otherwise (for example for `sigma_alt`
+of `variance = "alternative"` or `"studentized"` with four or more
+looks, and for nine or more looks with futility bounds at the earlier
+looks).
 
 ## References
 

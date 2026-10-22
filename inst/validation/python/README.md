@@ -64,8 +64,9 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   tools/check_miwa_accuracy.py in the project folder.
 * `expected_pmvn.py`: expected values for the tests of a covariance that is
   not Markov (`tests/testthat/helper-pmvn.R`, design V2_K5_T2_alternative of
-  tools/miwa_accuracy.R) and of a binding futility bound that reaches the
-  efficacy bound, written to `results/pmvn.csv`.
+  tools/miwa_accuracy.R), of a binding futility bound that reaches the
+  efficacy bound and of rectangles of 9 and 10 coordinates
+  (`tests/testthat/test-pmvn.R`), written to `results/pmvn.csv`.
 * `simulate_ms.py`: patient-level simulation of the validation scenarios
   V6-V8, written to `../results/sim_python.csv` (see `../README.md`).
 * `simulate_two.py`: patient-level simulation of PFS and OS together in

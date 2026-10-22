@@ -1,3 +1,16 @@
+# DesignComplexSurvival 0.2.2
+
+* Bug fix: rectangle probabilities of nine or more coordinates with two
+  finite limits for some coordinate (designs with futility bounds and nine
+  or more looks of an endpoint) were wrong with the Miwa algorithm of
+  mvtnorm, which leaves out the terms of nine or more coordinates of the
+  inclusion-exclusion over the limits (errors of 7.5e-4 with nine and 6.9e-3
+  with ten coordinates under the correlation of independent increments, so
+  also with the default `variance = "null"`). They now use the Genz-Bretz
+  algorithm with a fixed seed. Rectangles with one-sided limits only (no
+  futility bounds) and designs with at most eight looks per endpoint are
+  unchanged.
+
 # DesignComplexSurvival 0.2.1
 
 * Bug fix: with `variance = "alternative"` or `"studentized"` and four or

@@ -30,6 +30,7 @@
 #' matrices of Markov sequences, such as the default \code{corr}, and with
 #' the Genz-Bretz algorithm otherwise (for example for \code{sigma_alt} of
 #' \code{variance = "alternative"} or \code{"studentized"} with four or more
+#' looks, and for nine or more looks with futility bounds at the earlier
 #' looks).
 #'
 #' @param info_frac Information fractions used for spending (strictly

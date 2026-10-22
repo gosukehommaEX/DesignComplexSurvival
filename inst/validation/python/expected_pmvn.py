@@ -25,11 +25,23 @@ equal to it, which is below the beta to spend at look 2 (b_inc2), so that
 the futility bound of look 2 is set to the efficacy bound (exact Markov
 recursion).
 
+Cases K9 and K10: rectangles of 9 and 10 coordinates of tools/miwa_accuracy.R
+(looks at equal information fractions with the correlation of independent
+increments, mean 2.8 sqrt(t), limits and means rounded to 10 significant
+digits; tests/testthat/helper-pmvn.R). K9: continuation intervals at the
+first eight looks and crossing of the efficacy bound at the ninth; K10:
+crossing of the efficacy bound at the tenth look without futility bounds.
+Exact probabilities by the Markov recursion; for K9 also the value that the
+inclusion-exclusion over the limits gives without the terms of nine or more
+coordinates (miwa_without_terms), which is what the Miwa algorithm of
+mvtnorm returns.
+
 Output: results/pmvn.csv (a few minutes).
 
 Usage: python3 expected_pmvn.py
 """
 import csv
+import itertools
 import os
 
 import numpy as np
@@ -49,6 +61,43 @@ S5 = np.array([
     [0.4270453018, 0.6085326028, 0.7525497376, 0.8811053347, 0.9915623001]])
 LO5 = np.array([-2.393271892, -2.031302568, -1.523812071, -0.7462330574, 2.031032013])
 UP5 = np.array([4.876884949, 3.357012328, 2.680280071, 2.289816764, 2.031032013])
+LO9 = np.array([-1.066666667, -0.6800673418, -0.3834192463, -0.1333333333, 0.086996779,
+                0.2861904266, 0.4693678903, 0.6398653164, 2.074017588])
+UP9 = np.array([6.622531106, 4.61271216, 3.712056021, 3.178855076, 2.821696693, 2.562388399,
+                2.363415838, 2.204586649, INF])
+M9 = np.array([0.9333333333, 1.319932658, 1.616580754, 1.866666667, 2.086996779, 2.286190427,
+               2.46936789, 2.639865316, 2.8])
+LO10 = np.array([-INF] * 9 + [2.081175108])
+UP10 = np.array([6.991351707, 4.87680179, 3.929682519, 3.367079025, 2.989329537, 2.714808617,
+                 2.504076879, 2.335828578, 2.197502745, INF])
+M10 = np.array([0.8854377448, 1.252198067, 1.533623161, 1.77087549, 1.979898987, 2.168870674,
+                2.342648074, 2.504396135, 2.656313235, 2.8])
+
+
+def corr_of(k):
+    t = np.arange(1, k + 1) / k
+    return np.sqrt(np.minimum.outer(t, t) / np.maximum.outer(t, t))
+
+
+def big_cases():
+    c9 = corr_of(9)
+    # upper crossing at look 9 after the continuation intervals of looks 1-8
+    exact9 = RM.markov_stop(LO9, np.append(UP9[:-1], LO9[-1]), M9, c9)[0][-1]
+    # inclusion-exclusion with the infinite limit replaced by mean + 1000
+    # (as in .pmvn()): sum over the subsets S of coordinates set to their
+    # lower limits of (-1)^|S| P(X < c_S), here the terms of |S| >= 9
+    hi9 = np.where(np.isinf(UP9), M9 + 1000.0, UP9)
+    omitted = 0.0
+    for size in range(9, 10):
+        for sub in itertools.combinations(range(9), size):
+            c = hi9.copy()
+            c[list(sub)] = LO9[list(sub)]
+            lo_last = np.full(9, -INF)
+            lo_last[-1] = c[-1]
+            omitted += (-1) ** size * RM.markov_stop(lo_last, c, M9, c9)[1][-1]
+    c10 = corr_of(10)
+    exact10 = RM.markov_stop(LO10, np.append(UP10[:-1], LO10[-1]), M10, c10)[0][-1]
+    return dict(k9_exact=exact9, k9_miwa_without_terms=exact9 - omitted, k10_exact=exact10)
 
 
 def cap_case():
@@ -101,6 +150,11 @@ if __name__ == "__main__":
     print("cap", cap, flush=True)
     for key, v in cap.items():
         rows.append(("CAP", key, 0, v, ""))
+    big = big_cases()
+    print("big", big, flush=True)
+    rows.append(("K9", "exact", 0, big["k9_exact"], ""))
+    rows.append(("K9", "miwa_without_terms", 0, big["k9_miwa_without_terms"], ""))
+    rows.append(("K10", "exact", 0, big["k10_exact"], ""))
     os.makedirs("results", exist_ok=True)
     with open(os.path.join("results", "pmvn.csv"), "w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")

@@ -12,6 +12,14 @@
 #' Miwa algorithm was found to be inaccurate (errors of about 1e-3 with four
 #' looks and above 0.1 with six or more looks, against exact values computed
 #' in Python by tools/check_miwa_accuracy.py in the project folder).
+#' Rectangles of nine or more coordinates with two finite limits for some
+#' coordinate are also computed by \code{.pmvn_genz()}: for them mvtnorm
+#' computes the Miwa probability by inclusion-exclusion over the limits and
+#' leaves out the terms of nine or more coordinates (errors of 7.5e-4 with
+#' nine and 6.9e-3 with ten coordinates under the correlation of independent
+#' increments, tools/logs/check_switch_accuracy.txt in the project folder).
+#' With one-sided limits only, the Miwa algorithm computes one orthant
+#' probability and is used.
 #'
 #' When some coordinates have two finite limits and others only one, the
 #' Miwa algorithm of mvtnorm replaces the infinite limits by plus or minus
@@ -36,7 +44,8 @@
     }
     return(max(stats::pnorm(upper, mean, sd) - stats::pnorm(lower, mean, sd), 0))
   }
-  if (k >= 4L && !.is_markov(sigma)) {
+  if ((k >= 4L && !.is_markov(sigma)) ||
+      (k >= 9L && any(is.finite(lower) & is.finite(upper)))) {
     return(.pmvn_genz(lower, upper, mean, sigma))
   }
   lo_inf <- is.infinite(lower)

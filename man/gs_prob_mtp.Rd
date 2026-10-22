@@ -90,7 +90,8 @@ with \code{mvtnorm::pmvnorm()} (at most 20 looks in total): with the
 Genz-Bretz algorithm for the rectangles that involve both endpoints and
 have four or more coordinates and, as in \code{\link{gs_prob}}, for the
 other rectangles of four or more coordinates whose covariance matrix is
-not that of a Markov sequence, for which the Miwa algorithm can be
+not that of a Markov sequence and of nine or more coordinates with two
+finite limits for some coordinate, for which the Miwa algorithm can be
 inaccurate, and with the Miwa algorithm otherwise. The Genz-Bretz
 algorithm uses a fixed seed, so that the results are reproducible and the
 random number generator of the session is not changed, and an absolute

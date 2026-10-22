@@ -9,7 +9,7 @@ the approximation of the distribution of the statistics."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -193,6 +193,10 @@ with PFS and OS tested together, the powers with <code>"null"</code> and
 Carlo error, <code>"alternative"</code> gave slightly larger powers, and
 <code>"studentized"</code> agreed best with the simulated standard deviations
 and correlations of the statistics.</p>
+<p>With <code>"alternative"</code> and <code>"studentized"</code>, the covariance matrix
+of the statistics of an endpoint is not that of independent increments,
+and the probabilities over four or more of its looks are computed with the
+Genz-Bretz algorithm (see <code><a href="gs_prob.html">gs_prob</a></code>).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

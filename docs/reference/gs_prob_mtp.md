@@ -108,16 +108,19 @@ multivariate normal distribution, one for each combination of the
 outcome of the first endpoint (rejection or stop for futility at a look,
 or no rejection) and the look at which the second hypothesis is
 rejected. They are computed with
-[`mvtnorm::pmvnorm()`](https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html),
-with the Miwa algorithm, which limits the total number of looks to 20,
-for the rectangles of the first endpoint alone and those with at most
-three coordinates, and with the Genz-Bretz algorithm for the rectangles
-that involve both endpoints and have four or more coordinates, for which
-the Miwa algorithm can be inaccurate. The Genz-Bretz algorithm uses a
-fixed seed, so that the results are reproducible and the random number
-generator of the session is not changed, and an absolute error tolerance
-of 1e-5 for each rectangle, which can be changed with
-`options(DesignComplexSurvival.mtp_abseps = ...)`.
+[`mvtnorm::pmvnorm()`](https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html) (at
+most 20 looks in total): with the Genz-Bretz algorithm for the
+rectangles that involve both endpoints and have four or more coordinates
+and, as in
+[`gs_prob`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob.md),
+for the other rectangles of four or more coordinates whose covariance
+matrix is not that of a Markov sequence and of nine or more coordinates
+with two finite limits for some coordinate, for which the Miwa algorithm
+can be inaccurate, and with the Miwa algorithm otherwise. The Genz-Bretz
+algorithm uses a fixed seed, so that the results are reproducible and
+the random number generator of the session is not changed, and an
+absolute error tolerance of 1e-5 for each rectangle, which can be
+changed with `options(DesignComplexSurvival.genz_abseps = ...)`.
 
 ## References
 
