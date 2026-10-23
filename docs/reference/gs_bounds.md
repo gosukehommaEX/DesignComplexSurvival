@@ -108,10 +108,11 @@ The probabilities are computed as in
 [`gs_prob`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob.md):
 with the Miwa algorithm for rectangles of at most three coordinates and
 for covariance matrices of Markov sequences, such as the default `corr`,
-and with the Genz-Bretz algorithm otherwise (for example for `sigma_alt`
-of `variance = "alternative"` or `"studentized"` with four or more
-looks, and for nine or more looks with futility bounds at the earlier
-looks).
+except for rectangles of nine or more coordinates with two finite limits
+for some coordinate (nine or more looks with futility bounds at the
+earlier looks), and with the Genz-Bretz algorithm otherwise (for example
+for `sigma_alt` of `variance = "alternative"` or `"studentized"` with
+four or more looks).
 
 ## References
 

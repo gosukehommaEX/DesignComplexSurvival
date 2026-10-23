@@ -27,11 +27,12 @@
 #'
 #' The probabilities are computed as in \code{\link{gs_prob}}: with the Miwa
 #' algorithm for rectangles of at most three coordinates and for covariance
-#' matrices of Markov sequences, such as the default \code{corr}, and with
-#' the Genz-Bretz algorithm otherwise (for example for \code{sigma_alt} of
-#' \code{variance = "alternative"} or \code{"studentized"} with four or more
-#' looks, and for nine or more looks with futility bounds at the earlier
-#' looks).
+#' matrices of Markov sequences, such as the default \code{corr}, except for
+#' rectangles of nine or more coordinates with two finite limits for some
+#' coordinate (nine or more looks with futility bounds at the earlier looks),
+#' and with the Genz-Bretz algorithm otherwise (for example for
+#' \code{sigma_alt} of \code{variance = "alternative"} or \code{"studentized"}
+#' with four or more looks).
 #'
 #' @param info_frac Information fractions used for spending (strictly
 #'   increasing and ending at 1).

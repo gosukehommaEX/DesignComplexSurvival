@@ -150,11 +150,12 @@ spent at the later looks; the function then stops with an error that
 names that look.</p>
 <p>The probabilities are computed as in <code><a href="gs_prob.html">gs_prob</a></code>: with the Miwa
 algorithm for rectangles of at most three coordinates and for covariance
-matrices of Markov sequences, such as the default <code>corr</code>, and with
-the Genz-Bretz algorithm otherwise (for example for <code>sigma_alt</code> of
-<code>variance = "alternative"</code> or <code>"studentized"</code> with four or more
-looks, and for nine or more looks with futility bounds at the earlier
-looks).</p>
+matrices of Markov sequences, such as the default <code>corr</code>, except for
+rectangles of nine or more coordinates with two finite limits for some
+coordinate (nine or more looks with futility bounds at the earlier looks),
+and with the Genz-Bretz algorithm otherwise (for example for
+<code>sigma_alt</code> of <code>variance = "alternative"</code> or <code>"studentized"</code>
+with four or more looks).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
