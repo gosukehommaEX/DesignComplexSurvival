@@ -35,3 +35,33 @@ test_that("ms_surv returns consistent hazards and handles a single endpoint", {
   expect_equal(e$haz, c(0.05, 0.02), tolerance = 1e-14)
   expect_error(ms_surv(m, -1), "nonnegative")
 })
+
+# Expected values of version 0.3.0: inst/validation/python/results/model5_states.csv
+
+test_that("ms_surv matches the reference values with the options of version 0.3.0", {
+  ex <- expected_csv("model5_states.csv")
+  ex <- ex[ex$pfs_switch == "event", ]
+  for (name in unique(ex$model)) {
+    for (clock in c("reset", "forward")) {
+      e <- ex[ex$model == name & ex$clock == clock, ]
+      m <- models_s3(name, clock)
+      os <- ms_surv(m, e$time, "os")
+      expect_lt(max(abs(os$surv - e$os_surv)), 1e-10)
+      expect_lt(max(abs(os$dens - e$os_dens)), 1e-10)
+      pfs <- ms_surv(m, e$time, "pfs")
+      expect_lt(max(abs(pfs$surv - e$pfs_surv)), 1e-10)
+      expect_lt(max(abs(pfs$dens - e$pfs_dens)), 1e-10)
+    }
+  }
+})
+
+test_that("ms_surv gives PFS to progression or death whatever pfs_switch", {
+  s <- scn_s3("PRC")
+  tt <- c(2, 10)
+  expect_equal(ms_surv(s$control, tt, "pfs"), ms_surv(models_s3("P"), tt, "pfs"))
+  h <- 1e-5
+  a <- ms_surv(models_s3("P2", "forward"), c(2.5, 12.5) + h, "os")$surv
+  b <- ms_surv(models_s3("P2", "forward"), c(2.5, 12.5) - h, "os")$surv
+  expect_equal(ms_surv(models_s3("P2", "forward"), c(2.5, 12.5), "os")$dens, (b - a) / (2 * h),
+               tolerance = 1e-7)
+})

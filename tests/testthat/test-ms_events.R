@@ -49,3 +49,17 @@ test_that("ms_events agrees with lrstat::lrstat()", {
   expect_lt(rel_diff(eb$events_control, lr$nevents2), 1e-6)
   expect_lt(rel_diff(eb$dropouts_treatment, lr$ndropouts1), 1e-6)
 })
+
+# Expected values of version 0.3.0: inst/validation/python/results/model5_events.csv
+# (adaptive quadrature with the enrolled fraction inside the integrand)
+
+test_that("ms_events matches the reference values with the options of version 0.3.0", {
+  ex <- expected_csv("model5_events.csv")
+  for (i in seq_len(nrow(ex))) {
+    e <- ex[i, ]
+    ev <- ms_events(scn_s3(e$scenario), n = e$n, calendar_time = e$time, endpoint = e$endpoint)
+    got <- c(ev$events_control, ev$events_treatment, ev$dropouts_control, ev$dropouts_treatment)
+    ref <- c(e$events_control, e$events_treatment, e$dropouts_control, e$dropouts_treatment)
+    expect_lt(max(abs(got - ref)), 1e-8)
+  }
+})

@@ -25,5 +25,12 @@
     stop("The scenarios of 'null_scenarios' must have the allocation and accrual of 'scenario'.",
          call. = FALSE)
   }
+  same_pfs <- vapply(null_scenarios, function(s) {
+    identical(s$pfs_switch, scenario$pfs_switch)
+  }, logical(1))
+  if (!all(same_pfs)) {
+    stop("The scenarios of 'null_scenarios' must have the 'pfs_switch' of 'scenario'.",
+         call. = FALSE)
+  }
   invisible(TRUE)
 }

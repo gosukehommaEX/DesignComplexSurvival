@@ -25,7 +25,10 @@ survival implied by an \code{ms_model}, without dropout.
 \details{
 PFS has the hazard \code{prog + death}. OS combines death before
 progression with death after progression, with or without switch; its
-hazard is not piecewise constant when \code{prog} is positive.
+hazard is not piecewise constant when \code{prog} is positive. With a
+switch before progression (\code{switch_pre}), PFS is the time to
+progression or death whatever \code{pfs_switch} of
+\code{\link{ms_scenario}}, and its hazard is not piecewise constant.
 }
 \examples{
 m <- ms_fleischer(median_pfs = 6, median_os = 15)

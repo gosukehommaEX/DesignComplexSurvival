@@ -16,6 +16,8 @@ different numerical methods:
 | Time derivatives of the score mean, information and events | integrals against the accrual density | central differences of the reference moments |
 | Rejection probabilities of two endpoints (`gs_prob_mtp()`) | sums of rectangle probabilities over the outcomes of the first endpoint (Miwa algorithm; Genz-Bretz algorithm with a fixed seed for rectangles over both endpoints with four or more coordinates and for other rectangles of four or more coordinates whose covariance is not Markov) | numerical integration over the analyses of the joint density, with the decisions applied on the sample path (canonical joint distribution); for two looks, the formulas of Glimm et al. (2010) as one-dimensional integrals; Monte Carlo with 2 million trials |
 | Designs with two endpoints or with looks driven by the events of different endpoints (`ms_power()`, stage 2) | `.look_times()`, `.design_core2()` and `.fwer_core()` with the functions above | analysis times by root finding on the reference events, moments and covariance from the references above, bounds by recursive conditioning, rejection probabilities as sums over the sample-path outcomes of rectangle probabilities by recursive conditioning with adaptive quadrature (any covariance matrix); Monte Carlo with 4 million trials |
+| Model options of stage 3 (switch clock, AFT effect of the switch, switch before progression, censoring of PFS only) | closed forms on the pieces of the intensities (`.post_general()`, `.pre_states()`, `.from_state5()`) and Gauss-Legendre rules | adaptive quadrature over the switch, progression and switch-before-progression times (`ref_model5.py`); products of matrix exponentials for Markov models |
+| Products of the PFS and OS functionals with a switch before progression or a censoring of PFS only | terms C1 to C4 of the covariance note split by the progression-free state (addendum of the covariance note) | Markov models: state probabilities, generator and transition matrices with nested adaptive quadrature over the PFS and OS times (`ref_cross5.py`); other models: Monte Carlo with 10 million patients |
 
 The influence-function derivation used in the R code was checked against the
 formulas of Luo et al. (2019) in Python (function `influence_cov()` in
@@ -76,6 +78,19 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
 * `danzer_check.py`: covariance estimator of Danzer et al. (2025) applied
   to large simulated trials under the global null hypothesis, written to
   `../results/danzer_check.csv`.
+* `ref_model5.py`: multistate model of one group with the options of
+  stage 3 (`switch_clock`, `switch_af`, `switch_pre`, `prog_switch`,
+  `death_switch_pre`, `dropout_pfs` and `pfs_switch`), by adaptive
+  quadrature over the switch and progression times and, for Markov models,
+  by matrix exponentials; patient-level simulation of the model.
+* `ref_cross5.py`: products of the PFS and OS functionals for Markov models
+  of `ref_model5.py` (state probabilities, generator and transition
+  matrices, nested adaptive quadrature).
+* `expected_model5.py`: expected values for the tests of the options of
+  stage 3, written to `results/model5_*.csv` (models and scenarios of
+  `models_s3()`, `model_post_s3()` and `scn_s3()` in
+  `tests/testthat/helper-scenarios.R`), including the Monte Carlo check
+  `results/model5_cross_mc.csv`.
 
 ## Running
 
@@ -89,6 +104,7 @@ python3 expected_genz.py              # rectangles over both endpoints (about 2 
 python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 minutes)
 python3 simulate_two.py               # PFS and OS together, V3, V4, V6, V7 (about 30 minutes)
 python3 danzer_check.py               # estimator of Danzer et al. (2025) (about 2 minutes)
+python3 expected_model5.py            # model options of stage 3 (about 10 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and

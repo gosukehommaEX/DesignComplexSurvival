@@ -6,7 +6,10 @@
 #' of A(t - s) f_g(s) G_g(s), where A is the enrolled fraction, f_g the
 #' density of the endpoint and G_g the probability of no dropout. The
 #' expected number of dropouts is obtained in the same way with the dropout
-#' density.
+#' density. For PFS, the dropouts include the censoring of PFS only
+#' (\code{dropout_pfs} of \code{\link{ms_model}}) and, with
+#' \code{pfs_switch = "censor"} in \code{\link{ms_scenario}}, the censoring
+#' at a switch before progression.
 #'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.

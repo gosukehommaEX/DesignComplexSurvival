@@ -4,14 +4,22 @@
 #' progressed without switch (2), switched (3) and dead (4), between the
 #' clock values \code{from} and \code{to}. The clock is the time since
 #' randomization for \code{clock = "forward"} and the time since progression
-#' for \code{clock = "reset"}; the caller supplies the clock values.
+#' for \code{clock = "reset"}; the caller supplies the clock values. With
+#' \code{switch_clock = "switch"} or an accelerated failure time effect of
+#' the switch, the quantities are computed by \code{.post_general()}.
 #'
 #' @param model An \code{ms_model} object.
 #' @param from,to Numeric vectors of equal length with \code{from <= to}.
-#' @return A list with \code{r22}, \code{r23}, \code{r33} and the death
-#'   hazards \code{c_to} (state 2) and \code{d_to} (state 3) at \code{to}.
+#' @return A list with \code{r22}, \code{r23}, \code{r33}, the death
+#'   hazards \code{c_to} (state 2) and \code{d_to} (after a switch at
+#'   progression) at \code{to}, and the death density \code{f23} at
+#'   \code{to} of the patients who switched after progression.
 #' @noRd
 .post_trans <- function(model, from, to) {
+  if (identical(model$switch_clock, "switch") ||
+      (!is.null(model$switch_af) && model$switch_af != 1)) {
+    return(.post_general(model, from, to))
+  }
   tp <- model$time_post
   y <- model$switch_rate + model$death_prog
   d <- model$death_switch
@@ -33,7 +41,8 @@
     }
     r23 <- pmax(r23, 0)
   }
+  d_to <- .pw_value(to, tp, d)
   list(r22 = r22, r23 = r23, r33 = r33,
        c_to = .pw_value(to, tp, model$death_prog),
-       d_to = .pw_value(to, tp, d))
+       d_to = d_to, f23 = r23 * d_to)
 }

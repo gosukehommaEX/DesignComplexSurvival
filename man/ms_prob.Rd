@@ -14,10 +14,14 @@ ms_prob(model, time)
 \value{
 A data frame with \code{time} and the probabilities
   \code{progression_free}, \code{progressed} (without switch),
-  \code{switched} and \code{dead}.
+  \code{switched} and \code{dead}. With \code{switch_pre} positive in
+  some interval, \code{progression_free} is the probability of being
+  progression-free without a switch, and the column
+  \code{progression_free_switched} (progression-free after a switch
+  before progression) follows it.
 }
 \description{
-Probabilities of being in each state of the four-state model at given
+Probabilities of being in each state of the multistate model at given
 times since randomization, without dropout.
 }
 \details{
@@ -27,7 +31,9 @@ death. The probabilities of the progressed and switched states are
 integrals over the time of progression of the progression density times
 the transition probabilities after progression, which have closed forms
 for piecewise constant intensities. The integrals are computed with
-Gauss-Legendre rules.
+Gauss-Legendre rules. With a switch before progression, the probability
+of the switched progression-free state also has a closed form, and the
+switched state includes the patients who progressed after such a switch.
 }
 \examples{
 m <- ms_model(time = c(0, 6), prog = c(0.10, 0.08), death = 0.01,

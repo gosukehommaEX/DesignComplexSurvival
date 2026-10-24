@@ -18,6 +18,10 @@ print.ms_scenario <- function(x, ...) {
   print(x$control)
   cat("\nTreatment group. ")
   print(x$treatment)
+  if (any(c(x$control$switch_pre, x$treatment$switch_pre) > 0)) {
+    cat(sprintf("\nPFS at a switch before progression: %s\n",
+                if (identical(x$pfs_switch, "censor")) "censored" else "followed up"))
+  }
   cat("\n")
   print(x$accrual)
   invisible(x)

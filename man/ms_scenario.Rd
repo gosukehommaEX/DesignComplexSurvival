@@ -4,7 +4,13 @@
 \alias{ms_scenario}
 \title{Two-group trial scenario}
 \usage{
-ms_scenario(control, treatment, allocation = 1, accrual)
+ms_scenario(
+  control,
+  treatment,
+  allocation = 1,
+  accrual,
+  pfs_switch = c("event", "censor")
+)
 }
 \arguments{
 \item{control, treatment}{\code{ms_model} objects of the control and
@@ -14,15 +20,29 @@ treatment groups.}
 for 2:1).}
 
 \item{accrual}{An \code{ms_accrual} object.}
+
+\item{pfs_switch}{Definition of PFS at a switch before progression:
+\code{"event"} (followed up to progression or death) or \code{"censor"}
+(censored at the switch). It applies to both groups.}
 }
 \value{
 An object of class \code{ms_scenario}, a list with the two
   models, \code{allocation}, the allocation probabilities \code{prob}
-  (control, treatment) and \code{accrual}.
+  (control, treatment), \code{accrual} and \code{pfs_switch}. The models
+  carry \code{pfs_switch} as well.
 }
 \description{
 Combines the models of the control and treatment groups, the allocation
 ratio and the accrual.
+}
+\details{
+\code{pfs_switch} defines PFS for patients who switch before progression
+(\code{switch_pre} in \code{\link{ms_model}}). With \code{"event"}, the
+switch does not change the definition: PFS is the time to progression or
+death. With \code{"censor"}, PFS is censored at the switch (for example
+when the start of a new treatment censors PFS); the log-rank test of PFS
+then compares the hazard \code{prog + death} of the patients who are
+progression-free and have not switched.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)

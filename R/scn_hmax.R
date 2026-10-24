@@ -10,7 +10,9 @@
 #' @noRd
 .scn_hmax <- function(scenario, span) {
   lam <- unlist(lapply(list(scenario$control, scenario$treatment), function(x) {
-    c(x$prog + x$death + x$dropout, x$switch_rate + x$death_prog, x$death_switch)
+    c(x$prog + x$death + x$dropout + x$switch_pre + x$dropout_pfs,
+      x$switch_rate + x$death_prog, x$death_switch,
+      x$prog_switch + x$death_switch_pre)
   }))
   max(2 / max(lam, 1e-12), span / 400)
 }

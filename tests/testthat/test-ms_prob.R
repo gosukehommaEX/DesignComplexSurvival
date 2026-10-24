@@ -46,3 +46,38 @@ test_that("ms_prob without progression is exponential", {
   expect_equal(p$dead, 1 - exp(-0.1 * c(0, 5)), tolerance = 1e-14)
   expect_error(ms_prob(list(), 1), "ms_model")
 })
+
+# Expected values of version 0.3.0: inst/validation/python/results/model5_states.csv
+# (ref_model5.py: adaptive quadrature over the switch and progression times)
+
+test_that("ms_prob matches the reference values with the options of version 0.3.0", {
+  ex <- expected_csv("model5_states.csv")
+  ex <- ex[ex$pfs_switch == "event", ]
+  for (name in unique(ex$model)) {
+    for (clock in c("reset", "forward")) {
+      e <- ex[ex$model == name & ex$clock == clock, ]
+      p <- ms_prob(models_s3(name, clock), e$time)
+      ref <- as.matrix(e[, c("p1", "p5", "p2", "p3", "p4")])
+      got <- if (is.null(p$progression_free_switched)) {
+        cbind(p$progression_free, 0, p$progressed, p$switched, p$dead)
+      } else {
+        cbind(p$progression_free, p$progression_free_switched, p$progressed, p$switched,
+              p$dead)
+      }
+      expect_lt(max(abs(got - ref)), 1e-10)
+    }
+  }
+})
+
+test_that("ms_prob adds the switched progression-free state only with a switch before progression", {
+  tt <- c(1, 6, 20)
+  p <- ms_prob(models_s3("P"), tt)
+  expect_identical(names(p), c("time", "progression_free", "progression_free_switched",
+                               "progressed", "switched", "dead"))
+  expect_lt(max(abs(rowSums(p[, -1]) - 1)), 1e-12)
+  expect_identical(names(ms_prob(models_s3("A06"), tt)),
+                   c("time", "progression_free", "progressed", "switched", "dead"))
+  z <- ms_prob(models_s3("Z"), tt)
+  expect_equal(z$progressed, c(0, 0, 0))
+  expect_true(all(z$switched > 0))
+})
