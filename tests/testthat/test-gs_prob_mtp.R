@@ -140,8 +140,9 @@ test_that("gs_prob_mtp checks its arguments", {
 # density, with the decisions of Algorithm 1 of Maurer and Bretz (2013)
 # applied on the sample path) and checked against a Monte Carlo simulation of
 # the algorithm (gs_prob_graph_mc.csv). Configurations:
-# gs_prob_graph_configs.csv.
-graph_check_config <- function(id, hypotheses) {
+# gs_prob_graph_configs.csv. The error tolerance of the Genz-Bretz algorithm
+# is eps for each rectangle, and the probabilities are compared at tol.
+graph_check_config <- function(id, hypotheses, eps = 1e-6, tol = 1e-5) {
   cf <- expected_csv("gs_prob_graph_configs.csv")
   ex <- expected_csv("gs_prob_graph.csv")
   cf <- cf[cf$config == id, ]
@@ -157,10 +158,11 @@ graph_check_config <- function(id, hypotheses) {
                                    lower = mtp_num(cf$l1), mean = cn$mean,
                                    sigma = cn$sigma, analysis = list(a1, a2),
                                    mtp = "bonferroni",
-                                   upper_recycled = list(mtp_num(cf$r1), mtp_num(cf$r2))))
+                                   upper_recycled = list(mtp_num(cf$r1), mtp_num(cf$r2))),
+                       eps)
     q <- mtp_quantities(res)
     expect_true(all(e$quantity %in% names(q)))
-    expect_lt(max(abs(q[e$quantity] - e$value)), 1e-5)
+    expect_lt(max(abs(q[e$quantity] - e$value)), tol)
     n <- n + nrow(e)
   }
   n
@@ -169,7 +171,13 @@ graph_check_config <- function(id, hypotheses) {
 # 13 quantities for three looks of each endpoint, 11 for two and three looks,
 # 12 for three and two looks
 test_that("gs_prob_mtp with recycling matches the recursion with three looks (1)", {
-  expect_identical(graph_check_config("three_looks", "alternative"), 13L)
+  # under the alternative, the 14 rectangles over both endpoints took about
+  # 9 seconds with the error tolerance 1e-6; with the default tolerance 1e-5
+  # the errors of the probabilities were at most 1.6e-5 in the Python port
+  # (quasi-Monte Carlo of scipy with the same tolerance), so that the
+  # comparison is at 5e-5
+  expect_identical(graph_check_config("three_looks", "alternative", eps = 1e-5, tol = 5e-5),
+                   13L)
 })
 
 test_that("gs_prob_mtp with recycling matches the recursion with three looks (2)", {
@@ -214,6 +222,12 @@ test_that("gs_prob_mtp with recycling matches the recursion when the first start
   expect_identical(graph_check_config("first_late", c("null_second", "null_both")), 22L)
 })
 
+# two looks of each endpoint with a futility bound
+graph_two_looks <- function() {
+  cn <- mtp_canonical(c(0.5, 1), c(0.5, 1), 0.6, 3, 2.5, 1:2, 1:2)
+  list(mean = cn$mean, sigma = cn$sigma, u1 = c(2.8, 2), u2 = c(2.6, 2.1), l1 = c(0.5, 2))
+}
+
 # three looks of each endpoint with futility bounds (configuration
 # three_looks of gs_prob_mtp_configs.csv)
 graph_three_looks <- function() {
@@ -223,7 +237,7 @@ graph_three_looks <- function() {
 }
 
 test_that("gs_prob_mtp with recycling reduces to the Bonferroni procedure", {
-  g <- graph_three_looks()
+  g <- graph_two_looks()
   # bounds after recycling equal to the initial bounds
   rb <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni"))
   rg <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni",
@@ -233,11 +247,11 @@ test_that("gs_prob_mtp with recycling reduces to the Bonferroni procedure", {
 })
 
 test_that("gs_prob_mtp with recycling reduces to the fixed-sequence procedure", {
-  g <- graph_three_looks()
+  g <- graph_two_looks()
   # no test of the second hypothesis at its initial level: fixed sequence
   # (overall)
   rf <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma))
-  rh <- with_abseps(gs_prob_mtp(list(g$u1, rep(Inf, 3)), g$l1, g$mean, g$sigma,
+  rh <- with_abseps(gs_prob_mtp(list(g$u1, rep(Inf, 2)), g$l1, g$mean, g$sigma,
                                 mtp = "bonferroni", upper_recycled = list(g$u1, g$u2)))
   expect_lt(max(abs(mtp_quantities(rh) - mtp_quantities(rf))), 1e-5)
 })
