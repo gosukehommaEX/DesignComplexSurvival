@@ -169,10 +169,14 @@ graph_check_config <- function(id, hypotheses) {
 # 13 quantities for three looks of each endpoint, 11 for two and three looks,
 # 12 for three and two looks
 test_that("gs_prob_mtp with recycling matches the recursion with three looks (1)", {
-  expect_identical(graph_check_config("three_looks", c("alternative", "null_first")), 26L)
+  expect_identical(graph_check_config("three_looks", "alternative"), 13L)
 })
 
 test_that("gs_prob_mtp with recycling matches the recursion with three looks (2)", {
+  expect_identical(graph_check_config("three_looks", "null_first"), 13L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with three looks (3)", {
   expect_identical(graph_check_config("three_looks", c("null_second", "null_both")), 26L)
 })
 
@@ -210,26 +214,41 @@ test_that("gs_prob_mtp with recycling matches the recursion when the first start
   expect_identical(graph_check_config("first_late", c("null_second", "null_both")), 22L)
 })
 
-test_that("gs_prob_mtp with recycling reduces to the Bonferroni and fixed-sequence procedures", {
+# three looks of each endpoint with futility bounds (configuration
+# three_looks of gs_prob_mtp_configs.csv)
+graph_three_looks <- function() {
   cn <- mtp_canonical(c(0.4, 0.7, 1), c(0.4, 0.7, 1), 0.6, 3, 2.5, 1:3, 1:3)
-  u1 <- c(3, 2.4, 2)
-  u2 <- c(2.6, 2.3, 2.1)
-  l1 <- c(0, 1, 2)
-  # bounds after recycling equal to the initial bounds: Bonferroni
-  rb <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni"))
-  rg <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni",
-                                upper_recycled = list(u1, u2)))
+  list(mean = cn$mean, sigma = cn$sigma, u1 = c(3, 2.4, 2), u2 = c(2.6, 2.3, 2.1),
+       l1 = c(0, 1, 2))
+}
+
+test_that("gs_prob_mtp with recycling reduces to the Bonferroni procedure", {
+  g <- graph_three_looks()
+  # bounds after recycling equal to the initial bounds
+  rb <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni"))
+  rg <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni",
+                                upper_recycled = list(g$u1, g$u2)))
   expect_lt(max(abs(mtp_quantities(rg) - mtp_quantities(rb))), 1e-5)
   expect_identical(rg$looks[, 1:3], rb$looks[, 1:3])
+})
+
+test_that("gs_prob_mtp with recycling reduces to the fixed-sequence procedure", {
+  g <- graph_three_looks()
   # no test of the second hypothesis at its initial level: fixed sequence
   # (overall)
-  rf <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma))
-  rh <- with_abseps(gs_prob_mtp(list(u1, rep(Inf, 3)), l1, cn$mean, cn$sigma,
-                                mtp = "bonferroni", upper_recycled = list(u1, u2)))
+  rf <- with_abseps(gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma))
+  rh <- with_abseps(gs_prob_mtp(list(g$u1, rep(Inf, 3)), g$l1, g$mean, g$sigma,
+                                mtp = "bonferroni", upper_recycled = list(g$u1, g$u2)))
   expect_lt(max(abs(mtp_quantities(rh) - mtp_quantities(rf))), 1e-5)
-  # lower bounds after recycling: each hypothesis is rejected more often
-  rr <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni",
-                                upper_recycled = list(u1 - 0.3, u2 - 0.3)))
+})
+
+test_that("gs_prob_mtp rejects more often with lower bounds after recycling", {
+  # default error tolerance of the Genz-Bretz algorithm (1e-5), enough for
+  # differences above 0.01
+  g <- graph_three_looks()
+  rb <- gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni")
+  rr <- gs_prob_mtp(list(g$u1, g$u2), g$l1, g$mean, g$sigma, mtp = "bonferroni",
+                    upper_recycled = list(g$u1 - 0.3, g$u2 - 0.3))
   expect_gt(rr$reject[["first"]], rb$reject[["first"]] + 0.01)
   expect_gt(rr$reject[["second"]], rb$reject[["second"]] + 0.01)
   expect_equal(unname(rr$reject["any"]),
