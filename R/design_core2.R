@@ -10,9 +10,12 @@
 #' information fractions of the looks at which the endpoint is tested and the
 #' null correlations sqrt(d_j / d_k) of its expected events, at level alpha
 #' (fixed sequence) or w_k alpha (Bonferroni). Futility bounds are computed for
-#' the first endpoint only. The rejection probabilities are computed by
-#' \code{gs_prob_mtp()} with the mean vector and covariance matrix of
-#' \code{.zeta_cov()}.
+#' the first endpoint only. With recycling of the level
+#' (\code{test$transition}), the bounds at the level after recycling are
+#' computed by \code{.recycled_upper()}, with the binding futility bounds for
+#' the first endpoint when they are binding. The rejection probabilities are
+#' computed by \code{gs_prob_mtp()} with the mean vector and covariance matrix
+#' of \code{.zeta_cov()}.
 #'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.
@@ -86,10 +89,24 @@
                           binding = test$binding, mean = core$z_mean, corr = corr0,
                           sigma_alt = sigma[idx[[1L]], idx[[1L]], drop = FALSE])
   }
+  up_r <- NULL
+  tr <- test$transition
+  if (test$mtp == "bonferroni" && !is.null(tr) && any(tr > 0)) {
+    lev <- test$alpha * (test$weights + rev(tr * test$weights))
+    up_r <- lapply(1:2, function(j) {
+      if (!(lev[j] > alpha_e[j])) {
+        return(bnd[[j]]$upper)
+      }
+      d <- cores[[j]]$events
+      lw <- if (j == 1L && test$binding && test$futility != "none") bnd[[1L]]$lower
+      .recycled_upper(bnd[[j]]$info_frac, lev[j], test$sf_eff[j], test$param_eff[[j]],
+                      sqrt(outer(d, d, pmin) / outer(d, d, pmax)), bnd[[j]]$upper, lw, eps[j])
+    })
+  }
   lower <- if (test$futility == "none") NULL else bnd[[1L]]$lower
   pr <- gs_prob_mtp(list(bnd[[1L]]$upper, bnd[[2L]]$upper), lower = lower, mean = mean,
                     sigma = sigma, analysis = unname(tl), mtp = test$mtp,
-                    hierarchical = test$hierarchical)
+                    hierarchical = test$hierarchical, upper_recycled = up_r)
   out <- do.call(rbind, lapply(1:2, function(j) {
     core <- cores[[j]]
     b <- bnd[[j]]
@@ -98,7 +115,7 @@
     hr_lower <- exp(-b$lower / root_info)
     hr_lower[is.infinite(b$lower)] <- NA_real_
     pj <- pr$looks[pr$looks$endpoint == j, ]
-    data.frame(endpoint = eps[j], look = lks, trigger = lk$trigger[lks],
+    df <- data.frame(endpoint = eps[j], look = lks, trigger = lk$trigger[lks],
                time = times[lks], enrolled = n * .acc_frac(acc, times[lks]),
                events = core$events, events_control = core$events_control,
                events_treatment = core$events_treatment, info_frac = b$info_frac,
@@ -109,6 +126,13 @@
                prob_lower = pj$prob_lower, cum_power = pj$cum_upper,
                alpha_spent = b$alpha_spent, events_trigger = lt$target[lks],
                stringsAsFactors = FALSE)
+    if (!is.null(up_r)) {
+      pos <- match("hr_upper", names(df))
+      df <- cbind(df[seq_len(pos)], z_upper_recycled = up_r[[j]],
+                  p_upper_recycled = stats::pnorm(up_r[[j]], lower.tail = FALSE),
+                  df[-seq_len(pos)])
+    }
+    df
   }))
   rownames(out) <- NULL
   rj <- pr$reject
@@ -125,10 +149,12 @@
                               weights = test$weights, hierarchical = test$hierarchical,
                               mean = test$mean, variance = test$variance,
                               futility = test$futility, binding = test$binding,
-                              spending_time = test$spending_time, alpha = test$alpha),
+                              spending_time = test$spending_time, alpha = test$alpha,
+                              transition = test$transition),
               scenario = scenario, looks_def = looks, test = test)
   if (type1) {
-    fw <- .fwer_core(scenario, acc, lk, lt$target, tl, test, bnd, null_scenarios)
+    fw <- .fwer_core(scenario, acc, lk, lt$target, tl, test, bnd, null_scenarios,
+                     upper_recycled = up_r)
     res$type1 <- fw$type1
     res$fwer <- fw$fwer
     res$looks$cum_alpha <- fw$cum_alpha

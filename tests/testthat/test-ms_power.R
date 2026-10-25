@@ -221,3 +221,79 @@ test_that("ms_power with two endpoints checks its input", {
   lo <- ms_looks("os", fraction = c(0.5, 1), test = list("os", c("pfs", "os")))
   expect_error(ms_power(scn, 400, lo, ms_test(), events = 220), "PFS")
 })
+
+test_that("ms_power with recycling of the level computes the bounds at both levels", {
+  res <- with_abseps(run_design("D5"))
+  lk <- res$looks
+  pos <- match("hr_upper", names(lk))
+  expect_identical(names(lk)[pos + 1:2], c("z_upper_recycled", "p_upper_recycled"))
+  expect_identical(res$settings$transition, c(1, 1))
+  # level alpha after recycling for both endpoints (weights 0.8 and 0.2, full
+  # recycling); the bounds at the initial levels are those of design D2
+  for (j in 1:2) {
+    r <- lk[lk$endpoint == c("pfs", "os")[j], ]
+    corr <- sqrt(outer(r$events, r$events, pmin) / outer(r$events, r$events, pmax))
+    b <- gs_bounds(r$info_frac, alpha = 0.025, sf_eff = c("OF", "Pocock")[j], corr = corr)
+    expect_equal(r$z_upper_recycled, b$upper, tolerance = 1e-10)
+    expect_equal(r$p_upper_recycled, b$nominal_p, tolerance = 1e-10)
+    expect_true(all(r$z_upper_recycled < r$z_upper))
+  }
+  e <- design_expected("D2", "z_upper")
+  expect_lt(max(abs(looks_value(res, e, "z_upper") - e$value)), 1e-5)
+  # a hypothesis is first rejected at its initial level, so that the
+  # probability of rejecting at least one hypothesis is that of design D2,
+  # under the design scenario and under the global null hypothesis
+  e <- design_expected("D2", "power")
+  d2 <- stats::setNames(e$value, e$endpoint)
+  expect_lt(abs(res$power[["any"]] - d2[["any"]]), 1e-5)
+  expect_gt(res$power[["pfs"]], d2[["pfs"]] + 0.003)
+  expect_gt(res$power[["os"]], d2[["os"]] + 0.05)
+  for (b in c("nonbinding", "binding")) {
+    e <- design_expected("D2", paste0("fwer_", b), endpoint = "global")
+    expect_lt(abs(res$fwer[[b]][1] - e$value), 1e-5)
+  }
+  expect_lt(max(res$fwer$nonbinding), 0.025)
+  # the probabilities are those of gs_prob_mtp() with the bounds of the table
+  pr <- with_abseps(gs_prob_mtp(list(lk$z_upper[1:2], lk$z_upper[3:4]), lower = lk$z_lower[1:2],
+                                mean = res$mean, sigma = res$sigma, mtp = "bonferroni",
+                                upper_recycled = list(lk$z_upper_recycled[1:2],
+                                                      lk$z_upper_recycled[3:4])))
+  expect_equal(unname(res$power), unname(pr$reject), tolerance = 1e-10)
+  expect_equal(lk$prob_upper, pr$looks$prob_upper, tolerance = 1e-10)
+  expect_equal(lk$prob_lower, pr$looks$prob_lower, tolerance = 1e-10)
+})
+
+test_that("ms_power with recycling of the level and binding futility bounds", {
+  d <- design_def("D5")
+  te <- ms_test(endpoints = c("pfs", "os"), sf_eff = c("OF", "Pocock"), futility = "beta",
+                sf_fut = "HSD", param_fut = -2, beta = 0.1, binding = TRUE, mtp = "bonferroni",
+                weights = c(0.8, 0.2), transition = c(0.5, 1))
+  res <- with_abseps(ms_power(scn_f(), n = 400, looks = d$looks, test = te, followup = 12))
+  pfs <- res$looks[res$looks$endpoint == "pfs", ]
+  os <- res$looks[res$looks$endpoint == "os", ]
+  cp <- sqrt(outer(pfs$events, pfs$events, pmin) / outer(pfs$events, pfs$events, pmax))
+  co <- sqrt(outer(os$events, os$events, pmin) / outer(os$events, os$events, pmax))
+  # PFS after the rejection of OS: level (0.8 + 1 * 0.2) alpha with the
+  # binding futility bound; OS after the rejection of PFS: (0.2 + 0.5 * 0.8)
+  # alpha
+  expect_equal(pfs$z_upper_recycled,
+               gs_bounds(pfs$info_frac, alpha = 0.025, sf_eff = "OF", futility = "fixed",
+                         fut_bound = pfs$z_lower[1], binding = TRUE, corr = cp)$upper,
+               tolerance = 1e-10)
+  expect_equal(os$z_upper_recycled,
+               gs_bounds(os$info_frac, alpha = 0.015, sf_eff = "Pocock", corr = co)$upper,
+               tolerance = 1e-10)
+  expect_lt(res$type1[["binding"]], res$type1[["nonbinding"]])
+  expect_lt(res$type1[["binding"]], 0.025)
+})
+
+test_that("ms_power reports bounds after recycling that exceed the initial bounds", {
+  d <- design_def("D5")
+  # PFS at level 0.005 (Pocock) with a binding futility bound 2.3 at look 1,
+  # above the bound 2.15 of PFS at the level 0.025 after the rejection of OS
+  te <- ms_test(endpoints = c("pfs", "os"), sf_eff = "Pocock", futility = "fixed",
+                fut_bound = 2.3, binding = TRUE, mtp = "bonferroni", weights = c(0.2, 0.8),
+                transition = c(0, 1))
+  expect_error(ms_power(scn_f(), n = 400, looks = d$looks, test = te, followup = 12),
+               "Cannot compute the efficacy bounds of PFS at the level 0.025 after recycling")
+})

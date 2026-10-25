@@ -20,7 +20,13 @@ print.summary.ms_power <- function(x, digits = 4, ...) {
   cat("Group sequential log-rank design: summary\n")
   if (length(s$endpoint) == 2L) {
     proc <- if (s$mtp == "bonferroni") {
-      sprintf("Bonferroni (weights %s)", paste(format(s$weights), collapse = ", "))
+      g <- s$transition
+      sprintf("Bonferroni (weights %s%s)", paste(format(s$weights), collapse = ", "),
+              if (!is.null(g) && any(g > 0)) {
+                sprintf("; transition weights %s", paste(format(g), collapse = ", "))
+              } else {
+                ""
+              })
     } else {
       sprintf("fixed sequence (%s)", s$hierarchical)
     }

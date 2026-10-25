@@ -133,3 +133,119 @@ test_that("gs_prob_mtp checks its arguments", {
                            analysis = list(1:11, 1:10)), "20 looks")
   expect_error(gs_prob_mtp(list(c(2, 2), c(2, 2)), sigma = s, mtp = "holm"))
 })
+
+# Recycling of the level (upper_recycled). Expected values:
+# inst/validation/python/results/gs_prob_graph.csv, computed by
+# ref_graph.recursion() (numerical integration over the analyses of the joint
+# density, with the decisions of Algorithm 1 of Maurer and Bretz (2013)
+# applied on the sample path) and checked against a Monte Carlo simulation of
+# the algorithm (gs_prob_graph_mc.csv). Configurations:
+# gs_prob_graph_configs.csv.
+graph_check_config <- function(id, hypotheses) {
+  cf <- expected_csv("gs_prob_graph_configs.csv")
+  ex <- expected_csv("gs_prob_graph.csv")
+  cf <- cf[cf$config == id, ]
+  ex <- ex[ex$config == id & ex$hypothesis %in% hypotheses, ]
+  a1 <- mtp_num(cf$a1)
+  a2 <- mtp_num(cf$a2)
+  n <- 0L
+  for (h in hypotheses) {
+    e <- ex[ex$hypothesis == h, ]
+    cn <- mtp_canonical(mtp_num(cf$tau1), mtp_num(cf$tau2), cf$rho, e$theta1[1],
+                        e$theta2[1], a1, a2)
+    res <- with_abseps(gs_prob_mtp(list(mtp_num(cf$u1), mtp_num(cf$u2)),
+                                   lower = mtp_num(cf$l1), mean = cn$mean,
+                                   sigma = cn$sigma, analysis = list(a1, a2),
+                                   mtp = "bonferroni",
+                                   upper_recycled = list(mtp_num(cf$r1), mtp_num(cf$r2))))
+    q <- mtp_quantities(res)
+    expect_true(all(e$quantity %in% names(q)))
+    expect_lt(max(abs(q[e$quantity] - e$value)), 1e-5)
+    n <- n + nrow(e)
+  }
+  n
+}
+
+# 13 quantities for three looks of each endpoint, 11 for two and three looks,
+# 12 for three and two looks
+test_that("gs_prob_mtp with recycling matches the recursion with three looks (1)", {
+  expect_identical(graph_check_config("three_looks", c("alternative", "null_first")), 26L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with three looks (2)", {
+  expect_identical(graph_check_config("three_looks", c("null_second", "null_both")), 26L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with different analyses (1)", {
+  expect_identical(graph_check_config("unequal", c("alternative", "null_first")), 22L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with different analyses (2)", {
+  expect_identical(graph_check_config("unequal", c("null_second", "null_both")), 22L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion when the second starts later (1)", {
+  expect_identical(graph_check_config("late_second", c("alternative", "null_first")), 24L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion when the second starts later (2)", {
+  expect_identical(graph_check_config("late_second", c("null_second", "null_both")), 24L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with a high futility bound (1)", {
+  # futility bound above the bound after recycling, no test of the second
+  # hypothesis at its initial level at look 1
+  expect_identical(graph_check_config("lower_above", c("alternative", "null_first")), 26L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion with a high futility bound (2)", {
+  expect_identical(graph_check_config("lower_above", c("null_second", "null_both")), 26L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion when the first starts later (1)", {
+  expect_identical(graph_check_config("first_late", c("alternative", "null_first")), 22L)
+})
+
+test_that("gs_prob_mtp with recycling matches the recursion when the first starts later (2)", {
+  expect_identical(graph_check_config("first_late", c("null_second", "null_both")), 22L)
+})
+
+test_that("gs_prob_mtp with recycling reduces to the Bonferroni and fixed-sequence procedures", {
+  cn <- mtp_canonical(c(0.4, 0.7, 1), c(0.4, 0.7, 1), 0.6, 3, 2.5, 1:3, 1:3)
+  u1 <- c(3, 2.4, 2)
+  u2 <- c(2.6, 2.3, 2.1)
+  l1 <- c(0, 1, 2)
+  # bounds after recycling equal to the initial bounds: Bonferroni
+  rb <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni"))
+  rg <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni",
+                                upper_recycled = list(u1, u2)))
+  expect_lt(max(abs(mtp_quantities(rg) - mtp_quantities(rb))), 1e-5)
+  expect_identical(rg$looks[, 1:3], rb$looks[, 1:3])
+  # no test of the second hypothesis at its initial level: fixed sequence
+  # (overall)
+  rf <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma))
+  rh <- with_abseps(gs_prob_mtp(list(u1, rep(Inf, 3)), l1, cn$mean, cn$sigma,
+                                mtp = "bonferroni", upper_recycled = list(u1, u2)))
+  expect_lt(max(abs(mtp_quantities(rh) - mtp_quantities(rf))), 1e-5)
+  # lower bounds after recycling: each hypothesis is rejected more often
+  rr <- with_abseps(gs_prob_mtp(list(u1, u2), l1, cn$mean, cn$sigma, mtp = "bonferroni",
+                                upper_recycled = list(u1 - 0.3, u2 - 0.3)))
+  expect_gt(rr$reject[["first"]], rb$reject[["first"]] + 0.01)
+  expect_gt(rr$reject[["second"]], rb$reject[["second"]] + 0.01)
+  expect_equal(unname(rr$reject["any"]),
+               unname(rr$reject["first"] + rr$reject["second"] - rr$reject["both"]))
+})
+
+test_that("gs_prob_mtp checks the bounds after recycling", {
+  s <- diag(4)
+  u <- list(c(2, 2), c(2, 2))
+  expect_error(gs_prob_mtp(u, sigma = s, upper_recycled = u), "only with mtp")
+  expect_error(gs_prob_mtp(u, sigma = s, mtp = "bonferroni", upper_recycled = c(2, 2)),
+               "list of two")
+  expect_error(gs_prob_mtp(u, sigma = s, mtp = "bonferroni",
+                           upper_recycled = list(2, c(2, 2))), "one value per look")
+  expect_error(gs_prob_mtp(u, sigma = s, mtp = "bonferroni",
+                           upper_recycled = list(c(2, NA), c(2, 2))), "one value per look")
+  expect_error(gs_prob_mtp(u, sigma = s, mtp = "bonferroni",
+                           upper_recycled = list(c(2, 2.1), c(2, 2))), "must not exceed")
+})

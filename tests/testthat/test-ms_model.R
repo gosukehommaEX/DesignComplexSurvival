@@ -49,7 +49,7 @@ test_that("ms_model sets the options of version 0.3.0", {
   expect_equal(p$dropout_pfs, c(0.01, 0.01))
   expect_identical(ms_model(death = 0.1, switch_clock = "switch")$switch_clock, "switch")
   z <- models_s3("Z")
-  expect_equal(z$death_prog, c(0))
+  expect_equal(z$death_prog, c(0, 0))
   expect_equal(z$death_switch, c(0.03, 0.035))
 })
 

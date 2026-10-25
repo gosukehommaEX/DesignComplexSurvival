@@ -24,8 +24,8 @@ local({
 
   reproduce_all <- function(perturb = TRUE) {
     sources <- c("Barthel2006", "Erdmann2025", "Glimm2010", "Lakatos1988", "Lakatos2002",
-                 "Lu2021", "Luo2019", "Porcher2002", "Shih1995", "Sugimoto2017",
-                 "Tamhane2010", "Tang2022", "Vergote2024", "Xia2016")
+                 "Lu2021", "Luo2019", "MaurerBretz2013", "Porcher2002", "Shih1995",
+                 "Sugimoto2017", "Tamhane2010", "Tang2022", "Vergote2024", "Xia2016")
     res <- list()
     diag <- list()
     timing <- numeric(0)
@@ -69,7 +69,9 @@ local({
                                     paste(unshown, collapse = ", ")))
     }
 
-    # perturbation check (published values times 1.1, one row at a time)
+    # perturbation check (published values times 1.1, or moved by three times
+    # the tolerance of an abs criterion where 10 per cent is within it; one row
+    # at a time)
     pt <- NULL
     if (perturb) {
       judged <- out[out$criterion != "info", , drop = FALSE]
@@ -173,7 +175,10 @@ local({
     if (!is.null(pt)) {
       n_ok <- sum(pt$ok)
       l <- c(l, "## Perturbation check", "",
-             sprintf("Each judged published value (%d rows) was multiplied by 1.1 and judged again.", nrow(pt)),
+             sprintf(paste("Each judged published value (%d rows) was multiplied by 1.1",
+                           "(or moved by three times the tolerance of its abs criterion where",
+                           "a change of 10 per cent is within the tolerance) and judged again."),
+                     nrow(pt)),
              sprintf("Rows with the expected judgement: %d of %d.", n_ok, nrow(pt)),
              sprintf("Expected FAIL: %d; expected EXPLAINED (evidence taken from another row): %d (%s).",
                      sum(pt$expected == "FAIL"), sum(pt$expected == "EXPLAINED"),

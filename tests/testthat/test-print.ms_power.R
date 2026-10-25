@@ -15,3 +15,10 @@ test_that("print.ms_power shows a design with two endpoints", {
   expect_output(print(res), "null_scenarios\\[\\[1\\]\\] \\(PFS null\\)")
   expect_output(expect_invisible(print(res)), "at least one")
 })
+
+test_that("print.ms_power shows the bounds after recycling", {
+  res <- run_design("D5")
+  expect_output(print(res), "Bonferroni with weights 0.8 and 0.2 and transition weights 1 and 1")
+  expect_output(print(res), "z_upper_recycled")
+  expect_output(print(res), "p_upper_recycled")
+})

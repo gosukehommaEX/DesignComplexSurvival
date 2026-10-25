@@ -63,3 +63,26 @@ test_that("ms_test checks the input for two endpoints", {
                        param_eff = c(0.5, 1)), "param_eff")
   expect_error(ms_test(sf_eff = c("OF", "Pocock")), "sf_eff")
 })
+
+test_that("ms_test stores the transition weights of the Bonferroni procedure", {
+  tb <- ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", weights = c(0.8, 0.2),
+                transition = c(1, 0.5))
+  expect_identical(tb$transition, c(1, 0.5))
+  expect_identical(ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni")$transition, c(0, 0))
+  expect_identical(ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+                           transition = c(1L, 0L))$transition, c(1, 0))
+  expect_null(ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence")$transition)
+  expect_null(ms_test()$transition)
+})
+
+test_that("ms_test checks the transition weights", {
+  te <- function(...) ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", ...)
+  expect_error(te(transition = c(1.2, 0)), "between 0 and 1")
+  expect_error(te(transition = c(-0.1, 0)), "between 0 and 1")
+  expect_error(te(transition = 1), "between 0 and 1")
+  expect_error(te(transition = c(NA, 1)), "between 0 and 1")
+  expect_error(te(transition = c("1", "0")), "between 0 and 1")
+  expect_error(ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence", transition = c(1, 0)),
+               "only with mtp")
+  expect_error(ms_test(transition = c(0, 1)), "only with mtp")
+})

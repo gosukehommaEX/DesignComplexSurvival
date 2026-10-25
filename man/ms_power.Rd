@@ -64,7 +64,10 @@ which the endpoint is tested, with the columns above and \code{endpoint},
 \code{look}, \code{trigger} and \code{events_trigger} (the events of the
 trigger endpoint at the look, \code{NA} for calendar-driven looks);
 \code{prob_upper} is the probability of rejecting the hypothesis of the
-endpoint at the look under the multiple testing procedure,
+endpoint at the look under the multiple testing procedure (with recycling
+of the level, \code{z_upper_recycled} and \code{p_upper_recycled} give the
+efficacy bound and its nominal p-value at the level after the other
+hypothesis has been rejected, after \code{hr_upper}),
 \code{prob_lower} the probability of stopping for futility at the look
 (first endpoint), \code{cum_power} the cumulative sum of
 \code{prob_upper}, \code{alpha_spent} the cumulative alpha of the bounds
@@ -125,7 +128,9 @@ are tested have the joint distribution of \code{\link{lr_cov}}, with the
 observed events of the trigger endpoints determining the event-driven
 looks for \code{variance = "studentized"}. Each endpoint has its own
 bounds, and the rejection probabilities under the multiple testing
-procedure are computed by \code{\link{gs_prob_mtp}}. The familywise error
+procedure are computed by \code{\link{gs_prob_mtp}}; with recycling of
+the level (\code{transition} of \code{\link{ms_test}}), each endpoint also
+has bounds at its level after recycling. The familywise error
 rate is computed under \code{\link{ms_null}} applied to the scenario (the
 global null hypothesis), where the correlations between the endpoints are
 those of Danzer et al. (2025, Theorem 1), and under each scenario of

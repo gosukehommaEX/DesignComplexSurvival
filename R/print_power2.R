@@ -11,7 +11,13 @@
   ep <- toupper(s$endpoint)
   f <- function(v) format(signif(v, digits))
   proc <- if (s$mtp == "bonferroni") {
-    sprintf("Bonferroni with weights %s and %s", format(s$weights[1L]), format(s$weights[2L]))
+    g <- s$transition
+    sprintf("Bonferroni with weights %s and %s%s", format(s$weights[1L]), format(s$weights[2L]),
+            if (!is.null(g) && any(g > 0)) {
+              sprintf(" and transition weights %s and %s", format(g[1L]), format(g[2L]))
+            } else {
+              ""
+            })
   } else {
     sprintf("fixed sequence, %s", s$hierarchical)
   }
@@ -37,8 +43,9 @@
   }
   lk <- x$looks
   lk$endpoint <- toupper(lk$endpoint)
-  cols <- c("endpoint", "look", "time", "events", "info_frac", "z_upper", "p_upper",
-            "hr_upper", "z_lower", "hr_lower", "prob_upper", "prob_lower", "cum_power")
+  cols <- intersect(c("endpoint", "look", "time", "events", "info_frac", "z_upper", "p_upper",
+                      "hr_upper", "z_upper_recycled", "p_upper_recycled", "z_lower", "hr_lower",
+                      "prob_upper", "prob_lower", "cum_power"), names(lk))
   print(format(lk[, cols], digits = digits), row.names = FALSE)
   invisible(x)
 }

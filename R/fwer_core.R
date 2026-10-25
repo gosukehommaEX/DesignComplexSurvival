@@ -26,13 +26,16 @@
 #' @param null_scenarios \code{NULL}, or a list of \code{ms_scenario} objects
 #'   named by the endpoint (\code{"os"} or \code{"pfs"}) whose hypothesis is
 #'   true in the scenario.
+#' @param upper_recycled Bounds of the two endpoints at the level after
+#'   recycling (see \code{gs_prob_mtp()}), or \code{NULL} for none.
 #' @return A list with \code{type1} (familywise error rate under the global
 #'   null scenario, non-binding and binding), \code{fwer} (a data frame with
 #'   one row per null scenario) and \code{cum_alpha} (cumulative non-binding
 #'   probability of rejecting the hypothesis of each endpoint under the global
 #'   null scenario, in the order of the tested looks).
 #' @noRd
-.fwer_core <- function(scenario, acc, lk, targets, tl, test, bnd, null_scenarios = NULL) {
+.fwer_core <- function(scenario, acc, lk, targets, tl, test, bnd, null_scenarios = NULL,
+                       upper_recycled = NULL) {
   eps <- test$endpoints
   upper <- list(bnd[[1L]]$upper, bnd[[2L]]$upper)
   lower <- if (test$futility == "none") NULL else bnd[[1L]]$lower
@@ -41,9 +44,11 @@
   item_lk <- unlist(tl, use.names = FALSE)
   trig <- ifelse(lk$trigger == "calendar", NA_character_, lk$trigger)
   probs <- function(mean0, sig) {
-    nb <- gs_prob_mtp(upper, NULL, mean0, sig, an, test$mtp, test$hierarchical)
+    nb <- gs_prob_mtp(upper, NULL, mean0, sig, an, test$mtp, test$hierarchical,
+                      upper_recycled = upper_recycled)
     bd <- if (is.null(lower)) nb else gs_prob_mtp(upper, lower, mean0, sig, an,
-                                                   test$mtp, test$hierarchical)
+                                                   test$mtp, test$hierarchical,
+                                                   upper_recycled = upper_recycled)
     list(nb = nb, bd = bd)
   }
   s0 <- ms_null(scenario)

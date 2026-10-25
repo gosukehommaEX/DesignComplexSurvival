@@ -8,6 +8,8 @@
 #' @examples
 #' print(ms_test(futility = "beta"))
 #' print(ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"))
+#' print(ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+#'               weights = c(0.8, 0.2), transition = c(1, 1)))
 #'
 #' @export
 print.ms_test <- function(x, ...) {
@@ -18,6 +20,15 @@ print.ms_test <- function(x, ...) {
     if (x$mtp == "bonferroni") {
       cat(sprintf("  Bonferroni: %s at level %s, %s at level %s\n", ep[1L],
                   format(x$weights[1L] * x$alpha), ep[2L], format(x$weights[2L] * x$alpha)))
+      g <- x$transition
+      if (!is.null(g) && any(g > 0)) {
+        lev <- x$alpha * (x$weights + rev(g * x$weights))
+        cat(sprintf(paste0("  Recycling: fraction %s from %s to %s and %s from %s to %s; ",
+                           "%s at level %s after %s is rejected, %s at level %s after %s ",
+                           "is rejected\n"),
+                    format(g[1L]), ep[1L], ep[2L], format(g[2L]), ep[2L], ep[1L],
+                    ep[2L], format(lev[2L]), ep[1L], ep[1L], format(lev[1L]), ep[2L]))
+      }
     } else {
       cat(sprintf("  Fixed sequence: %s, then %s (%s)\n", ep[1L], ep[2L], x$hierarchical))
     }

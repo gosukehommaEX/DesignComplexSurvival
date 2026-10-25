@@ -18,6 +18,7 @@ different numerical methods:
 | Designs with two endpoints or with looks driven by the events of different endpoints (`ms_power()`, stage 2) | `.look_times()`, `.design_core2()` and `.fwer_core()` with the functions above | analysis times by root finding on the reference events, moments and covariance from the references above, bounds by recursive conditioning, rejection probabilities as sums over the sample-path outcomes of rectangle probabilities by recursive conditioning with adaptive quadrature (any covariance matrix); Monte Carlo with 4 million trials |
 | Model options of stage 3 (switch clock, AFT effect of the switch, switch before progression, censoring of PFS only) | closed forms on the pieces of the intensities (`.post_general()`, `.pre_states()`, `.from_state5()`) and Gauss-Legendre rules | adaptive quadrature over the switch, progression and switch-before-progression times (`ref_model5.py`); products of matrix exponentials for Markov models |
 | Products of the PFS and OS functionals with a switch before progression or a censoring of PFS only | terms C1 to C4 of the covariance note split by the progression-free state (addendum of the covariance note) | Markov models: state probabilities, generator and transition matrices with nested adaptive quadrature over the PFS and OS times (`ref_cross5.py`); other models: Monte Carlo with 10 million patients |
+| Rejection probabilities of two endpoints with recycling of the level (`gs_prob_mtp()` with `upper_recycled`, stage 3) | sums of rectangle probabilities over the outcomes at each analysis (`.mtp_graph()`) | numerical integration over the analyses of the joint density, with the decisions of Algorithm 1 of Maurer and Bretz (2013) applied on the sample path (canonical joint distribution, `ref_graph.py`); Monte Carlo simulation of the algorithm with 2 million trials |
 
 The influence-function derivation used in the R code was checked against the
 formulas of Luo et al. (2019) in Python (function `influence_cov()` in
@@ -91,6 +92,17 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   `models_s3()`, `model_post_s3()` and `scn_s3()` in
   `tests/testthat/helper-scenarios.R`), including the Monte Carlo check
   `results/model5_cross_mc.csv`.
+* `ref_graph.py`: rejection probabilities of two endpoints under the
+  graphical procedure with recycling of the level (Maurer and Bretz 2013,
+  Algorithm 1): recursive integration and Monte Carlo simulation of the
+  algorithm. Kept apart from `ref_mtp.py`, whose results are not changed.
+* `expected_graph.py`: expected values for `gs_prob_mtp()` with
+  `upper_recycled`, written to `results/gs_prob_graph_configs.csv`,
+  `results/gs_prob_graph.csv` and the Monte Carlo check
+  `results/gs_prob_graph_mc.csv`; it also prints checks of the reference
+  (with the bounds after recycling equal to the initial bounds it equals
+  the Bonferroni procedure of `ref_mtp.recursion()`, and without a test of
+  the second hypothesis at its initial level the fixed sequence).
 
 ## Running
 
@@ -105,6 +117,7 @@ python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 min
 python3 simulate_two.py               # PFS and OS together, V3, V4, V6, V7 (about 30 minutes)
 python3 danzer_check.py               # estimator of Danzer et al. (2025) (about 2 minutes)
 python3 expected_model5.py            # model options of stage 3 (about 10 minutes)
+python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and

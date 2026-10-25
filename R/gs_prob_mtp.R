@@ -20,6 +20,22 @@
 #' until the trial stops, with bounds computed at levels that add up to
 #' alpha. The trial stops when both hypotheses are rejected or for futility.
 #'
+#' With \code{mtp = "bonferroni"} and \code{upper_recycled}, the level of a
+#' rejected hypothesis is passed on to the other hypothesis (the graphical
+#' procedure of Maurer and Bretz 2013, Algorithm 1, for two hypotheses).
+#' Each hypothesis is tested with its bounds in \code{upper} until the other
+#' hypothesis is rejected, and with its bounds in \code{upper_recycled} from
+#' the analysis at which the other is rejected on: a hypothesis rejected with
+#' its bound in \code{upper} at an analysis makes the other be tested with its
+#' bound in \code{upper_recycled} at the same analysis. The bounds in
+#' \code{upper_recycled} are those of the level after recycling, for example
+#' \code{(w1 + g21 w2) alpha} for the first hypothesis with the weights w and
+#' the fraction g21 of the level of the second hypothesis that is passed on
+#' to the first. They must not exceed the bounds in \code{upper}, which holds
+#' when the nominal levels of the spending function do not decrease with the
+#' level (Maurer and Bretz 2013, Section 3.1). The futility stop of the first
+#' endpoint also applies after the second hypothesis has been rejected.
+#'
 #' With \code{mtp = "fixed_sequence"}, the second hypothesis is tested only
 #' after the first has been rejected. With \code{hierarchical = "overall"} it
 #' is tested at the analysis at which the first hypothesis is rejected and at
@@ -32,7 +48,17 @@
 #' The probabilities are sums of rectangle probabilities of the multivariate
 #' normal distribution, one for each combination of the outcome of the first
 #' endpoint (rejection or stop for futility at a look, or no rejection) and
-#' the look at which the second hypothesis is rejected. They are computed
+#' the look at which the second hypothesis is rejected. With
+#' \code{upper_recycled}, the probabilities are summed over the outcomes at
+#' each analysis: at an analysis at which both hypotheses are tested and
+#' neither has been rejected, with the bounds A1, A2 in \code{upper} and B1,
+#' B2 in \code{upper_recycled}, both hypotheses are rejected when Z1 >= A1 and
+#' Z2 >= B2 or when B1 <= Z1 < A1 and Z2 >= A2, only the first when Z1 >= A1
+#' and Z2 < B2, only the second when Z1 < B1 and Z2 >= A2, and neither when
+#' Z1 < A1 and Z2 < A2; at an analysis at which one hypothesis is tested, it
+#' is rejected or not. The futility stop splits the outcomes in which the
+#' first hypothesis is tested and not rejected at an interim look. The
+#' rectangle probabilities are computed
 #' with \code{mvtnorm::pmvnorm()} (at most 20 looks in total): with the
 #' Genz-Bretz algorithm for the rectangles that involve both endpoints and
 #' have four or more coordinates and, as in \code{\link{gs_prob}}, for the
@@ -61,6 +87,10 @@
 #' @param mtp \code{"fixed_sequence"} or \code{"bonferroni"}.
 #' @param hierarchical \code{"overall"} or \code{"stagewise"} (used with
 #'   \code{mtp = "fixed_sequence"}).
+#' @param upper_recycled For \code{mtp = "bonferroni"}, an optional list of
+#'   two numeric vectors: the efficacy bounds of the first and of the second
+#'   endpoint at their looks at the level after the other hypothesis has been
+#'   rejected (not above \code{upper}). \code{NULL} means no recycling.
 #'
 #' @return A list with
 #' \describe{
@@ -79,6 +109,10 @@
 #' Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
 #' endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
 #'
+#' Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+#' using graphical approaches. Statistics in Biopharmaceutical Research
+#' 5:311-320.
+#'
 #' Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
 #' endpoint in a group sequential design. Biometrics 66:1174-1184.
 #'
@@ -96,11 +130,18 @@
 #' gs_prob_mtp(list(b1, b2), mean = c(2, 2.9, 1.5, 2.1), sigma = sigma)$reject
 #' # Probability of rejecting the second hypothesis when it is true
 #' gs_prob_mtp(list(b1, b2), mean = c(2, 2.9, 0, 0), sigma = sigma)$reject
+#' # Bonferroni with the level alpha / 2 for each endpoint and the level
+#' # alpha after the other hypothesis has been rejected (full recycling)
+#' h1 <- gs_bounds(tt, alpha = 0.0125, sf_eff = "OF")$upper
+#' h2 <- gs_bounds(tt, alpha = 0.0125, sf_eff = "Pocock")$upper
+#' gs_prob_mtp(list(h1, h2), mean = c(2, 2.9, 1.5, 2.1), sigma = sigma,
+#'             mtp = "bonferroni", upper_recycled = list(b1, b2))$reject
 #'
 #' @export
 gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
                         mtp = c("fixed_sequence", "bonferroni"),
-                        hierarchical = c("overall", "stagewise")) {
+                        hierarchical = c("overall", "stagewise"),
+                        upper_recycled = NULL) {
   mtp <- match.arg(mtp)
   hierarchical <- match.arg(hierarchical)
   if (!is.list(upper) || length(upper) != 2L ||
@@ -156,6 +197,23 @@ gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
   }
   a1 <- analysis[[1L]]
   a2 <- analysis[[2L]]
+  if (!is.null(upper_recycled)) {
+    if (mtp != "bonferroni") {
+      stop("'upper_recycled' is used only with mtp = \"bonferroni\".", call. = FALSE)
+    }
+    ok <- is.list(upper_recycled) && length(upper_recycled) == 2L &&
+      all(vapply(seq_len(2L), function(e) {
+        u <- upper_recycled[[e]]
+        is.numeric(u) && length(u) == length(upper[[e]]) && !anyNA(u)
+      }, logical(1)))
+    if (!ok) {
+      stop(paste0("'upper_recycled' must be NULL or a list of two numeric vectors with ",
+                  "one value per look of each endpoint."), call. = FALSE)
+    }
+    if (any(upper_recycled[[1L]] > u1) || any(upper_recycled[[2L]] > u2)) {
+      stop("'upper_recycled' must not exceed the efficacy bounds in 'upper'.", call. = FALSE)
+    }
+  }
 
   # probability of a rectangle on the coordinates idx; coordinates without
   # finite limits are left out, and rectangles over both endpoints with four
@@ -181,7 +239,12 @@ gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
   pf <- numeric(k1)
   p2 <- numeric(k2)
   both <- 0
-  for (pat in .mtp_patterns(a1, a2, is.finite(lower), mtp, hierarchical)) {
+  pats <- if (is.null(upper_recycled)) {
+    .mtp_patterns(a1, a2, is.finite(lower), mtp, hierarchical)
+  } else {
+    list()
+  }
+  for (pat in pats) {
     if (pat$type == "none" && !length(pat$eligible)) {
       next
     }
@@ -210,6 +273,13 @@ gs_prob_mtp <- function(upper, lower = NULL, mean = 0, sigma, analysis = NULL,
         both <- both + q
       }
     }
+  }
+  if (!is.null(upper_recycled)) {
+    gr <- .mtp_graph(list(u1, u2), upper_recycled, lower, list(a1, a2), box)
+    p1 <- gr$p1
+    pf <- gr$pf
+    p2 <- gr$p2
+    both <- gr$both
   }
   looks <- data.frame(endpoint = rep(1:2, c(k1, k2)), look = c(seq_len(k1), seq_len(k2)),
                       analysis = c(a1, a2), prob_upper = c(p1, p2),

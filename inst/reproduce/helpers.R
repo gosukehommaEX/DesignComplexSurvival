@@ -321,13 +321,26 @@ repro_judge_one <- function(criterion, explained_id, published, computed,
        evidence_pass = ev_pass)
 }
 
-# Judge all rows. With perturb = TRUE, each published value is multiplied by
-# 1.1 (one row at a time; a reference value taken from another row is not
-# changed) and the perturbed computed values are used.
+# Perturbed published values: times 1.1, or plus three times the tolerance of
+# an abs criterion when a change of 10 per cent is within the tolerance (a
+# value printed with one significant digit)
+repro_perturb <- function(value, criterion) {
+  tol <- rep(NA_real_, length(value))
+  is_abs <- startsWith(criterion, "abs:")
+  tol[is_abs] <- as.numeric(sub("^abs:", "", criterion[is_abs]))
+  small <- !is.na(tol) & abs(0.1 * value) <= tol
+  ifelse(small, value + 3 * tol, 1.1 * value)
+}
+
+# Judge all rows. With perturb = TRUE, each published value is perturbed by
+# repro_perturb() (one row at a time; a reference value taken from another
+# row is not changed) and the perturbed computed values are used.
 repro_judge <- function(res, pv, perturb = FALSE) {
   idx <- match(res$id, pv$id)
-  f <- if (perturb) 1.1 else 1
-  pub <- pv$value[idx] * f
+  pub <- pv$value[idx]
+  if (perturb) {
+    pub <- repro_perturb(pub, pv$criterion[idx])
+  }
   ref <- ifelse(is.na(res$evidence_ref_id), pub,
                 pv$value[match(res$evidence_ref_id, pv$id)])
   comp <- if (perturb) res$computed_perturbed else res$computed

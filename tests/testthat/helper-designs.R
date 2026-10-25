@@ -1,6 +1,7 @@
 # Designs with two endpoints or with looks driven by the events of different
 # endpoints, defined identically in inst/validation/python/expected_design.py
-# (scenario F of helper-scenarios.R, n = 400).
+# (scenario F of helper-scenarios.R, n = 400). Design D5 (stage 3) is design D2
+# with recycling of the level and has no values in design2.csv.
 
 # Scenario F with the same OS ("os") or the same PFS ("pfs") in both groups
 scn_f_null <- function(which) {
@@ -25,6 +26,11 @@ design_def <- function(name) {
               test = ms_test(endpoints = c("pfs", "os"), sf_eff = c("OF", "Pocock"),
                              futility = "beta", sf_fut = "HSD", param_fut = -2, beta = 0.1,
                              mtp = "bonferroni", weights = c(0.8, 0.2)),
+              events = NULL, followup = 12, null = list(pfs = scn_f_null("pfs"))),
+    D5 = list(looks = ms_looks(c("calendar", "os"), fraction = c(NA, 1), time = c(15, NA)),
+              test = ms_test(endpoints = c("pfs", "os"), sf_eff = c("OF", "Pocock"),
+                             futility = "beta", sf_fut = "HSD", param_fut = -2, beta = 0.1,
+                             mtp = "bonferroni", weights = c(0.8, 0.2), transition = c(1, 1)),
               events = NULL, followup = 12, null = list(pfs = scn_f_null("pfs"))),
     D3 = list(looks = ms_looks("os", fraction = c(0.5, 1)),
               test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence",

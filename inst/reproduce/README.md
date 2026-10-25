@@ -37,6 +37,7 @@ results file.
 | `reproduce_Lakatos2002.R` | Lakatos (2002), Statistics in Medicine 21:1969-1989, Tables VIII-IX |
 | `reproduce_Lu2021.R` | Lu (2021), Pharmaceutical Statistics, doi:10.1002/pst.2069, Tables 1-3 (lrstat) |
 | `reproduce_Luo2019.R` | Luo et al. (2019), Statistics in Medicine 38:192-209, Examples 1-3 (PWEALL) |
+| `reproduce_MaurerBretz2013.R` | Maurer and Bretz (2013), Statistics in Biopharmaceutical Research 5:311-320, Tables 1 and 2 and Section 4 (nominal levels and repeated p-values, ADDPLAN 6.0.1) |
 | `reproduce_Porcher2002.R` | Porcher et al. (2002), Controlled Clinical Trials 23:650-661, Tables 1-2 and the MAG90 example |
 | `reproduce_Shih1995.R` | Shih (1995), Controlled Clinical Trials 16:395-407, examples computed with SIZE |
 | `reproduce_Sugimoto2017.R` | Sugimoto et al. (2017), Statistics in Medicine 36:1363-1382, Tables III and VI (PFS and OS, rows with rho = 0) |
@@ -86,7 +87,10 @@ diagnostic is outside its tolerance, or when the perturbation check fails.
 
 In the perturbation check, each judged published value is multiplied by 1.1,
 one row at a time, and judged again; for the criterion `power_at_time` the
-power is recomputed at 1.1 times the published time. Every row is expected
+power is recomputed at 1.1 times the published time. A value printed with one
+significant digit, whose change by 10 per cent is within the tolerance of its
+`abs` criterion (MaurerBretz2013-T1-a1-0.0125, -T1-a2-0.01875 and
+-S4-a1-0.025), is moved by three times the tolerance instead. Every row is expected
 to FAIL, except Barthel2006-T2-r2 and Tamhane2010-T1-OF1OF2-rho0.4-d, whose
 evidence is compared with a value printed in another row (the same design in
 Barthel et al.; the Delta_1 of the same cell in Tamhane et al.) and which are
