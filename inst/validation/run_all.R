@@ -9,18 +9,23 @@
 #    helpers.R and validate_fastsurvival.R are unchanged since it was written
 #    (checked by MD5); set rerun_fastsurvival <- TRUE before sourcing to force
 #    a new simulation.
-# 2. compare_simulation.R compares results/sim_python.csv (V6-V8, written by
+# 2. compare_simulation.R compares results/sim_python.csv (V6-V10, written by
 #    python/simulate_ms.py) and results/sim_fastsurvival.csv with the package.
-# 3. compare_two_endpoints.R compares results/sim_python_two.csv (V3, V4, V6
-#    and V7 with PFS and OS together, written by python/simulate_two.py) and
-#    results/danzer_check.csv (python/danzer_check.py) with the package.
+# 3. compare_two_endpoints.R compares results/sim_python_two.csv (V3, V4, V6,
+#    V7, V11 and V12 with PFS and OS together, written by
+#    python/simulate_two.py) and results/danzer_check.csv
+#    (python/danzer_check.py) with the package; compare_calendar.R compares
+#    results/sim_python_calendar.csv (V13-V15, switching from a calendar time,
+#    written by python/simulate_calendar.py) with the package.
 # 4. compare_pweall.R compares with PWEALL.
+# 5. compare_graph_lrstat.R compares the graphical procedure with recycling
+#    of the level with lrstat::fseqbon() and lrstat::getBound().
 # Outputs in inst/validation/results/: compare_simulation.csv,
-# compare_two_endpoints.csv, compare_pweall.csv, summary.csv, summary.md and
-# perturb.csv. The run stops with an error (after writing the outputs) when
-# the Python results are missing, when the perturbation check does not give
-# the expected judgements, or when an id of explained.csv is not judged
-# EXPLAINED.
+# compare_two_endpoints.csv, compare_calendar.csv, compare_pweall.csv,
+# compare_graph_lrstat.csv, summary.csv, summary.md and perturb.csv. The run
+# stops with an error (after writing the outputs) when the Python results are
+# missing, when the perturbation check does not give the expected judgements,
+# or when an id of explained.csv is not judged EXPLAINED.
 
 local({
   dir <- if (dir.exists(file.path("inst", "validation"))) {
@@ -64,6 +69,9 @@ local({
   if (!file.exists(file.path(rd, "danzer_check.csv"))) {
     problems <- c(problems, "results/danzer_check.csv (python/danzer_check.py) is missing.")
   }
+  if (!file.exists(file.path(rd, "sim_python_calendar.csv"))) {
+    problems <- c(problems, "results/sim_python_calendar.csv (python/simulate_calendar.py) is missing.")
+  }
 
   # 2. simulations versus the package
   t0 <- proc.time()[["elapsed"]]
@@ -84,6 +92,13 @@ local({
   timing["compare_two_endpoints"] <- proc.time()[["elapsed"]] - t0
   two_src <- c("python_two", "danzer")
 
+  # 3b. switching from a calendar time versus the package
+  t0 <- proc.time()[["elapsed"]]
+  cenv <- new.env(parent = henv)
+  sys.source(file.path(dir, "compare_calendar.R"), envir = cenv)
+  cc <- cenv$compare_calendar()
+  timing["compare_calendar"] <- proc.time()[["elapsed"]] - t0
+
   # 4. PWEALL
   t0 <- proc.time()[["elapsed"]]
   penv <- new.env(parent = henv)
@@ -93,11 +108,23 @@ local({
   if (is.null(cp)) {
     notes <- c(notes, "PWEALL is not installed: the comparison with PWEALL is not made.")
   }
-  all <- rbind(cs, ct, cp)
+
+  # 5. lrstat::fseqbon() (graphical procedure with recycling of the level)
+  t0 <- proc.time()[["elapsed"]]
+  genv <- new.env(parent = henv)
+  sys.source(file.path(dir, "compare_graph_lrstat.R"), envir = genv)
+  cg <- genv$compare_graph_lrstat()
+  timing["compare_graph_lrstat"] <- proc.time()[["elapsed"]] - t0
+  if (is.null(cg)) {
+    notes <- c(notes, paste("lrstat 0.3.4 or later is not installed: the comparison with",
+                            "lrstat::fseqbon() is not made."))
+  }
+  all <- rbind(cs, ct, cc, cp, cg)
   ex <- henv$val_explained()
   j <- henv$val_judge(all, explained = ex$id)
   all <- cbind(all, j)
-  utils::write.csv(all[!(all$source %in% c("pweall", two_src)), ], file.path(rd, "compare_simulation.csv"),
+  utils::write.csv(all[!(all$source %in% c("pweall", "lrstat_fseqbon", "python_calendar", two_src)), ],
+                   file.path(rd, "compare_simulation.csv"),
                    row.names = FALSE)
   if (!is.null(ct)) {
     utils::write.csv(all[all$source %in% two_src, ], file.path(rd, "compare_two_endpoints.csv"),
@@ -105,6 +132,14 @@ local({
   }
   if (!is.null(cp)) {
     utils::write.csv(all[all$source == "pweall", ], file.path(rd, "compare_pweall.csv"), row.names = FALSE)
+  }
+  if (!is.null(cg)) {
+    utils::write.csv(all[all$source == "lrstat_fseqbon", ], file.path(rd, "compare_graph_lrstat.csv"),
+                     row.names = FALSE)
+  }
+  if (!is.null(cc)) {
+    utils::write.csv(all[all$source == "python_calendar", ], file.path(rd, "compare_calendar.csv"),
+                     row.names = FALSE)
   }
   utils::write.csv(all, file.path(rd, "summary.csv"), row.names = FALSE)
   unused <- setdiff(ex$id, all$id[all$judgement == "EXPLAINED"])
@@ -136,12 +171,13 @@ local({
   l <- c("# Validation against independent routes", "",
          "Generated by `inst/validation/run_all.R`. Do not edit by hand.", "",
          sprintf("- Date: %s", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z")),
-         sprintf("- %s; DesignComplexSurvival %s; FastSurvival %s; PWEALL %s", R.version.string, desc,
-                 ver("FastSurvival"), ver("PWEALL")),
+         sprintf("- %s; DesignComplexSurvival %s; FastSurvival %s; PWEALL %s; lrstat %s", R.version.string,
+                 desc, ver("FastSurvival"), ver("PWEALL"), ver("lrstat")),
          sprintf("- sim_python.csv md5 %s; sim_fastsurvival.csv md5 %s", md5(file.path(rd, "sim_python.csv")),
                  md5(fs_file)),
-         sprintf("- sim_python_two.csv md5 %s; danzer_check.csv md5 %s",
-                 md5(file.path(rd, "sim_python_two.csv")), md5(file.path(rd, "danzer_check.csv"))),
+         sprintf("- sim_python_two.csv md5 %s; danzer_check.csv md5 %s; sim_python_calendar.csv md5 %s",
+                 md5(file.path(rd, "sim_python_two.csv")), md5(file.path(rd, "danzer_check.csv")),
+                 md5(file.path(rd, "sim_python_calendar.csv"))),
          sprintf("- Status: %s", if (length(problems)) "CHECKS FAILED" else "all checks passed"),
          if (length(notes)) paste("- Note:", notes), "")
   if (length(problems)) {

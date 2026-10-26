@@ -1,13 +1,19 @@
 """Patient-level simulation of the four-state model, written independently of the R code.
 
 Scenarios V6-V8 of the Phase 3 plan (section 4.2), which FastSurvival cannot simulate: a hazard of switching after
-progression, the forward clock, and treatment discontinuation (dilution) of Luo et al. (2019), Example 1.
+progression, the forward clock, and treatment discontinuation (dilution) of Luo et al. (2019), Example 1. Scenarios
+V9 and V10 (stage 3, candidate 2) are scenario C with the death hazard after a switch measured from the switch
+(switch_clock = "switch", forward clock) and with an accelerated failure time effect of the switch (switch_af = 0.6,
+reset clock).
 
 Each patient is generated directly: entry time from the piecewise uniform accrual, group by simple randomization,
 the exit from the progression-free state by inversion of the piecewise linear cumulative hazard (the cause drawn in
 proportion to the hazards), the switch at progression with the probability at the progression time, the exit from the
 progressed state (death or switch) and the death after a switch in the same way on the post-progression clock (time
 since progression for clock = "reset", time since randomization for clock = "forward"), and the dropout time.
+With switch_clock = "switch" the death hazard after a switch is a function of the time since the switch; with
+switch_af = phi the time from the switch to death is the time to death without switch (death_prog on the
+post-progression clock, given survival to the switch) divided by phi.
 
 Only summaries are written (no patient-level data), to results/sim_python.csv:
   calendar looks: group-wise OS and PFS events and dropouts, log-rank Z of OS and PFS (positive when the treatment
@@ -18,7 +24,7 @@ Only summaries are written (no patient-level data), to results/sim_python.csv:
     survival at times since randomization.
 
 Usage:
-  python3 simulate_ms.py                    # all scenarios, 20000 trials under each hypothesis
+  python3 simulate_ms.py                    # all scenarios (V6-V10), 20000 trials under each hypothesis
   python3 simulate_ms.py --scenarios V6 --reps 2000 --out /tmp/x.csv
 """
 import argparse, csv, os, sys, time
@@ -39,7 +45,8 @@ class Group:
     """One treatment group, with the arguments of ms_model()."""
 
     def __init__(self, death, time=(0.0,), prog=0.0, death_prog=0.0, switch_prob=0.0, switch_rate=0.0,
-                 death_switch=None, dropout=0.0, time_post=(0.0,), clock="reset"):
+                 death_switch=None, dropout=0.0, time_post=(0.0,), clock="reset", switch_clock="same",
+                 switch_af=None):
         self.time = np.asarray(time, float); k = self.time.size
         self.prog = _expand(prog, k); self.death = _expand(death, k)
         self.switch_prob = _expand(switch_prob, k); self.dropout = _expand(dropout, k)
@@ -47,6 +54,8 @@ class Group:
         self.death_prog = _expand(death_prog, m); self.switch_rate = _expand(switch_rate, m)
         self.death_switch = self.death_prog.copy() if death_switch is None else _expand(death_switch, m)
         self.clock = clock
+        self.switch_clock = switch_clock
+        self.switch_af = None if switch_af is None else float(switch_af)
 
 
 def step(x, brk, val):
@@ -98,7 +107,16 @@ def simulate_group(rng, g, n):
         later = (~sw0) & (rng.random(ip.size) < ps)
         tau_s = np.where(sw0, tau0, np.where(later, tau2, np.inf))
         switched = sw0 | later
-        taud = np.where(switched, draw_after(rng, np.where(switched, tau_s, 0.0), g.time_post, g.death_switch), tau2)
+        start = np.where(switched, tau_s, 0.0)
+        if g.switch_af is not None:
+            # accelerated failure time: the remaining time without switch divided by switch_af
+            t0 = draw_after(rng, start, g.time_post, g.death_prog)
+            taud_s = start + (t0 - start) / g.switch_af
+        elif g.switch_clock == "switch":
+            taud_s = start + draw_after(rng, np.zeros(ip.size), g.time_post, g.death_switch)
+        else:
+            taud_s = draw_after(rng, start, g.time_post, g.death_switch)
+        taud = np.where(switched, taud_s, tau2)
         os_[ip] = u + (taud - tau0)
         sw[ip] = np.where(switched, u + (tau_s - tau0), np.inf)
     drop = draw_after(rng, np.zeros(n), g.time, g.dropout)
@@ -151,9 +169,10 @@ def kth_time(rep, x, k, nrep):
 
 
 # Scenarios ---------------------------------------------------------------------
-def scenario_c(clock):
+def scenario_c(clock, switch_clock="same", switch_af=None):
     ctl = Group(0.01, time=[0, 4], prog=[0.10, 0.08], switch_prob=0.3, time_post=[0, 3], death_prog=[0.05, 0.06],
-                switch_rate=0.04, death_switch=[0.03, 0.035], dropout=0.005, clock=clock)
+                switch_rate=0.04, death_switch=None if switch_af is not None else [0.03, 0.035], dropout=0.005,
+                clock=clock, switch_clock=switch_clock, switch_af=switch_af)
     trt = Group(0.008, time=[0, 4], prog=[0.06, 0.05], switch_prob=0.0, time_post=[0, 3], death_prog=[0.045, 0.05],
                 switch_rate=0.0, dropout=0.005, clock=clock)
     return dict(control=ctl, treatment=trt, alloc=1.0, n=500,
@@ -174,8 +193,10 @@ def scenario_luo1():
                 cal=[30.0, 40.0], events=[361, 722], latent=[6.0, 12.0, 24.0, 36.0])
 
 
-SCENARIOS = {"V6": lambda: scenario_c("reset"), "V7": lambda: scenario_c("forward"), "V8": scenario_luo1}
-SEEDS = {"V6": 61, "V7": 71, "V8": 81}
+SCENARIOS = {"V6": lambda: scenario_c("reset"), "V7": lambda: scenario_c("forward"), "V8": scenario_luo1,
+             "V9": lambda: scenario_c("forward", switch_clock="switch"),
+             "V10": lambda: scenario_c("reset", switch_af=0.6)}
+SEEDS = {"V6": 61, "V7": 71, "V8": 81, "V9": 91, "V10": 101}
 
 
 # Simulation -----------------------------------------------------------------------
@@ -304,7 +325,7 @@ COLS = ["source", "scenario", "hypothesis", "look_type", "look", "time", "target
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scenarios", default="V6,V7,V8")
+    ap.add_argument("--scenarios", default="V6,V7,V8,V9,V10")
     ap.add_argument("--reps", type=int, default=20000)
     ap.add_argument("--out", default=os.path.join(HERE, "..", "results", "sim_python.csv"))
     a = ap.parse_args()

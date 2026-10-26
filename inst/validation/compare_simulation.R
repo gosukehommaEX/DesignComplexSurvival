@@ -1,7 +1,7 @@
 # Compare the simulation summaries with the package (Phase 3 plan, sections
 # 4.1, 4.2 and 12.4).
 #
-# Inputs: results/sim_python.csv (python/simulate_ms.py, V6-V8) and
+# Inputs: results/sim_python.csv (python/simulate_ms.py, V6-V10) and
 # results/sim_fastsurvival.csv (validate_fastsurvival.R, V1-V5).
 # Output: results/compare_simulation.csv.
 #
@@ -13,9 +13,36 @@
 # between looks), the event-driven look times and events, the rejection rates
 # (power and type I error), and the dropouts at the event-driven looks
 # (compared with the expected dropouts at the expected look time).
+#
+# V9 and V10 (stage 3, candidate 2) are scenario C with the death hazard
+# after a switch measured from the switch (switch_clock = "switch", clock
+# forward) and with an accelerated failure time effect of the switch
+# (switch_af = 0.6, clock reset). They are defined here rather than in
+# helpers.R, whose MD5 decides whether the FastSurvival simulation is reused.
 
 if (!exists("val_scenarios", mode = "function")) {
   source(file.path("inst", "validation", "helpers.R"))
+}
+
+val_scenarios_stage3 <- function() {
+  acc_c <- ms_accrual(time = c(0, 6), prop = c(0.3, 0.7), duration = 18)
+  models <- function(clock, ...) {
+    list(control = ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,
+                            switch_prob = 0.3, time_post = c(0, 3),
+                            death_prog = c(0.05, 0.06), switch_rate = 0.04,
+                            dropout = 0.005, clock = clock, ...),
+         treatment = ms_model(time = c(0, 4), prog = c(0.06, 0.05), death = 0.008,
+                              switch_prob = 0, time_post = c(0, 3),
+                              death_prog = c(0.045, 0.05), switch_rate = 0,
+                              dropout = 0.005, clock = clock))
+  }
+  def <- function(m) {
+    list(scenario = ms_scenario(m$control, m$treatment, accrual = acc_c), n = 500,
+         cal = c(20, 30), events = c(150, 250), latent = c(2, 5, 10, 20, 30),
+         progression = TRUE)
+  }
+  list(V9 = def(models("forward", death_switch = c(0.03, 0.035), switch_clock = "switch")),
+       V10 = def(models("reset", switch_af = 0.6)))
 }
 
 compare_simulation <- function() {
@@ -35,7 +62,7 @@ compare_simulation <- function() {
   if (is.null(sims)) {
     stop("No simulation results in ", val_results_dir(), call. = FALSE)
   }
-  defs <- val_scenarios()
+  defs <- c(val_scenarios(), val_scenarios_stage3())
   cache <- new.env()
   memo <- function(key, f) {
     if (is.null(cache[[key]])) {

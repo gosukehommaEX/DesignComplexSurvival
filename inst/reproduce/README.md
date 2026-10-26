@@ -43,6 +43,7 @@ results file.
 | `reproduce_Sugimoto2017.R` | Sugimoto et al. (2017), Statistics in Medicine 36:1363-1382, Tables III and VI (PFS and OS, rows with rho = 0) |
 | `reproduce_Tamhane2010.R` | Tamhane et al. (2010), Biometrics 66:1174-1184, Table 1 (by `gs_prob_mtp()`), Sections 3.2 and 5 |
 | `reproduce_Tang2022.R` | Tang (2022), Statistics in Medicine, doi:10.1002/sim.9256, Example 4 |
+| `reproduce_TorresSaavedra2026.R` | Torres-Saavedra et al. (2026), Clinical Trials 23:219-224, Simulations and Results sections (crossover at progression in the rank preserving structural failure time model; probability of progression and proportions of censored observations) |
 | `reproduce_Vergote2024.R` | innovaTV 301 statistical analysis plan, version 2.0 (Vergote et al. 2024, doi:10.1056/NEJMoa2313811), Sections 6.2 and 6.7 (EAST) |
 | `reproduce_Xia2016.R` | Xia et al. (2016), Statistics in Biopharmaceutical Research 8:12-21, CALGB 30607 example |
 

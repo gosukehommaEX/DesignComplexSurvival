@@ -1,6 +1,7 @@
 # Compare the simulation of PFS and OS together (python/simulate_two.py,
-# scenarios V3, V4, V6 and V7) and the covariance estimator of Danzer et al.
-# (2025) (python/danzer_check.py) with the package (stage 2).
+# scenarios V3, V4, V6, V7, V11 and V12) and the covariance estimator of
+# Danzer et al. (2025) (python/danzer_check.py) with the package (stage 2,
+# and stage 3 for V11, V12 and the Bonferroni procedure with recycling).
 #
 # Inputs: results/sim_python_two.csv and results/danzer_check.csv.
 # Output: the rows of results/compare_two_endpoints.csv (sources "python_two"
@@ -29,14 +30,43 @@
 #   V4, V6, V7  look 1 at 330 PFS events (PFS and OS tested), look 2 at 250
 #               OS events (OS tested); PFS first, then OS, both with
 #               O'Brien-Fleming type spending
+#   V11, V12    calendar looks at months 20 (PFS and OS tested) and 30 (OS
+#               tested); PFS first, then OS, both with O'Brien-Fleming type
+#               spending
 # Procedures: fixed sequence with hierarchical = "overall" (fs_overall) and
-# "stagewise" (fs_stagewise), each endpoint at level 0.025, and Bonferroni
-# with weights 0.8 (first endpoint) and 0.2 (bonferroni). The designs are
-# defined here rather than in helpers.R, whose MD5 decides whether the
-# FastSurvival simulation is reused.
+# "stagewise" (fs_stagewise), each endpoint at level 0.025, Bonferroni
+# with weights 0.8 (first endpoint) and 0.2 (bonferroni), and the same
+# Bonferroni procedure with recycling of the level, transition c(1, 1)
+# (bonferroni_recycle). V11 and V12 (stage 3, candidates 4 and 5) are
+# scenario C (clock reset) with switching before progression in the control
+# group (switch_pre 0.02, prog_switch 0.07 and 0.06, death_switch_pre
+# 0.008); in V12 PFS is censored at that switch (pfs_switch = "censor") and
+# both groups have a censoring of PFS only (dropout_pfs 0.01). The designs
+# and V11 and V12 are defined here rather than in helpers.R, whose MD5
+# decides whether the FastSurvival simulation is reused.
 
 if (!exists("val_scenarios", mode = "function")) {
   source(file.path("inst", "validation", "helpers.R"))
+}
+
+val_scenarios_two3 <- function() {
+  acc_c <- ms_accrual(time = c(0, 6), prop = c(0.3, 0.7), duration = 18)
+  def <- function(cens) {
+    dp <- if (cens) 0.01 else 0
+    ctl <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01, switch_prob = 0.3,
+                    time_post = c(0, 3), death_prog = c(0.05, 0.06), switch_rate = 0.04,
+                    death_switch = c(0.03, 0.035), dropout = 0.005, clock = "reset",
+                    switch_pre = 0.02, prog_switch = c(0.07, 0.06), death_switch_pre = 0.008,
+                    dropout_pfs = dp)
+    trt <- ms_model(time = c(0, 4), prog = c(0.06, 0.05), death = 0.008, time_post = c(0, 3),
+                    death_prog = c(0.045, 0.05), dropout = 0.005, clock = "reset",
+                    dropout_pfs = dp)
+    list(scenario = ms_scenario(ctl, trt, accrual = acc_c,
+                                pfs_switch = if (cens) "censor" else "event"),
+         n = 500, cal = c(20, 30), events = NULL, latent = c(2, 5, 10, 20, 30),
+         progression = TRUE)
+  }
+  list(V11 = def(FALSE), V12 = def(TRUE))
 }
 
 val_designs <- function() {
@@ -44,16 +74,20 @@ val_designs <- function() {
                                  test = list(c("pfs", "os"), "os")),
                 endpoints = c("pfs", "os"), sf_eff = c("OF", "OF"),
                 events = c(pfs = 330, os = 250))
+  des_cal <- list(looks = ms_looks("calendar", time = c(20, 30),
+                                   test = list(c("pfs", "os"), "os")),
+                  endpoints = c("pfs", "os"), sf_eff = c("OF", "OF"), events = NULL)
   list(V3 = list(looks = ms_looks("os", fraction = c(252, 336) / 336),
                  endpoints = c("os", "pfs"), sf_eff = c("OF", "Pocock"), events = 336),
-       V4 = des_c, V6 = des_c, V7 = des_c)
+       V4 = des_c, V6 = des_c, V7 = des_c, V11 = des_cal, V12 = des_cal)
 }
 
 val_test2 <- function(design, procedure, mean = "direct", variance = "null") {
-  if (procedure == "bonferroni") {
+  if (procedure %in% c("bonferroni", "bonferroni_recycle")) {
     return(ms_test(alpha = 0.025, endpoints = design$endpoints, sf_eff = design$sf_eff,
                    mean = mean, variance = variance, mtp = "bonferroni",
-                   weights = c(0.8, 0.2)))
+                   weights = c(0.8, 0.2),
+                   transition = if (procedure == "bonferroni_recycle") c(1, 1) else c(0, 0)))
   }
   ms_test(alpha = 0.025, endpoints = design$endpoints, sf_eff = design$sf_eff, mean = mean,
           variance = variance, mtp = "fixed_sequence",
@@ -81,7 +115,7 @@ compare_two_endpoints <- function() {
   # rows of simulate_two.py are reported as "python_two", apart from the
   # stage 1 simulation (source "python")
   sims$source[sims$source == "python"] <- "python_two"
-  defs <- val_scenarios()
+  defs <- c(val_scenarios(), val_scenarios_two3())
   des <- val_designs()
   cache <- new.env()
   memo <- function(key, f) {
@@ -120,9 +154,12 @@ compare_two_endpoints <- function() {
       lk <- pa$looks
       up <- lapply(eps, function(e) lk$z_upper[lk$endpoint == e])
       an <- lapply(eps, function(e) lk$look[lk$endpoint == e])
+      upr <- if (!is.null(lk$z_upper_recycled)) {
+        lapply(eps, function(e) lk$z_upper_recycled[lk$endpoint == e])
+      }
       ts <- val_test2(des[[nm]], proc)
       r <- gs_prob_mtp(up, mean = 0, sigma = p0$sigma, analysis = an, mtp = ts$mtp,
-                       hierarchical = ts$hierarchical)$reject
+                       hierarchical = ts$hierarchical, upper_recycled = upr)$reject
       out <- c(r[["first"]], r[["second"]], r[["both"]], r[["any"]])
       names(out) <- c(eps, "both", "any")
       out
@@ -208,9 +245,11 @@ compare_two_endpoints <- function() {
         }
       }
     } else if (r$quantity == "bound") {
-      proc <- if (r$group == "fs") "fs_overall" else "bonferroni"
+      proc <- switch(r$group, fs = "fs_overall", bonferroni_recycled = "bonferroni_recycle",
+                     "bonferroni")
       la <- pw_of(nm, "alternative", proc, "direct", "null")$looks
-      emit(r, "", "abs:1e-6", r$mean, 0, la$z_upper[item(la, r$endpoint, k)])
+      col <- if (r$group == "bonferroni_recycled") "z_upper_recycled" else "z_upper"
+      emit(r, "", "abs:1e-6", r$mean, 0, la[[col]][item(la, r$endpoint, k)])
     } else if (r$quantity == "not_reached") {
       emit(r, "", "info", r$mean, NA_real_, 0)
     }

@@ -275,6 +275,198 @@
 "python|V8|null|calendar|2|40|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python|V8|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python|V8|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|1|20|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|calendar|2|30|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V9|alternative|latent||2|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||2|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V9|alternative|latent||5|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||5|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V9|alternative|latent||10|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||10|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V9|alternative|latent||20|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||20|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V9|alternative|latent||30|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|alternative|latent||30|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|1|20|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|calendar|2|30|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V9|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|1|20|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|calendar|2|30|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state1||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state2||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state3||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state4||control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|surv_os|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|surv_pfs|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V10|alternative|latent||2|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||2|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V10|alternative|latent||5|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||5|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V10|alternative|latent||10|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||10|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V10|alternative|latent||20|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||20|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state1||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state2||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|p_state3||treatment|","PASS",FALSE,"PASS","any",TRUE
+"python|V10|alternative|latent||30|p_state4||treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|surv_os|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|alternative|latent||30|surv_pfs|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|1|20|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|dropouts|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|events|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|dropouts|pfs|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|events|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|calendar|2|30|dropouts|pfs|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python|V10|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "fastsurvival|V1|alternative|calendar|1|24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "fastsurvival|V1|alternative|calendar|1|24|dropouts|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "fastsurvival|V1|alternative|calendar|1|24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -579,6 +771,10 @@
 "python_two|V3|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|alternative|design|2||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|alternative|design|2||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -587,6 +783,10 @@
 "python_two|V3|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|null|design|2||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V3|null|design|2||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V3|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -618,12 +818,18 @@
 "python_two|V4|alternative|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V4|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V4|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -642,12 +848,18 @@
 "python_two|V6|alternative|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V6|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V6|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -666,12 +878,18 @@
 "python_two|V7|alternative|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V7|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -687,6 +905,114 @@
 "python_two|V7|alternative|perpatient|1-2||corr_stud|pfs-os||variance=null","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|perpatient|2-1||corr_stud|pfs-os||variance=null","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "python_two|V7|alternative|perpatient|2-2||corr_stud|pfs-os||variance=null","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V11|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|alternative|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|2||bound|os|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|pfs|bonferroni|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|2||bound|os|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|pfs|bonferroni_recycled|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|2||bound|os|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_two|V12|null|design|1||bound|pfs|fs|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||24|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||36|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|alternative|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||24|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V13|null|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|perpatient||36|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V13|null|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V13|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||24|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||36|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|alternative|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||24|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V14|null|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|perpatient||36|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V14|null|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V14|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||24|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||36|score|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|alternative|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||24|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||24|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||24|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||24|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V15|null|perpatient||24|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||36|events|os|control|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||36|events|os|treatment|","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||36|events|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|perpatient||36|score|os||","PASS",FALSE,"PASS","any",TRUE
+"python_calendar|V15|null|perpatient||36|info|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|event|1||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"python_calendar|V15|null|event|2||bound|os||","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "pweall|Luo2019-Ex1-constHR|30|events_control","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "pweall|Luo2019-Ex1-constHR|38.9|events_control","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "pweall|Luo2019-Ex1-constHR|48|events_control","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
@@ -848,3 +1174,145 @@
 "pweall|Barthel2006-T4-r12|4|power_alternative","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "pweall|Barthel2006-T4-r12|3|power_null","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
 "pweall|Barthel2006-T4-r12|4|power_null","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|1|24.85123|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|2|32.90394|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|1|24.85123|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|2|32.90394|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|1|24.85123|bound|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|2|32.90394|bound|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|1|24.85123|bound_recycled|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|design|design|2|32.90394|bound_recycled|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|alternative|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|os|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|pfs|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|both|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|alternative|design|||reject|any|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|||reject|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|||reject|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null|design|||reject|any|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_first|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_first|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_first|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_first|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_first|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_first|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_first|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_first|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_first|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_second|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L1|null_second|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L1|null_second|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|1|25.30466|bound|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|1|25.30466|bound_recycled|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|1|25.30466|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|2|38.03986|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|1|25.30466|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|design|design|2|38.03986|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|alternative|design|1|25.30466|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|1|25.30466|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|2|38.03986|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|pfs|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|os|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|both|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|alternative|design|||reject|any|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null|design|1|25.30466|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null|design|1|25.30466|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null|design|2|38.03986|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null|design|||reject|pfs|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null|design|||reject|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null|design|||reject|any|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null_first|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null_first|design|1|25.30466|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null_first|design|1|25.30466|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_first|design|2|38.03986|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_first|design|||reject|pfs|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null_first|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_first|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null_first|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_second|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null_second|design|1|25.30466|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_second|design|1|25.30466|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L2|null_second|design|2|38.03986|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L2|null_second|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_second|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_second|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L2|null_second|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|1|24.85123|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|2|32.90394|bound|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|1|24.85123|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|2|32.90394|bound_recycled|os|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|1|24.85123|bound|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|2|32.90394|bound|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|1|24.85123|bound_recycled|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|design|design|2|32.90394|bound_recycled|pfs|graph|getBound","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|alternative|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|1|24.85123|futility_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|os|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|pfs|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|both|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|both|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|alternative|design|||reject|any|graph|ms_power","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|1|24.85123|futility_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null|design|||reject|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|||reject|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_first|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_first|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|1|24.85123|futility_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_first|design|||reject|os|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|||reject|pfs|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_first|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L3|null_first|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_second|design|||decisions_differ||graph|direct","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_second|design|1|24.85123|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_second|design|2|32.90394|reject_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_second|design|1|24.85123|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_second|design|2|32.90394|reject_look|pfs|graph|gs_prob_mtp","PASS",FALSE,"PASS","any",TRUE
+"lrstat_fseqbon|L3|null_second|design|1|24.85123|futility_look|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_second|design|||reject|os|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
+"lrstat_fseqbon|L3|null_second|design|||reject|pfs|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L3|null_second|design|||reject|both|graph|gs_prob_mtp","PASS",FALSE,"FAIL","any",TRUE
+"lrstat_fseqbon|L3|null_second|design|||reject|any|graph|gs_prob_mtp","PASS",TRUE,"FAIL","FAIL or EXPLAINED",TRUE
