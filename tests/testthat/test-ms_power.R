@@ -297,3 +297,52 @@ test_that("ms_power reports bounds after recycling that exceed the initial bound
   expect_error(ms_power(scn_f(), n = 400, looks = d$looks, test = te, followup = 12),
                "Cannot compute the efficacy bounds of PFS at the level 0.025 after recycling")
 })
+
+# Switching from a calendar time (stage 3). Expected values: calendar_looks.csv and
+# calendar_zeta.csv (ref_calendar.py)
+
+test_that("ms_power with switching from a calendar time uses the exact null correlation", {
+  ex <- expected_csv("calendar_looks.csv")
+  e <- ex[ex$design == "alt", ]
+  res <- ms_power(scn_cal(), n = 500, looks = ms_looks("calendar", time = c(24, 36)),
+                  test = ms_test())
+  lk <- res$looks
+  expect_equal(lk$events, 500 * (e$ev0 + e$ev1), tolerance = 1e-10)
+  expect_equal(lk$z_mean, -sqrt(500) * e$mu / sqrt(e$v), tolerance = 1e-10)
+  expect_equal(lk$z_sd, c(1, 1))
+  # bounds from the event fractions
+  d <- lk$events
+  bnd <- gs_bounds(d / d[2], alpha = 0.025, sf_eff = "OF",
+                   corr = sqrt(outer(d, d, pmin) / outer(d, d, pmax)))
+  expect_equal(lk$z_upper, bnd$upper, tolerance = 1e-10)
+  # power with the correlation of the influence functions, type I error with the exact
+  # correlation under the null hypothesis
+  pr <- gs_prob(lk$z_lower, lk$z_upper, lk$z_mean, expected_zeta_cal("alt", "none", "null"))
+  expect_equal(res$power, sum(pr$prob_upper), tolerance = 1e-8)
+  t1 <- gs_prob(rep(-Inf, 2), lk$z_upper, 0, expected_zeta_cal("null", "none", "null"))
+  expect_equal(res$type1[["nonbinding"]], sum(t1$prob_upper), tolerance = 1e-8)
+  expect_gt(0.025 - res$type1[["nonbinding"]], 5e-5)
+})
+
+test_that("ms_power with switching from a calendar time and the studentized variance", {
+  res <- ms_power(scn_cal(), n = 500, looks = ms_looks("calendar", time = c(24, 36)),
+                  test = ms_test(variance = "studentized"))
+  sig <- expected_zeta_cal("alt", "none", "studentized")
+  expect_equal(res$looks$z_sd, sqrt(diag(sig)), tolerance = 1e-7)
+  pr <- gs_prob(res$looks$z_lower, res$looks$z_upper, res$looks$z_mean, sig)
+  expect_equal(res$power, sum(pr$prob_upper), tolerance = 1e-8)
+})
+
+test_that("ms_power checks the scope of the switching from a calendar time", {
+  lo <- ms_looks("calendar", time = c(24, 36))
+  expect_error(ms_power(scn_cal(), n = 500, looks = lo, test = ms_test(mean = "schoenfeld")),
+               "mean = \"direct\"")
+  expect_error(ms_power(scn_cal(), n = 500, looks = ms_looks("pfs", fraction = c(0.5, 1)),
+                        test = ms_test(), events = 200), "cannot be driven by PFS events")
+  expect_error(ms_power(scn_cal(), n = 500, looks = lo,
+                        test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni")),
+               "one endpoint only")
+  expect_error(ms_power(scn_cal(), n = 500, looks = ms_looks("os", fraction = c(0.5, 1)),
+                        test = ms_test(endpoints = "pfs", variance = "alternative"),
+                        events = 150), "needs variance = \"null\"")
+})

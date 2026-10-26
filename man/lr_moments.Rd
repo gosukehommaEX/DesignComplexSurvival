@@ -31,7 +31,7 @@ lr_moments(
 \item{trigger}{Endpoint whose observed number of events determines each
 calendar time (\code{"os"} or \code{"pfs"}; one value or one per time),
 or \code{NULL} or \code{NA} for fixed calendar times. Used only with
-\code{variance = "studentized"}.}
+\code{variance = "studentized"}, and with switching from a calendar time.}
 }
 \value{
 A data frame with \code{time}, \code{events_control},
@@ -70,6 +70,10 @@ randomization gives a variance that is not larger. For
 which also accounts for the variability of V and, for times determined by
 the observed number of events of an endpoint (\code{trigger}), of the
 analysis time (see \code{\link{lr_cov}}).
+
+With switching from a calendar time (\code{switch_start} of
+\code{\link{ms_scenario}}), the moments of OS integrate over the entry
+time; see \code{\link{lr_cov}}.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)

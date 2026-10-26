@@ -9,10 +9,15 @@
 #'   sqrt(V_j / V_k)), \code{"alternative"} (Luo et al. 2019) or
 #'   \code{"studentized"} (\code{.zeta_cov()}).
 #' @param trigger Endpoint whose events determine each time, or \code{NULL}
-#'   (used with \code{"studentized"}).
-#' @return A covariance matrix.
+#'   (used with \code{"studentized"}, and with all variances when switching
+#'   starts at a calendar time).
+#' @return A covariance matrix. With switching from a calendar time
+#'   (\code{.is_calendar()}), OS uses \code{.cal_zeta()}.
 #' @noRd
 .z_cov <- function(scenario, acc, t, endpoint, core, variance, trigger = NULL) {
+  if (endpoint == "os" && .is_calendar(scenario)) {
+    return(.cal_zeta(scenario, acc, t, trigger, variance)$sigma)
+  }
   info <- core$info
   if (variance == "null") {
     return(sqrt(outer(info, info, pmin) / outer(info, info, pmax)))

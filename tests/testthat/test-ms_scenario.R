@@ -24,3 +24,18 @@ test_that("ms_scenario stores pfs_switch in the scenario and in both models", {
   expect_error(ms_scenario(m, m, accrual = ms_accrual(rate = 1), pfs_switch = "x"),
                "should be one of")
 })
+
+test_that("ms_scenario stores switch_start and checks it", {
+  expect_identical(scn_c()$switch_start, 0)
+  expect_identical(scn_cal()$switch_start, 15)
+  expect_identical(ms_null(scn_cal())$switch_start, 15)
+  m <- models_c()
+  acc <- ms_accrual(rate = 20)
+  for (bad in list(-1, NA_real_, Inf, c(1, 2), "15")) {
+    expect_error(ms_scenario(m$control, m$treatment, accrual = acc, switch_start = bad),
+                 "'switch_start' must be a nonnegative number")
+  }
+  expect_error(ms_scenario(models_s3("P"), models_s3("T"), accrual = acc, switch_start = 10),
+               "cannot be combined with switching before progression")
+  expect_identical(ms_scenario(models_s3("P"), models_s3("T"), accrual = acc)$switch_start, 0)
+})

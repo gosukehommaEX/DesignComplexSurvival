@@ -9,3 +9,11 @@ expected_csv <- function(name) {
   }
   read.csv(path, stringsAsFactors = FALSE)
 }
+
+# Covariance matrix of calendar_zeta.csv (switching from a calendar time) for a design ("alt" or
+# "null"), a trigger ("none" or "os") and a variance
+expected_zeta_cal <- function(design, trigger, variance) {
+  ex <- expected_csv("calendar_zeta.csv")
+  e <- ex[ex$design == design & ex$trigger == trigger & ex$variance == variance, ]
+  matrix(e$value[order(e$j, e$i)], max(e$i), max(e$j))
+}

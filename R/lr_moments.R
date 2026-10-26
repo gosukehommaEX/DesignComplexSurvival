@@ -32,6 +32,10 @@
 #' the observed number of events of an endpoint (\code{trigger}), of the
 #' analysis time (see \code{\link{lr_cov}}).
 #'
+#' With switching from a calendar time (\code{switch_start} of
+#' \code{\link{ms_scenario}}), the moments of OS integrate over the entry
+#' time; see \code{\link{lr_cov}}.
+#'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.
 #' @param calendar_time Calendar times (positive).
@@ -42,7 +46,7 @@
 #' @param trigger Endpoint whose observed number of events determines each
 #'   calendar time (\code{"os"} or \code{"pfs"}; one value or one per time),
 #'   or \code{NULL} or \code{NA} for fixed calendar times. Used only with
-#'   \code{variance = "studentized"}.
+#'   \code{variance = "studentized"}, and with switching from a calendar time.
 #'
 #' @return A data frame with \code{time}, \code{events_control},
 #'   \code{events_treatment}, \code{events}, \code{score_mean},
@@ -80,10 +84,16 @@ lr_moments <- function(scenario, n, calendar_time, endpoint = c("os", "pfs"),
   .check_positive(n, "n")
   .check_times(calendar_time, "calendar_time", positive = TRUE)
   trigger <- .check_trigger(trigger, length(calendar_time))
+  .check_calendar(scenario, endpoint, mean, variance, trigger)
   acc <- .acc_setup(scenario$accrual, n)
   core <- .lr_core(scenario, acc, calendar_time, endpoint, mean)
   if (variance == "null") {
     z_var <- rep(1, length(calendar_time))
+  } else if (endpoint == "os" && .is_calendar(scenario)) {
+    o <- order(calendar_time)
+    z_var <- numeric(length(calendar_time))
+    z_var[o] <- diag(.cal_zeta(scenario, acc, calendar_time[o], trigger[o],
+                               variance)$sigma)
   } else if (variance == "alternative") {
     cv <- .lr_alt_cov(scenario, acc, calendar_time, endpoint, core$score_mean / n)
     z_var <- diag(cv) / (core$info / n)

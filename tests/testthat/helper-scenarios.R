@@ -100,5 +100,32 @@ scn_s3 <- function(name) {
               pfs_switch = m[[3L]])
 }
 
+# Stage 3, switching from a calendar time: scenario C with switching of the control group
+# possible from the calendar time tc (switch_start), defined identically in
+# inst/validation/python/expected_calendar.py (design()); null = TRUE gives the control model
+# in both groups
+scn_cal <- function(tc = 15, clock = "forward", null = FALSE) {
+  m <- models_c(clock)
+  ms_scenario(m$control, if (null) m$control else m$treatment, allocation = 1,
+              accrual = ms_accrual(time = c(0, 6), prop = c(0.3, 0.7), duration = 18),
+              switch_start = tc)
+}
+
+# Post-progression models of calendar_os.csv (models_post() of expected_calendar.py), named
+# "<clock>_<variant>" with clock "reset" or "forward" and variant "same", "switch", "aft0.6"
+# or "aft1.5"
+model_post_cal <- function(name) {
+  parts <- strsplit(name, "_", fixed = TRUE)[[1L]]
+  args <- list(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01, switch_prob = 0.3,
+               time_post = c(0, 3, 8), death_prog = c(0.05, 0.08, 0.04),
+               switch_rate = c(0.04, 0.06, 0.02), dropout = 0.005, clock = parts[1L])
+  extra <- switch(parts[2L],
+    same = list(death_switch = c(0.03, 0.05, 0.02)),
+    switch = list(death_switch = c(0.03, 0.05, 0.02), switch_clock = "switch"),
+    aft0.6 = list(switch_af = 0.6),
+    aft1.5 = list(switch_af = 1.5))
+  do.call(ms_model, c(args, extra))
+}
+
 # Relative difference
 rel_diff <- function(x, y) max(abs(x - y) / pmax(abs(y), 1e-300))

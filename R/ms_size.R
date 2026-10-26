@@ -108,6 +108,8 @@ ms_size <- function(scenario, looks, test, power = 0.9,
   if (power <= test$alpha) {
     stop("'power' must be larger than the type I error.", call. = FALSE)
   }
+  .check_calendar(scenario, test$endpoints, test$mean, test$variance,
+                  .looks_table(looks)$trigger)
   two <- length(test$endpoints) == 2L
   if (!two && target != "first") {
     stop("'target' other than \"first\" needs two endpoints.", call. = FALSE)

@@ -32,6 +32,19 @@
 #' and the covariance between the endpoints is that of Danzer et al. (2025,
 #' Theorem 1).
 #'
+#' With switching from a calendar time (\code{switch_start} of
+#' \code{\link{ms_scenario}}), the hazard of OS depends on the entry time
+#' and the score has no independent increments, even under the null
+#' hypothesis. The means, information and covariances of OS then integrate
+#' over the entry time, with the proportion in the risk set and the pooled
+#' hazard of each calendar time. With \code{"null"} the statistics have unit
+#' variances and the correlations of the studentized statistics (which,
+#' under the null hypothesis, are the exact correlations), with
+#' \code{"alternative"} the covariances of the scores divided by
+#' \code{sqrt(V_j V_k)}, and with \code{"studentized"} the covariances of
+#' the studentized statistics; \code{trigger} is used with all three. Only
+#' OS alone with \code{mean = "direct"} is covered; PFS is not affected.
+#'
 #' @inheritParams lr_moments
 #' @param calendar_time Strictly increasing calendar times (positive).
 #' @param endpoint \code{"os"}, \code{"pfs"} or both (for example
@@ -86,6 +99,7 @@ lr_cov <- function(scenario, n, calendar_time, endpoint = "os",
   }
   k <- length(calendar_time)
   trigger <- .check_trigger(trigger, k)
+  .check_calendar(scenario, endpoint, mean, variance, trigger)
   acc <- .acc_setup(scenario$accrual, n)
   if (length(endpoint) == 1L) {
     core <- .lr_core(scenario, acc, calendar_time, endpoint, mean)

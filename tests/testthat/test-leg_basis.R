@@ -1,0 +1,10 @@
+test_that(".leg_basis gives the Legendre polynomials", {
+  x <- c(-1, -0.3, 0, 0.45, 1)
+  b <- .leg_basis(x, 3L)
+  expect_equal(dim(b), c(5L, 4L))
+  expect_equal(b[, 1], rep(1, 5))
+  expect_equal(b[, 2], x)
+  expect_equal(b[, 3], (3 * x^2 - 1) / 2, tolerance = 1e-14)
+  expect_equal(b[, 4], (5 * x^3 - 3 * x) / 2, tolerance = 1e-14)
+  expect_equal(dim(.leg_basis(x, 0L)), c(5L, 1L))
+})

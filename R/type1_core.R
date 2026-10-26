@@ -14,6 +14,12 @@
 #' @param bnd Output of \code{gs_bounds()}.
 #' @return A list with \code{type1} (non-binding and binding) and the
 #'   cumulative non-binding type I error \code{cum_nonbinding}.
+#' @details The statistics under the null scenario have unit variances and
+#'   the correlations sqrt(V_j / V_k), except for OS with switching from a
+#'   calendar time (\code{.is_calendar()}), where the score has no
+#'   independent increments and the correlations are those of
+#'   \code{.cal_zeta()}; the type I error then differs from the level of the
+#'   bounds.
 #' @noRd
 .type1_core <- function(scenario, acc, looks, targets, endpoint, bnd) {
   s0 <- ms_null(scenario)
@@ -21,7 +27,11 @@
                         what = "the null scenario")$time
   core0 <- .lr_core(s0, acc, times0, endpoint, "direct")
   v0 <- core0$info
-  corr <- sqrt(outer(v0, v0, pmin) / outer(v0, v0, pmax))
+  corr <- if (endpoint == "os" && .is_calendar(s0)) {
+    .cal_zeta(s0, acc, times0, NULL, "null")$sigma
+  } else {
+    sqrt(outer(v0, v0, pmin) / outer(v0, v0, pmax))
+  }
   k_max <- length(times0)
   nb <- gs_prob(rep(-Inf, k_max), bnd$upper, 0, corr)
   bd <- gs_prob(bnd$lower, bnd$upper, 0, corr)

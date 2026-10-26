@@ -22,6 +22,10 @@ print.ms_scenario <- function(x, ...) {
     cat(sprintf("\nPFS at a switch before progression: %s\n",
                 if (identical(x$pfs_switch, "censor")) "censored" else "followed up"))
   }
+  if (!is.null(x$switch_start) && x$switch_start > 0) {
+    cat(sprintf("\nSwitching possible from calendar time %s (time since the start of accrual)\n",
+                format(x$switch_start)))
+  }
   cat("\n")
   print(x$accrual)
   invisible(x)

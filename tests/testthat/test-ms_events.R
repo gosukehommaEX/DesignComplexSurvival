@@ -63,3 +63,19 @@ test_that("ms_events matches the reference values with the options of version 0.
     expect_lt(max(abs(got - ref)), 1e-8)
   }
 })
+
+test_that("ms_events with switching from a calendar time matches the reference", {
+  # Expected values: calendar_looks.csv (ref_calendar.py, per patient)
+  ex <- expected_csv("calendar_looks.csv")
+  e <- ex[ex$design == "alt", ]
+  ev <- ms_events(scn_cal(), n = 500, calendar_time = c(0, 24, 36))
+  expect_equal(ev$events_control, c(0, 500 * e$ev0), tolerance = 1e-10)
+  expect_equal(ev$events_treatment, c(0, 500 * e$ev1), tolerance = 1e-10)
+  expect_equal(ev$dropouts_treatment, c(0, 500 * e$do1), tolerance = 1e-10)
+  # the treatment group does not switch, and PFS is not affected
+  e0 <- ms_events(scn_cal(tc = 0), n = 500, calendar_time = c(24, 36))
+  expect_equal(ev$events_treatment[-1L], e0$events_treatment, tolerance = 1e-10)
+  expect_identical(ms_events(scn_cal(), n = 500, calendar_time = c(24, 36), endpoint = "pfs"),
+                   ms_events(scn_cal(tc = 0), n = 500, calendar_time = c(24, 36),
+                             endpoint = "pfs"))
+})

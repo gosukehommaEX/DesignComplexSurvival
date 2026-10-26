@@ -58,3 +58,32 @@ test_that("lr_cov of PFS and OS with the null and alternative variances", {
                variance = "alternative")
   expect_equal(la$sigma[2, 2], ao$sigma[1, 1], tolerance = 1e-12)
 })
+
+# Switching from a calendar time (stage 3). Expected values: calendar_looks.csv,
+# calendar_zeta.csv and calendar_delta.csv (ref_calendar.py)
+
+test_that("lr_cov with switching from a calendar time matches the reference", {
+  ex <- expected_csv("calendar_looks.csv")
+  e <- ex[ex$design == "alt", ]
+  lc <- lr_cov(scn_cal(), n = 500, calendar_time = c(24, 36), variance = "studentized",
+               trigger = "os")
+  expect_equal(lc$events, 500 * (e$ev0 + e$ev1), tolerance = 1e-10)
+  expect_equal(lc$info, 500 * e$v, tolerance = 1e-10)
+  expect_equal(lc$mean, -sqrt(500) * e$mu / sqrt(e$v), tolerance = 1e-10)
+  expect_lt(max(abs(lc$sigma - expected_zeta_cal("alt", "os", "studentized"))), 1e-7)
+})
+
+test_that("lr_cov with switching from a calendar time uses the exact null correlation", {
+  lc <- lr_cov(ms_null(scn_cal()), n = 500, calendar_time = c(24, 36))
+  expect_equal(diag(lc$sigma), c(1, 1))
+  expect_equal(lc$sigma[1, 2], expected_csv("calendar_delta.csv")$corr, tolerance = 1e-7)
+  # no independent increments: not the square root of the information ratio
+  expect_gt(abs(lc$sigma[1, 2] - sqrt(lc$info[1] / lc$info[2])), 1e-3)
+  # PFS is not affected by the switching
+  expect_identical(lr_cov(scn_cal(), n = 500, calendar_time = c(24, 36), endpoint = "pfs"),
+                   lr_cov(scn_cal(tc = 0), n = 500, calendar_time = c(24, 36), endpoint = "pfs"))
+  expect_error(lr_cov(scn_cal(), n = 500, calendar_time = 24, endpoint = c("pfs", "os")),
+               "one endpoint only")
+  expect_error(lr_cov(scn_cal(), n = 500, calendar_time = 24, mean = "schoenfeld"),
+               "mean = \"direct\"")
+})

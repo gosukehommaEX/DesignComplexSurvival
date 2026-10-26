@@ -80,3 +80,16 @@ test_that("lr_moments with the studentized variance is 1 under the null", {
                    endpoint = "pfs", variance = "studentized", trigger = "os")
   expect_equal(m0$z_var, c(1, 1), tolerance = 1e-8)
 })
+
+test_that("lr_moments with switching from a calendar time matches the reference", {
+  # Expected values: diagonal of calendar_zeta.csv (ref_calendar.py)
+  ma <- lr_moments(scn_cal(), n = 500, calendar_time = c(36, 24), variance = "alternative")
+  expect_equal(ma$z_var, rev(diag(expected_zeta_cal("alt", "none", "alternative"))),
+               tolerance = 1e-7)
+  ms <- lr_moments(scn_cal(), n = 500, calendar_time = c(24, 36), variance = "studentized",
+                   trigger = "os")
+  expect_equal(ms$z_var, diag(expected_zeta_cal("alt", "os", "studentized")), tolerance = 1e-7)
+  mn <- lr_moments(scn_cal(), n = 500, calendar_time = c(24, 36))
+  expect_equal(mn$z_var, c(1, 1))
+  expect_equal(mn$info, rev(ma$info))
+})

@@ -9,8 +9,17 @@
 #'   score mean (observed minus expected events in the treatment group), the
 #'   information and the mean of the standardized statistic
 #'   Z = -U / sqrt(V), which is positive when the treatment is better.
+#'   With switching from a calendar time (\code{.is_calendar()}), OS is
+#'   computed by \code{.cal_core()}.
 #' @noRd
 .lr_core <- function(scenario, acc, t, endpoint, mean = "direct") {
+  if (endpoint == "os" && .is_calendar(scenario)) {
+    if (mean != "direct") {
+      stop("Switching from a calendar time ('switch_start') needs mean = \"direct\" for OS.",
+           call. = FALSE)
+    }
+    return(.cal_core(scenario, acc, t))
+  }
   sch <- mean == "schoenfeld"
   hfun <- function(s) .lr_integrands(scenario, s, endpoint, schoenfeld = sch)
   res <- .acc_integral(acc, t, hfun, breaks = .scn_breaks(scenario),

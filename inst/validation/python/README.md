@@ -103,6 +103,20 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   (with the bounds after recycling equal to the initial bounds it equals
   the Bonferroni procedure of `ref_mtp.recursion()`, and without a test of
   the second hypothesis at its initial level the fixed sequence).
+* `ref_calendar.py`: switching from a calendar time (`switch_start` of
+  `ms_scenario()`, stage 3). OS given the follow-up time from which
+  switching is possible by adaptive quadrature over the progression time
+  (with `ref_model5.post()`) and, for Markov models, by matrix
+  exponentials; group functions, per-patient moments and the covariance of
+  the per-patient functionals (equation (5) of the covariance note given
+  the entry time) by Gauss-Legendre rules over the whole entry range;
+  time derivatives by central differences; the closed form of the null
+  covariance (calendar-time switching note, equation (3)).
+* `expected_calendar.py`: expected values for the tests of `switch_start`,
+  written to `results/calendar_*.csv` (scenario `scn_cal()` and models
+  `model_post_cal()` in `tests/testthat/helper-scenarios.R`); it also
+  prints checks of the reference (matrix exponentials against quadrature,
+  null correlation from the closed form against the moments).
 
 ## Running
 
@@ -118,6 +132,7 @@ python3 simulate_two.py               # PFS and OS together, V3, V4, V6, V7 (abo
 python3 danzer_check.py               # estimator of Danzer et al. (2025) (about 2 minutes)
 python3 expected_model5.py            # model options of stage 3 (about 10 minutes)
 python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
+python3 expected_calendar.py          # switching from a calendar time, stage 3 (about 4 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and

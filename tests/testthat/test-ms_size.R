@@ -96,3 +96,11 @@ test_that("ms_size checks the target and the null scenarios", {
   expect_error(ms_size(scn_a(), lm, ms_test(), solve_for = "events", n = 500),
                "event-driven final look")
 })
+
+test_that("ms_size checks the scope of the switching from a calendar time", {
+  lo <- ms_looks("calendar", time = c(24, 36))
+  expect_error(ms_size(scn_cal(), lo, ms_test(mean = "schoenfeld"), solve_for = "n",
+                       interval = c(100, 1000)), "mean = \"direct\"")
+  expect_error(ms_size(scn_cal(), lo, ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni"),
+                       solve_for = "n", interval = c(100, 1000)), "one endpoint only")
+})

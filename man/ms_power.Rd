@@ -140,6 +140,16 @@ be derived from the multistate model of the design scenario and are given
 by the user, for example a model with the same OS in both groups and a
 difference in PFS. Under each null scenario the event-driven looks take
 place at the same numbers of events of their trigger endpoints.
+
+With switching from a calendar time (\code{switch_start} of
+\code{\link{ms_scenario}}), only a test of one endpoint with
+\code{mean = "direct"} for OS is covered, and an OS test cannot use looks
+driven by PFS events. For OS the covariance of the statistics comes from
+the per-patient influence functions (see \code{\link{lr_cov}}); the
+bounds still come from the information or event fractions, and the type I
+error under \code{\link{ms_null}} uses the exact correlations under the
+null hypothesis, so it can differ from \code{alpha} when the switching
+changes the death hazard.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)

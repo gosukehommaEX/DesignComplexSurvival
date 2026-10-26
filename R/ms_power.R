@@ -55,6 +55,16 @@
 #' difference in PFS. Under each null scenario the event-driven looks take
 #' place at the same numbers of events of their trigger endpoints.
 #'
+#' With switching from a calendar time (\code{switch_start} of
+#' \code{\link{ms_scenario}}), only a test of one endpoint with
+#' \code{mean = "direct"} for OS is covered, and an OS test cannot use looks
+#' driven by PFS events. For OS the covariance of the statistics comes from
+#' the per-patient influence functions (see \code{\link{lr_cov}}); the
+#' bounds still come from the information or event fractions, and the type I
+#' error under \code{\link{ms_null}} uses the exact correlations under the
+#' null hypothesis, so it can differ from \code{alpha} when the switching
+#' changes the death hazard.
+#'
 #' @param scenario An \code{ms_scenario} object.
 #' @param n Total sample size.
 #' @param looks An \code{ms_looks} object.
@@ -161,6 +171,8 @@ ms_power <- function(scenario, n, looks, test, events = NULL, followup = NULL,
                              is.na(followup) || followup < 0)) {
     stop("'followup' must be a nonnegative number.", call. = FALSE)
   }
+  .check_calendar(scenario, test$endpoints, test$mean, test$variance,
+                  .looks_table(looks)$trigger)
   if (length(test$endpoints) == 1L) {
     if (!is.null(null_scenarios)) {
       stop("'null_scenarios' is used only with two endpoints.", call. = FALSE)

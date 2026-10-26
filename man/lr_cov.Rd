@@ -32,7 +32,7 @@ lr_cov(
 \item{trigger}{Endpoint whose observed number of events determines each
 calendar time (\code{"os"} or \code{"pfs"}; one value or one per time),
 or \code{NULL} or \code{NA} for fixed calendar times. Used only with
-\code{variance = "studentized"}.}
+\code{variance = "studentized"}, and with switching from a calendar time.}
 }
 \value{
 A list with \code{time}, \code{endpoint}, \code{events},
@@ -71,6 +71,19 @@ endpoints are the covariances of the scores divided by
 \code{sqrt(V_P V_O)}. Under the null hypothesis the three choices agree,
 and the covariance between the endpoints is that of Danzer et al. (2025,
 Theorem 1).
+
+With switching from a calendar time (\code{switch_start} of
+\code{\link{ms_scenario}}), the hazard of OS depends on the entry time
+and the score has no independent increments, even under the null
+hypothesis. The means, information and covariances of OS then integrate
+over the entry time, with the proportion in the risk set and the pooled
+hazard of each calendar time. With \code{"null"} the statistics have unit
+variances and the correlations of the studentized statistics (which,
+under the null hypothesis, are the exact correlations), with
+\code{"alternative"} the covariances of the scores divided by
+\code{sqrt(V_j V_k)}, and with \code{"studentized"} the covariances of
+the studentized statistics; \code{trigger} is used with all three. Only
+OS alone with \code{mean = "direct"} is covered; PFS is not affected.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)
