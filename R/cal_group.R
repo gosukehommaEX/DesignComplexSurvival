@@ -7,8 +7,9 @@
 #' \code{tc - s} and \code{tc}: before \code{tc - s} the patient cannot switch
 #' by \code{s} (the model without switching), from \code{tc} on the patient
 #' can switch from randomization (the model itself), and only in between is
-#' the integral over the entry time computed by Gauss-Legendre rules with
-#' \code{.os_avail()}. The rules end at the accrual breaks and at the entry
+#' the integral over the entry time computed: for the forward clock by
+#' \code{.cal_mid_fwd()}, and for the reset clock by Gauss-Legendre rules
+#' with \code{.os_avail()}, ending at the accrual breaks and at the entry
 #' times where (s, o) lies on a line of \code{.cal_lines()}. A group without
 #' switching gives \code{S(s) A(t - s)} as in the other computations.
 #'
@@ -17,7 +18,7 @@
 #' @param t Calendar time (one value).
 #' @param s Follow-up times, not larger than \code{t}.
 #' @param tc Calendar time from which switching is possible (positive).
-#' @param hmax Largest piece of the rules over the entry time.
+#' @param hmax Largest piece of the rules over the entry time (reset clock).
 #' @return A list with \code{Y} (probability of being enrolled by \code{t - s}
 #'   and alive at \code{s}) and \code{D} (the same with the OS density), both
 #'   without the dropout and the allocation probability.
@@ -39,6 +40,15 @@
   d <- e0$dens * a1 + ep$dens * a3
   lo <- pmax(tc - s, 0)
   hi <- pmin(top, tc)
+  if (model$clock == "forward") {
+    k <- which(hi > lo)
+    if (length(k) > 0L) {
+      mid <- .cal_mid_fwd(model, acc, s[k], lo[k], hi[k], tc)
+      y[k] <- y[k] + mid$surv
+      d[k] <- d[k] + mid$dens
+    }
+    return(list(Y = y, D = d))
+  }
   a <- acc$alpha
   ln <- .cal_lines(model)
   nodes <- lapply(seq_along(s), function(k) {

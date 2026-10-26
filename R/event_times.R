@@ -1,5 +1,10 @@
 #' Calendar times at which the expected number of events reaches targets
 #'
+#' For OS with switching from a calendar time (\code{.is_calendar()}), the
+#' times come from Newton's method (\code{.cal_event_times()}); the
+#' bracketing search below is used only for the targets where that method
+#' gives no time.
+#'
 #' @param scenario An \code{ms_scenario} object.
 #' @param acc Output of \code{.acc_setup()}.
 #' @param targets Target numbers of events (positive).
@@ -12,9 +17,17 @@
     e$ev0 + e$ev1
   }
   out <- numeric(length(targets))
+  todo <- seq_along(targets)
+  if (endpoint == "os" && .is_calendar(scenario)) {
+    out <- .cal_event_times(scenario, acc, targets)
+    todo <- which(is.na(out))
+    if (length(todo) == 0L) {
+      return(out)
+    }
+  }
   hi <- max(acc$duration, 1)
   dhi <- ftot(hi)
-  for (i in seq_along(targets)) {
+  for (i in todo) {
     d <- targets[i]
     iter <- 0L
     while (dhi < d) {

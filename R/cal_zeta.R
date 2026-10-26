@@ -10,7 +10,7 @@
 #' has the influence function zeta of equation (2) of the covariance note;
 #' the term of a look driven by OS events uses the time derivatives of the
 #' mean, the information and the events, obtained by differentiating the
-#' upper limit t - s of the entry integral.
+#' upper limit t - s of the entry integral (\code{.cal_dt()}).
 #'
 #' The variance options give: \code{"studentized"} the covariance of zeta;
 #' \code{"null"} its correlation matrix (variances 1); \code{"alternative"}
@@ -40,10 +40,7 @@
     stop("Internal error: looks driven by PFS events with calendar-time switching.",
          call. = FALSE)
   }
-  tc <- scenario$switch_start
-  a <- acc$alpha
   p <- scenario$prob
-  models <- list(scenario$control, scenario$treatment)
   looks <- lapply(time, function(t) .cal_look(scenario, acc, t))
   mu <- vapply(looks, `[[`, numeric(1), "mu")
   v <- vapply(looks, `[[`, numeric(1), "v")
@@ -89,18 +86,9 @@
   for (i in which(!is.na(trigger))) {
     lk <- looks[[i]]
     s <- lk$g$x
-    e <- lk$t - s
-    inside <- e < acc$duration
-    al <- numeric(length(s))
-    al[inside] <- .pw_value(e[inside], a[-length(a)], acc$rho)
-    o <- pmax(tc - e, 0)
-    dy <- vector("list", 2L)
-    dd <- vector("list", 2L)
-    for (j in 1:2) {
-      os <- .cal_os(models[[j]], s, o)
-      dy[[j]] <- p[[j]] * lk$G[[j]] * os$surv * al
-      dd[[j]] <- p[[j]] * lk$G[[j]] * os$dens * al
-    }
+    dt <- .cal_dt(scenario, acc, lk)
+    dy <- dt$dy
+    dd <- dt$dd
     y <- lapply(1:2, function(j) p[[j]] * lk$G[[j]] * lk$Y[[j]])
     d <- lapply(1:2, function(j) p[[j]] * lk$G[[j]] * lk$D[[j]])
     ys <- y[[1L]] + y[[2L]]

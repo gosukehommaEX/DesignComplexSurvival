@@ -41,10 +41,11 @@ test_that(".cal_group of a group without switching is S(s) A(t - s)", {
   expect_equal(got$D, ep$dens * .acc_cum(acc, 36 - s))
 })
 
-test_that(".cal_group gives the same values with a much finer rule (all switch models)", {
+test_that(".cal_group gives the same values with a much finer rule (reset clock)", {
+  # the forward clock does not use the rule over the entry time (test-cal_mid_fwd.R)
   acc <- .acc_setup(scn_cal()$accrual, 500)
   s <- c(2.5, 7.3, 12.9, 19.1)
-  for (nm in c("reset_same", "reset_switch", "reset_aft0.6", "forward_switch", "forward_aft1.5")) {
+  for (nm in c("reset_same", "reset_switch", "reset_aft0.6", "reset_aft1.5")) {
     m <- model_post_cal(nm)
     a <- .cal_group(m, acc, 33.1, s, 13.7, 20)
     b <- .cal_group(m, acc, 33.1, s, 13.7, 0.25)
