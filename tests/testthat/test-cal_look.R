@@ -31,16 +31,17 @@ test_that(".cal_look covers the follow-up time and gives the risk-set functions"
 })
 
 test_that(".cal_look agrees with a finer rule over the follow-up time", {
-  # control model "reset_switch" of calendar_os.csv, treatment group of scenario C; without
-  # the points of .cal_cross() the rule of .cal_look() would be off by about 1.4e-9
-  m <- model_post_cal("reset_switch")
+  # control model "forward_switch" of calendar_os.csv, treatment group of scenario C; without
+  # the points of .cal_cross() the rule of .cal_look() would be off by about 1.6e-8 (the reset
+  # clock, slower here, is checked with the Python port in chk_tests_calendar.py)
+  m <- model_post_cal("forward_switch")
   scn <- ms_scenario(m, models_c("forward")$treatment, accrual = scn_cal()$accrual,
                      switch_start = 13.7)
   acc <- .acc_setup(scn$accrual, 500)
-  lk <- .cal_look(scn, acc, 19)
-  g <- .gl_pieces(0, 19, c(.scn_breaks(scn), 19 - acc$alpha, 19 - 13.7, 13.7 - acc$alpha, 13.7),
-                  hmax = 0.5, n = 12L)
-  gr <- .cal_group(m, acc, 19, g$x, 13.7, lk$hmax)
+  lk <- .cal_look(scn, acc, 26.3)
+  g <- .gl_pieces(0, 26.3, c(.scn_breaks(scn), 26.3 - acc$alpha, 26.3 - 13.7,
+                             13.7 - acc$alpha, 13.7), hmax = 0.5, n = 12L)
+  gr <- .cal_group(m, acc, 26.3, g$x, 13.7, lk$hmax)
   ev0 <- sum(g$w * scn$prob[[1L]] * exp(-.pw_cumhaz(g$x, m$time, m$dropout)) * gr$D)
   expect_lt(abs(lk$ev[1L] - ev0), 1e-10)
 })
