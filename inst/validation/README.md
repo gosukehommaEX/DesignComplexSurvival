@@ -54,11 +54,20 @@ The larger simulations of V2 and V7 under the null hypothesis use
 python3 inst/validation/python/simulate_type1.py
 ```
 
-The FastSurvival simulation (V1-V5, about 30 minutes) is reused by later runs
+The FastSurvival simulation (V1-V5, about 3 minutes) is reused by later runs
 as long as `helpers.R` and `validate_fastsurvival.R` are unchanged; set
 `rerun_fastsurvival <- TRUE` before sourcing `run_all.R` to force a new
 simulation. The comparison with `lrstat::fseqbon()` (`compare_graph_lrstat.R`,
 1.2 million simulated trials) takes about 20 minutes.
+
+At each look driven by OS deaths, `validate_fastsurvival.R` checks that every
+trial has the target number of OS deaths, and in trials 1 to 20 of the first
+batch it compares the log-rank Z of `FastSurvival::analysis_fast()` with that
+of `survival::survdiff()`; the run stops when a check fails, and the results
+are written to `results/sim_fastsurvival_info.txt`. Up to version 0.3.2 the
+death at the cut was lost in 10% to 31% of the trials, because the follow-up
+time cut - entry could be smaller than its time by rounding. The correction
+changed only the numbers of events at these looks, not the log-rank Z.
 
 ## Scenarios
 
@@ -224,7 +233,7 @@ results are missing, when the perturbation check fails, or when an id of
 | File | Content |
 |---|---|
 | `helpers.R` | Scenario definitions V1-V8, judgement and summary functions |
-| `validate_fastsurvival.R` | FastSurvival simulation of V1-V5, writes `results/sim_fastsurvival.csv` |
+| `validate_fastsurvival.R` | FastSurvival simulation of V1-V5, writes `results/sim_fastsurvival.csv` and `results/sim_fastsurvival_info.txt` (versions, times and checks) |
 | `python/simulate_ms.py` | Python simulation of V6-V10, writes `results/sim_python.csv` |
 | `compare_simulation.R` | Simulation summaries versus the package (definitions of V9 and V10) |
 | `python/simulate_two.py` | Python simulation of PFS and OS together (V3, V4, V6, V7, V11, V12), writes `results/sim_python_two.csv` |

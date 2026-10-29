@@ -10,7 +10,10 @@
 #     better), and the correlation of Z between the looks;
 #   event looks (calendar time of the d-th OS death in each trial, from
 #     cutoff_fast()): look time, group-wise events, Z, correlation and the
-#     rejection of the O'Brien-Fleming design;
+#     rejection of the O'Brien-Fleming design. The d-th death lies at the
+#     cut, and the follow-up time cut - entry can be smaller than its time by
+#     rounding, so that up to version 0.3.2 the death was lost in some trials;
+#     the counts and analysis_fast() use the cut times (1 + cut_tol);
 #   latent quantities (alternative hypothesis, no dropout): OS and PFS
 #     survival and the state occupation probabilities at times since
 #     randomization. FastSurvival switches only after an observed
@@ -18,6 +21,13 @@
 #     (2000 trials).
 # FastSurvival allocates fixed group sizes and places a fixed number of
 # patients in each accrual interval.
+# Checks (the run stops when one fails; results written to
+# results/sim_fastsurvival_info.txt): at each look driven by OS deaths, every
+# trial that reached the look has the target number of OS deaths (the number
+# of trials in which the comparison without the tolerance loses a death is
+# also written); in trials 1 to 20 of the first batch, the Z of
+# analysis_fast() equals the log-rank Z of survival::survdiff() (absolute
+# difference at most 1e-8).
 
 if (!exists("val_scenarios", mode = "function")) {
   source(file.path("inst", "validation", "helpers.R"))
@@ -25,6 +35,26 @@ if (!exists("val_scenarios", mode = "function")) {
 
 fs_available <- requireNamespace("FastSurvival", quietly = TRUE)
 fs_version <- if (fs_available) as.character(utils::packageVersion("FastSurvival")) else NA_character_
+has_survival <- requireNamespace("survival", quietly = TRUE)
+cut_tol <- 1e-12
+
+# Largest absolute difference between the Z of analysis_fast() (sign changed; z in the order of sim_z) and the
+# log-rank Z of survival::survdiff() in trials 1 to n_check (trials that did not reach the look are skipped)
+fs_z_check <- function(d, trt, tt, ev, fu, enr, z, sim_z, n_check = 20L) {
+  out <- 0
+  for (s in seq_len(n_check)) {
+    zs <- z[match(s, sim_z)]
+    i <- d$sim == s & enr
+    if (!is.finite(zs) || !any(i) || !all(is.finite(fu[i]))) next
+    time <- pmin(tt[i], fu[i])
+    status <- 1 * (ev[i] & tt[i] <= fu[i])
+    g <- trt[i]
+    f <- survival::survdiff(survival::Surv(time, status) ~ g)
+    zr <- (f$exp[2] - f$obs[2]) / sqrt(f$var[2, 2])
+    out <- max(out, abs(zs - zr))
+  }
+  out
+}
 
 # Arguments of simdata_fast() for each scenario; hyp = "null" gives the
 # treatment group the control parameters
@@ -62,6 +92,8 @@ fs_args <- function(name, hyp) {
 
 fs_simulate <- function(name, def, reps_batch = 2000L, n_batch = 10L, seed = 20261019L) {
   rows <- list()
+  chk <- list()
+  zdiff <- if (has_survival) 0 else NA_real_
   idm <- !is.null(fs_args(name, "alternative")$h01.hazard)
   eps <- if (idm) c("os", "pfs") else "os"
   cols <- list(os = if (idm) c("e2_tte", "e2_event") else c("tte", "event"),
@@ -78,7 +110,8 @@ fs_simulate <- function(name, def, reps_batch = 2000L, n_batch = 10L, seed = 202
       add <- function(key, v) st[[key]] <<- c(st[[key]], v)
       looks <- list()
       for (k in seq_along(def$cal)) {
-        looks[[length(looks) + 1L]] <- list(tag = paste0("calendar|", k), cut = rep(def$cal[k], reps_batch))
+        looks[[length(looks) + 1L]] <- list(tag = paste0("calendar|", k), k = k, event = FALSE,
+                                            cut = rep(def$cal[k], reps_batch))
       }
       if (!is.null(def$events)) {
         cutm <- FastSurvival::cutoff_fast(d, event.looks = def$events, tte.col = cols$os[1],
@@ -87,11 +120,15 @@ fs_simulate <- function(name, def, reps_batch = 2000L, n_batch = 10L, seed = 202
         for (k in seq_along(def$events)) {
           cut <- cutm[match(seq_len(reps_batch), sims), k]
           add(paste0("event|", k, "|time"), cut)
-          looks[[length(looks) + 1L]] <- list(tag = paste0("event|", k), cut = cut)
+          looks[[length(looks) + 1L]] <- list(tag = paste0("event|", k), k = k, event = TRUE, cut = cut)
         }
       }
       for (lk in looks) {
-        cut_i <- lk$cut[d$sim]
+        # At a look driven by OS deaths the d-th death lies at the cut; the counts and analysis_fast() use the
+        # cut times (1 + cut_tol), so that rounding in cut - entry does not lose it. The look time recorded
+        # above is the cut itself.
+        cut_a <- if (lk$event) lk$cut * (1 + cut_tol) else lk$cut
+        cut_i <- cut_a[d$sim]
         cut_i[is.na(cut_i)] <- Inf
         fu <- cut_i - d$accrual_time
         enr <- fu >= 0
@@ -106,12 +143,38 @@ fs_simulate <- function(name, def, reps_batch = 2000L, n_batch = 10L, seed = 202
           add(paste0(lk$tag, "|events_", ep, "_treatment"), m[, "et"])
           add(paste0(lk$tag, "|dropouts_", ep, "_control"), m[, "dc"])
           add(paste0(lk$tag, "|dropouts_", ep, "_treatment"), m[, "dt"])
+          if (lk$event && ep == "os") {
+            # every trial that reached the look has the target number of OS deaths; count also the trials in
+            # which the comparison without the tolerance (cut - entry, up to version 0.3.2) loses a death
+            target <- def$events[lk$k]
+            reached <- !is.na(lk$cut)
+            tot <- (m[, "ec"] + m[, "et"])[reached]
+            if (any(tot != target)) {
+              stop(sprintf("%s %s batch %d look %d: the number of OS deaths differs from %d in %d trials",
+                           name, hyp, b, lk$k, target, sum(tot != target)), call. = FALSE)
+            }
+            raw_i <- lk$cut[d$sim]
+            raw_i[is.na(raw_i)] <- Inf
+            old <- rowsum(1 * (ev & raw_i - d$accrual_time >= 0 & tt <= raw_i - d$accrual_time), d$sim,
+                          reorder = TRUE)[, 1]
+            key <- paste(hyp, lk$k)
+            prev <- if (is.null(chk[[key]])) c(0, 0) else chk[[key]]
+            chk[[key]] <- prev + c(sum(reached), sum(old[reached] < target))
+          }
           de <- data.frame(sim = d$sim, group = d$group, accrual_time = d$accrual_time,
                            tte = tt, event = as.numeric(ev))
-          cutv <- matrix(lk$cut, ncol = 1, dimnames = list(seq_len(reps_batch), NULL))
+          cutv <- matrix(cut_a, ncol = 1, dimnames = list(seq_len(reps_batch), NULL))
           a <- FastSurvival::analysis_fast(de, control = 1, cutoff.looks = cutv)
           a <- a[order(a$sim), ]
           add(paste0(lk$tag, "|z_", ep), -a$logrank.z)
+          if (b == 1L && has_survival) {
+            zd <- fs_z_check(d, trt, tt, ev, fu, enr, -a$logrank.z, a$sim)
+            if (zd > 1e-8) {
+              stop(sprintf("%s %s %s %s: Z of analysis_fast() differs from survival::survdiff() by %.3g",
+                           name, hyp, lk$tag, ep, zd), call. = FALSE)
+            }
+            zdiff <- max(zdiff, zd)
+          }
         }
       }
       message(sprintf("  %s %s batch %d of %d", name, hyp, b, n_batch))
@@ -201,23 +264,37 @@ fs_simulate <- function(name, def, reps_batch = 2000L, n_batch = 10L, seed = 202
       }
     }
   }
-  do.call(rbind, rows)
+  res <- do.call(rbind, rows)
+  attr(res, "checks") <- c(
+    vapply(names(chk), function(key) {
+      p <- strsplit(key, " ")[[1]]
+      sprintf(paste("events_check %s %s look %s: %d trials reached the look, all with the target number of",
+                    "OS deaths; %d short without the tolerance"),
+              name, p[1], p[2], as.integer(chk[[key]][1]), as.integer(chk[[key]][2]))
+    }, ""),
+    sprintf("z_check %s: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: %.3g",
+            name, zdiff))
+  res
 }
 
 if (fs_available) {
   defs <- val_scenarios()
   out <- list()
   timing <- numeric(0)
+  checks <- character(0)
   for (nm in c("V1", "V2", "V3", "V4", "V5")) {
     t0 <- proc.time()[["elapsed"]]
     out[[nm]] <- fs_simulate(nm, defs[[nm]])
+    checks <- c(checks, unname(attr(out[[nm]], "checks")))
     timing[nm] <- proc.time()[["elapsed"]] - t0
     message(sprintf("%s done in %.0f s", nm, timing[nm]))
   }
   fs_result <- do.call(rbind, out)
   rownames(fs_result) <- NULL
   utils::write.csv(fs_result, file.path(val_results_dir(), "sim_fastsurvival.csv"), row.names = FALSE)
-  writeLines(c(paste("FastSurvival", fs_version), paste("time_s", names(timing), round(timing, 1))),
+  writeLines(c(paste("FastSurvival", fs_version), paste("time_s", names(timing), round(timing, 1)),
+               paste("cut_tol", format(cut_tol)),
+               if (!has_survival) "z_check not made: survival is not installed", checks),
              file.path(val_results_dir(), "sim_fastsurvival_info.txt"))
 } else {
   message("FastSurvival is not installed; V1-V5 are not simulated.")

@@ -1,6 +1,28 @@
 FastSurvival 1.2.0
-time_s V1 30.5
-time_s V2 19.1
-time_s V3 53.9
-time_s V4 60.7
-time_s V5 17.8
+time_s V1 35.1
+time_s V2 22
+time_s V3 54.1
+time_s V4 61.2
+time_s V5 17
+cut_tol 1e-12
+events_check V1 alternative look 1: 20000 trials reached the look, all with the target number of OS deaths; 4065 short without the tolerance
+events_check V1 alternative look 2: 20000 trials reached the look, all with the target number of OS deaths; 3042 short without the tolerance
+events_check V1 null look 1: 20000 trials reached the look, all with the target number of OS deaths; 5052 short without the tolerance
+events_check V1 null look 2: 20000 trials reached the look, all with the target number of OS deaths; 4284 short without the tolerance
+z_check V1: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: 3.06e-14
+events_check V2 alternative look 1: 20000 trials reached the look, all with the target number of OS deaths; 4935 short without the tolerance
+events_check V2 alternative look 2: 20000 trials reached the look, all with the target number of OS deaths; 2018 short without the tolerance
+events_check V2 null look 1: 20000 trials reached the look, all with the target number of OS deaths; 4910 short without the tolerance
+events_check V2 null look 2: 20000 trials reached the look, all with the target number of OS deaths; 2162 short without the tolerance
+z_check V2: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: 1.91e-14
+events_check V3 alternative look 1: 20000 trials reached the look, all with the target number of OS deaths; 5398 short without the tolerance
+events_check V3 alternative look 2: 20000 trials reached the look, all with the target number of OS deaths; 4828 short without the tolerance
+events_check V3 null look 1: 20000 trials reached the look, all with the target number of OS deaths; 6157 short without the tolerance
+events_check V3 null look 2: 20000 trials reached the look, all with the target number of OS deaths; 3684 short without the tolerance
+z_check V3: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: 4.44e-14
+events_check V4 alternative look 1: 20000 trials reached the look, all with the target number of OS deaths; 3017 short without the tolerance
+events_check V4 alternative look 2: 20000 trials reached the look, all with the target number of OS deaths; 3793 short without the tolerance
+events_check V4 null look 1: 20000 trials reached the look, all with the target number of OS deaths; 3576 short without the tolerance
+events_check V4 null look 2: 20000 trials reached the look, all with the target number of OS deaths; 4090 short without the tolerance
+z_check V4: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: 5.36e-14
+z_check V5: largest |Z(analysis_fast) - Z(survdiff)| in trials 1 to 20 of batch 1: 2.35e-14

@@ -1,3 +1,14 @@
+# DesignComplexSurvival 0.3.3
+
+* Validation: in `inst/validation/validate_fastsurvival.R` (V1-V4), the
+  death that defines a look driven by OS deaths was lost in some trials,
+  because the follow-up time cut - entry could be smaller than its time by
+  rounding (on average, about 0.1 to 0.3 deaths fewer than the target at
+  these looks). The comparisons now use the cut times (1 + 1e-12), and the
+  script checks that every trial has the target number of deaths and that
+  the log-rank Z agrees with `survival::survdiff()`. The package code is
+  unchanged.
+
 # DesignComplexSurvival 0.3.2
 
 * Documentation: `ms_power()` notes that the normal approximation does not
