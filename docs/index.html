@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Simulation-Free Design of Complex Time-to-Event Trials">
-<meta name="description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a four-state model (progression-free, progressed, switched, dead) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching at or after progression, together with piecewise uniform accrual, piecewise exponential dropout and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
-<meta property="og:description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a four-state model (progression-free, progressed, switched, dead) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching at or after progression, together with piecewise uniform accrual, piecewise exponential dropout and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
+<meta name="description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
+<meta property="og:description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,10 +52,11 @@
 </h1></div>
 <p>DesignComplexSurvival computes the operating characteristics of two-group time-to-event trials analysed with the log-rank test, without patient-level simulation:</p>
 <ul>
-<li>each group follows a four-state model (progression-free, progressed, switched, dead) with piecewise constant intensities, covering progression-free survival, overall survival and treatment switching at or after progression, with the post-progression intensities measured from progression or from randomization;</li>
-<li>accrual is piecewise uniform (by rates or by proportions) and dropout is piecewise exponential by group;</li>
+<li>each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, covering progression-free survival, overall survival and treatment switching before, at or after progression, with the post-progression intensities measured from progression or from randomization, and the effect of a switch on the death hazard (measured on the post-progression clock or from the switch) or as an accelerated failure time effect;</li>
+<li>switching may start at a calendar time, for example after an interim analysis (for the OS statistic);</li>
+<li>accrual is piecewise uniform (by rates or by proportions), dropout is piecewise exponential by group, and PFS may have a censoring of its own and be censored at a switch before progression;</li>
 <li>expected events, the mean, variance and covariance of the log-rank statistic over calendar time, group sequential bounds by alpha and beta spending (binding or non-binding futility), power, type I error, and the number of events, sample size, accrual duration or follow-up for a target power;</li>
-<li>progression-free survival (PFS) and overall survival (OS) can be tested together with a group sequential fixed-sequence or Bonferroni procedure, with analyses driven by the events of either endpoint or by calendar time; the joint distribution of the two log-rank statistics gives the power of each endpoint, the probability of rejecting both or at least one hypothesis, and the familywise error rate.</li>
+<li>progression-free survival (PFS) and overall survival (OS) can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013), with analyses driven by the events of either endpoint or by calendar time; the joint distribution of the two log-rank statistics gives the power of each endpoint, the probability of rejecting both or at least one hypothesis, and the familywise error rate.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -124,7 +125,7 @@
 <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h2>
 <p>The tests compare the results with an independent Python implementation (<code>inst/validation/python/</code>, using matrix exponentials and adaptive quadrature) and, when the packages are installed, with gsDesign, gsDesign2, rpact and lrstat.</p>
-<p>The scripts in <code>inst/reproduce/</code> recompute sample sizes, numbers of events, analysis times, bounds and powers printed in 14 sources (articles and a statistical analysis plan). The scripts in <code>inst/validation/</code> compare the package with patient-level simulations of 8 scenarios (FastSurvival and a Python simulation; PFS and OS analysed together in 4 of them), with the covariance estimator of Danzer et al. (2025) applied to large simulated trials under the null hypothesis, and with the package PWEALL in 8 designs. Each folder is run by its <code>run_all.R</code>, which judges every value as PASS (the criterion is met), EXPLAINED (the criterion is met after a registered explanation, such as an apparent misprint), FAIL, or INFO (not judged: a published value computed by a method that the package does not reproduce, or an asymptotic approximation compared with simulation):</p>
+<p>The scripts in <code>inst/reproduce/</code> recompute sample sizes, numbers of events, analysis times, bounds and powers printed in 16 sources (articles and a statistical analysis plan). The scripts in <code>inst/validation/</code> compare the package with patient-level simulations of 15 scenarios (FastSurvival and a Python simulation; PFS and OS analysed together in 6 of them, switching from a calendar time in 3), with the covariance estimator of Danzer et al. (2025) applied to large simulated trials under the null hypothesis, with the package PWEALL in 8 designs, and with the decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code> in 3 designs with recycling of the level. Each folder is run by its <code>run_all.R</code>, which judges every value as PASS (the criterion is met), EXPLAINED (the criterion is met after a registered explanation, such as an apparent misprint), FAIL, or INFO (not judged: a published value computed by a method that the package does not reproduce, or an asymptotic approximation compared with simulation):</p>
 <table class="table">
 <thead><tr>
 <th align="left">Folder</th>
@@ -137,23 +138,23 @@
 <tbody>
 <tr>
 <td align="left"><code>inst/reproduce/</code></td>
-<td align="right">243</td>
-<td align="right">75</td>
+<td align="right">257</td>
+<td align="right">79</td>
 <td align="right">0</td>
 <td align="right">191</td>
-<td align="right">509</td>
+<td align="right">527</td>
 </tr>
 <tr>
 <td align="left"><code>inst/validation/</code></td>
-<td align="right">849</td>
+<td align="right">1317</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">1366</td>
-<td align="right">2215</td>
+<td align="right">2128</td>
+<td align="right">3445</td>
 </tr>
 </tbody>
 </table>
-<p><code>run_all.R</code> also multiplies the compared values by 1.1 and checks that the judgements change as expected. The criteria are described in the <code>README.md</code> of each folder and the registered explanations in its <code>explained.csv</code>. Every compared value is listed with its judgement in <code>results/summary.csv</code>, and <code>results/summary.md</code> summarizes the results. FastSurvival and PWEALL are needed only to rerun <code>inst/validation/</code>.</p>
+<p><code>run_all.R</code> also multiplies the compared values by 1.1 and checks that the judgements change as expected. The criteria are described in the <code>README.md</code> of each folder and the registered explanations in its <code>explained.csv</code>. Every compared value is listed with its judgement in <code>results/summary.csv</code>, and <code>results/summary.md</code> summarizes the results. FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to rerun <code>inst/validation/</code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

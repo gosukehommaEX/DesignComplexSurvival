@@ -1,7 +1,7 @@
 Package: DesignComplexSurvival
 Type: Package
 Title: Simulation-Free Design of Complex Time-to-Event Trials
-Version: 0.2.2
+Version: 0.3.0
 Authors@R: c(
     person(
       "Gosuke", "Homma",
@@ -14,15 +14,20 @@ Description: Computes the expected numbers of events, the mean, variance and
     covariance of the log-rank statistic over calendar time, and the power,
     type I error, required number of events, sample size, accrual duration
     and follow-up of two-group time-to-event trials, without patient-level
-    simulation. Each group follows a four-state model (progression-free,
-    progressed, switched, dead) with piecewise constant intensities, which
-    covers progression-free survival, overall survival and treatment
-    switching at or after progression, together with piecewise uniform
-    accrual, piecewise exponential dropout and group sequential designs with
-    efficacy bounds and binding or non-binding futility bounds.
-    Progression-free and overall survival can be tested together with a
-    group sequential fixed-sequence or Bonferroni procedure, using the joint
-    distribution of the two log-rank statistics over calendar time. The
+    simulation. Each group follows a multistate model (progression-free,
+    progressed, switched, dead, and progression-free after a switch before
+    progression) with piecewise constant intensities, which covers
+    progression-free survival, overall survival and treatment switching
+    before, at or after progression, with an effect of the switch on the
+    death hazard or an accelerated failure time effect, together with
+    piecewise uniform accrual, piecewise exponential dropout, a censoring of
+    progression-free survival only, switching that starts at a calendar time
+    and group sequential designs with efficacy bounds and binding or
+    non-binding futility bounds. Progression-free and overall survival can be
+    tested together with a group sequential fixed-sequence or Bonferroni
+    procedure, the latter with recycling of the level after a rejection
+    (Maurer and Bretz 2013 <doi:10.1080/19466315.2013.807748>), using the
+    joint distribution of the two log-rank statistics over calendar time. The
     variance and covariance of the log-rank score under the alternative
     follow Luo et al. (2019) <doi:10.1002/sim.7975>.
 License: GPL (>= 2)

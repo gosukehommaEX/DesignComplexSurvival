@@ -50,7 +50,8 @@ lr_moments(
 
   Endpoint whose observed number of events determines each calendar time
   (`"os"` or `"pfs"`; one value or one per time), or `NULL` or `NA` for
-  fixed calendar times. Used only with `variance = "studentized"`.
+  fixed calendar times. Used only with `variance = "studentized"`, and
+  with switching from a calendar time.
 
 ## Value
 
@@ -85,6 +86,11 @@ which also accounts for the variability of V and, for times determined
 by the observed number of events of an endpoint (`trigger`), of the
 analysis time (see
 [`lr_cov`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/lr_cov.md)).
+
+With switching from a calendar time (`switch_start` of
+[`ms_scenario`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)),
+the moments of OS integrate over the entry time; see
+[`lr_cov`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/lr_cov.md).
 
 ## References
 

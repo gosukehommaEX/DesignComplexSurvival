@@ -48,7 +48,8 @@ python3 inst/validation/python/simulate_calendar.py
 The FastSurvival simulation (V1-V5, about 30 minutes) is reused by later runs
 as long as `helpers.R` and `validate_fastsurvival.R` are unchanged; set
 `rerun_fastsurvival <- TRUE` before sourcing `run_all.R` to force a new
-simulation.
+simulation. The comparison with `lrstat::fseqbon()` (`compare_graph_lrstat.R`,
+1.2 million simulated trials) takes about 20 minutes.
 
 ## Scenarios
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,10 @@ events by calendar time t is <code>n p_g</code> times the integral from 0 to t
 of A(t - s) f_g(s) G_g(s), where A is the enrolled fraction, f_g the
 density of the endpoint and G_g the probability of no dropout. The
 expected number of dropouts is obtained in the same way with the dropout
-density.</p>
+density. For PFS, the dropouts include the censoring of PFS only
+(<code>dropout_pfs</code> of <code><a href="ms_model.html">ms_model</a></code>) and, with
+<code>pfs_switch = "censor"</code> in <code><a href="ms_scenario.html">ms_scenario</a></code>, the censoring
+at a switch before progression.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

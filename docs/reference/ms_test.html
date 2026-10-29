@@ -9,7 +9,7 @@ the approximation of the distribution of the statistics."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,8 @@ the approximation of the distribution of the statistics.</p>
 <span>  spending_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"events"</span>, <span class="st">"information"</span><span class="op">)</span>,</span>
 <span>  mtp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"bonferroni"</span>, <span class="st">"fixed_sequence"</span><span class="op">)</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  hierarchical <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"overall"</span>, <span class="st">"stagewise"</span><span class="op">)</span></span>
+<span>  hierarchical <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"overall"</span>, <span class="st">"stagewise"</span><span class="op">)</span>,</span>
+<span>  transition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -146,6 +147,14 @@ up to 1; defaults to equal weights).</p></dd>
 <dd><p><code>"overall"</code> or <code>"stagewise"</code> (for
 <code>mtp = "fixed_sequence"</code>).</p></dd>
 
+
+<dt id="arg-transition">transition<a class="anchor" aria-label="anchor" href="#arg-transition"></a></dt>
+<dd><p>For <code>mtp = "bonferroni"</code>, the fractions of the
+level passed on after a rejection, <code>c(g12, g21)</code>: g12 from the
+first endpoint to the second after the first hypothesis is rejected and
+g21 from the second to the first after the second is rejected (numbers
+between 0 and 1). The default <code>c(0, 0)</code> means no recycling.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -169,7 +178,28 @@ ignore the futility bounds.</p>
 <p>With two endpoints, each endpoint has its own efficacy bounds, computed as
 above from the looks at which it is tested (see <code><a href="ms_looks.html">ms_looks</a></code>).
 With <code>mtp = "bonferroni"</code>, the endpoint k is tested at level
-<code>weights[k] * alpha</code>; the levels are not recycled after a rejection.
+<code>weights[k] * alpha</code>. By default the levels are not recycled after a
+rejection. With <code>transition = c(g12, g21)</code>, the level of a rejected
+hypothesis is passed on to the other in the graphical procedure of Maurer
+and Bretz (2013, Algorithm 1): after the first hypothesis has been
+rejected, the second is tested at level
+<code>(weights[2] + g12 * weights[1]) * alpha</code>, and after the second has
+been rejected, the first at level
+<code>(weights[1] + g21 * weights[2]) * alpha</code>. The bounds at the level
+after recycling are computed with the spending function of the endpoint
+for all its looks (Maurer and Bretz 2013, Section 3.2). The procedure
+controls the familywise error rate when the nominal levels of the spending
+functions do not decrease with the level (Maurer and Bretz 2013, Section
+3.1). The spending functions of <code><a href="gs_spend.html">gs_spend</a></code> other than
+<code>"OF"</code> are proportional to the level and have this property, and
+<code>"OF"</code> has it for levels below 0.318 (Maurer and Bretz 2013, p. 313).
+<code><a href="ms_power.html">ms_power</a></code> checks at every look that the bounds after
+recycling do not exceed the bounds at the initial level and stops with an
+error otherwise. With binding futility bounds, the bounds of the first
+endpoint after recycling are computed with the futility bounds of the
+initial level as binding bounds.
+A hypothesis rejected at an analysis makes the other be tested at its
+level after recycling at the same analysis (see <code><a href="gs_prob_mtp.html">gs_prob_mtp</a></code>).
 With <code>mtp = "fixed_sequence"</code>, both endpoints are tested at level
 <code>alpha</code> and the second endpoint is tested only after the first has
 been rejected: with <code>hierarchical = "overall"</code> at the analysis at
@@ -202,6 +232,9 @@ Genz-Bretz algorithm (see <code><a href="gs_prob.html">gs_prob</a></code>).</p>
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
 endpoints in group-sequential trials. Statistics in Medicine 29:219-228.</p>
+<p>Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.</p>
 <p>Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
 endpoint in a group sequential design. Biometrics 66:1174-1184.</p>
     </div>
@@ -239,6 +272,16 @@ endpoint in a group sequential design. Biometrics 66:1174-1184.</p>
 <span class="r-in"><span><span class="fu">ms_test</span><span class="op">(</span>endpoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pfs"</span>, <span class="st">"os"</span><span class="op">)</span>, mtp <span class="op">=</span> <span class="st">"bonferroni"</span>, weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> One-sided log-rank tests of PFS and OS at familywise level 0.025</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Bonferroni: PFS at level 0.02, OS at level 0.005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Futility (PFS): none</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Mean: "direct"; variance: "null"; spending time: "events"</span>
+<span class="r-in"><span><span class="co"># The same with the level of PFS passed on to OS after the rejection of</span></span></span>
+<span class="r-in"><span><span class="co"># PFS, and the level of OS to PFS after the rejection of OS</span></span></span>
+<span class="r-in"><span><span class="fu">ms_test</span><span class="op">(</span>endpoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pfs"</span>, <span class="st">"os"</span><span class="op">)</span>, mtp <span class="op">=</span> <span class="st">"bonferroni"</span>, weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        transition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> One-sided log-rank tests of PFS and OS at familywise level 0.025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Bonferroni: PFS at level 0.02, OS at level 0.005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Recycling: fraction 1 from PFS to OS and 1 from OS to PFS; OS at level 0.025 after PFS is rejected, PFS at level 0.025 after OS is rejected</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Futility (PFS): none</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Mean: "direct"; variance: "null"; spending time: "events"</span>

@@ -15,7 +15,7 @@ is positive when the treatment is better."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,7 @@ is positive when the treatment is better.</p>
 <dd><p>Endpoint whose observed number of events determines each
 calendar time (<code>"os"</code> or <code>"pfs"</code>; one value or one per time),
 or <code>NULL</code> or <code>NA</code> for fixed calendar times. Used only with
-<code>variance = "studentized"</code>.</p></dd>
+<code>variance = "studentized"</code>, and with switching from a calendar time.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -127,6 +127,9 @@ randomization gives a variance that is not larger. For
 which also accounts for the variability of V and, for times determined by
 the observed number of events of an endpoint (<code>trigger</code>), of the
 analysis time (see <code><a href="lr_cov.html">lr_cov</a></code>).</p>
+<p>With switching from a calendar time (<code>switch_start</code> of
+<code><a href="ms_scenario.html">ms_scenario</a></code>), the moments of OS integrate over the entry
+time; see <code><a href="lr_cov.html">lr_cov</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

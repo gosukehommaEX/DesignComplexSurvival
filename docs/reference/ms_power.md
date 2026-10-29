@@ -94,12 +94,15 @@ the endpoint is tested, with the columns above and `endpoint`, `look`,
 `trigger` and `events_trigger` (the events of the trigger endpoint at
 the look, `NA` for calendar-driven looks); `prob_upper` is the
 probability of rejecting the hypothesis of the endpoint at the look
-under the multiple testing procedure, `prob_lower` the probability of
-stopping for futility at the look (first endpoint), `cum_power` the
-cumulative sum of `prob_upper`, `alpha_spent` the cumulative alpha of
-the bounds of the endpoint and `cum_alpha` the cumulative non-binding
-probability of rejecting the hypothesis of the endpoint under the global
-null hypothesis. `power` has the powers of the two endpoints (named by
+under the multiple testing procedure (with recycling of the level,
+`z_upper_recycled` and `p_upper_recycled` give the efficacy bound and
+its nominal p-value at the level after the other hypothesis has been
+rejected, after `hr_upper`), `prob_lower` the probability of stopping
+for futility at the look (first endpoint), `cum_power` the cumulative
+sum of `prob_upper`, `alpha_spent` the cumulative alpha of the bounds of
+the endpoint and `cum_alpha` the cumulative non-binding probability of
+rejecting the hypothesis of the endpoint under the global null
+hypothesis. `power` has the powers of the two endpoints (named by
 endpoint), the probability of rejecting both hypotheses (`both`) and of
 rejecting at least one (`any`); `type1` is the familywise error rate
 under the global null hypothesis, non-binding and binding; `fwer` is a
@@ -156,8 +159,11 @@ with the observed events of the trigger endpoints determining the
 event-driven looks for `variance = "studentized"`. Each endpoint has its
 own bounds, and the rejection probabilities under the multiple testing
 procedure are computed by
-[`gs_prob_mtp`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob_mtp.md).
-The familywise error rate is computed under
+[`gs_prob_mtp`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob_mtp.md);
+with recycling of the level (`transition` of
+[`ms_test`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md)),
+each endpoint also has bounds at its level after recycling. The
+familywise error rate is computed under
 [`ms_null`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_null.md)
 applied to the scenario (the global null hypothesis), where the
 correlations between the endpoints are those of Danzer et al. (2025,
@@ -168,6 +174,19 @@ multistate model of the design scenario and are given by the user, for
 example a model with the same OS in both groups and a difference in PFS.
 Under each null scenario the event-driven looks take place at the same
 numbers of events of their trigger endpoints.
+
+With switching from a calendar time (`switch_start` of
+[`ms_scenario`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)),
+only a test of one endpoint with `mean = "direct"` for OS is covered,
+and an OS test cannot use looks driven by PFS events. For OS the
+covariance of the statistics comes from the per-patient influence
+functions (see
+[`lr_cov`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/lr_cov.md));
+the bounds still come from the information or event fractions, and the
+type I error under
+[`ms_null`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_null.md)
+uses the exact correlations under the null hypothesis, so it can differ
+from `alpha` when the switching changes the death hazard.
 
 ## References
 

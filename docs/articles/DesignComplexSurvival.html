@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,12 +64,13 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gosukehommaEX/DesignComplexSurvival" class="external-link">DesignComplexSurvival</a></span><span class="op">)</span></span></code></pre></div>
 <p>DesignComplexSurvival computes the operating characteristics of
 two-group time-to-event trials analysed with the log-rank test, without
-patient-level simulation. Each group follows a four-state model
-(progression-free, progressed, switched, dead) with piecewise constant
-intensities. This vignette shows a single endpoint with a delayed
-treatment effect, then overall survival (OS) with treatment switching
-after progression, and finally progression-free survival (PFS) and OS
-tested together.</p>
+patient-level simulation. Each group follows a multistate model
+(progression-free, progressed, switched, dead, and progression-free
+after a switch before progression) with piecewise constant intensities.
+This vignette shows a single endpoint with a delayed treatment effect,
+then overall survival (OS) with treatment switching after progression,
+and progression-free survival (PFS) and OS tested together, and finally
+the options added in version 0.3.0.</p>
 <div class="section level2">
 <h2 id="a-delayed-treatment-effect">A delayed treatment effect<a class="anchor" aria-label="anchor" href="#a-delayed-treatment-effect"></a>
 </h2>
@@ -251,6 +252,82 @@ the same in both groups but PFS is not, can be given through
 <span><span class="co">#&gt; 2 null_scenarios[[1]]             OS 0.02405394 0.02405394</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="new-in-version-0-3-0">New in version 0.3.0<a class="anchor" aria-label="anchor" href="#new-in-version-0-3-0"></a>
+</h2>
+<div class="section level3">
+<h3 id="switching-from-a-calendar-time">Switching from a calendar time<a class="anchor" aria-label="anchor" href="#switching-from-a-calendar-time"></a>
+</h3>
+<p>Switching is sometimes allowed only from a calendar time, for example
+after an interim analysis. With <code>switch_start</code> in
+<code><a href="../reference/ms_scenario.html">ms_scenario()</a></code>, nobody switches before that time, and a
+patient enrolled at time e can switch from the follow-up time
+max(switch_start - e, 0) on. In the example of switching after
+progression, switching allowed from month 12 gives</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scn_cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_scenario.html">ms_scenario</a></span><span class="op">(</span><span class="va">ctl_sw</span>, <span class="va">trt_sw</span>, accrual <span class="op">=</span> <span class="fu"><a href="../reference/ms_accrual.html">ms_accrual</a></span><span class="op">(</span>rate <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>,</span>
+<span>                       switch_start <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
+<span><span class="va">pw_cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_power.html">ms_power</a></span><span class="op">(</span><span class="va">scn_cal</span>, n <span class="op">=</span> <span class="fl">500</span>, looks <span class="op">=</span> <span class="fu"><a href="../reference/ms_looks.html">ms_looks</a></span><span class="op">(</span><span class="st">"os"</span>, fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                   test <span class="op">=</span> <span class="fu"><a href="../reference/ms_test.html">ms_test</a></span><span class="op">(</span><span class="op">)</span>, events <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>from_randomization <span class="op">=</span> <span class="va">pw</span><span class="op">$</span><span class="va">power</span>, from_month_12 <span class="op">=</span> <span class="va">pw_cal</span><span class="op">$</span><span class="va">power</span>,</span>
+<span>  no_switching <span class="op">=</span> <span class="va">pw_ns</span><span class="op">$</span><span class="va">power</span><span class="op">)</span></span>
+<span><span class="co">#&gt; from_randomization      from_month_12       no_switching </span></span>
+<span><span class="co">#&gt;          0.2205938          0.3446201          0.8426871</span></span></code></pre></div>
+<p>The power is 0.345 with switching from month 12, against 0.221 with
+switching from randomization and 0.843 without switching. The
+distribution of OS now depends on the entry time, and under the null
+hypothesis the statistics no longer have independent increments. The
+efficacy bounds still come from the event fractions, and the type I
+error of this design is 0.025. The computations cover the OS statistic
+alone with <code>mean = "direct"</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="recycling-of-the-level">Recycling of the level<a class="anchor" aria-label="anchor" href="#recycling-of-the-level"></a>
+</h3>
+<p>With <code>transition</code> in <code><a href="../reference/ms_test.html">ms_test()</a></code>, the
+Bonferroni procedure passes the level of a rejected hypothesis on to the
+other (Maurer and Bretz 2013). With <code>transition = c(1, 1)</code>
+and the weights 0.8 and 0.2, OS is tested at level 0.025 once PFS has
+been rejected, and PFS at level 0.025 once OS has been rejected.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_power.html">ms_power</a></span><span class="op">(</span><span class="va">fl</span>, n <span class="op">=</span> <span class="fl">450</span>, looks <span class="op">=</span> <span class="va">lk2</span>,</span>
+<span>               test <span class="op">=</span> <span class="fu"><a href="../reference/ms_test.html">ms_test</a></span><span class="op">(</span>endpoints <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pfs"</span>, <span class="st">"os"</span><span class="op">)</span>, mtp <span class="op">=</span> <span class="st">"bonferroni"</span>,</span>
+<span>                              weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span><span class="op">)</span>, transition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>               events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>pfs <span class="op">=</span> <span class="fl">300</span>, os <span class="op">=</span> <span class="fl">220</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>bonferroni <span class="op">=</span> <span class="va">bf</span><span class="op">$</span><span class="va">power</span>, recycling <span class="op">=</span> <span class="va">rc</span><span class="op">$</span><span class="va">power</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  pfs        os      both       any</span></span>
+<span><span class="co">#&gt; bonferroni 0.9265375 0.3237669 0.3173922 0.9329122</span></span>
+<span><span class="co">#&gt; recycling  0.9266956 0.5479409 0.5417243 0.9329122</span></span></code></pre></div>
+<p>The power for OS is 0.324 without and 0.548 with recycling, and the
+familywise error rate under the global null hypothesis is 0.0242. The
+table of <code><a href="../reference/ms_power.html">ms_power()</a></code> gives the bounds after recycling in the
+columns <code>z_upper_recycled</code> and
+<code>p_upper_recycled</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="other-options-of-the-model">Other options of the model<a class="anchor" aria-label="anchor" href="#other-options-of-the-model"></a>
+</h3>
+<ul>
+<li>
+<code>switch_clock = "switch"</code> in <code><a href="../reference/ms_model.html">ms_model()</a></code>
+measures the death hazard after a switch from the time of the
+switch.</li>
+<li>
+<code>switch_af</code> gives the switch an accelerated failure time
+effect: the remaining time after the switch is the remaining time
+without switch divided by <code>switch_af</code> (the rank preserving
+structural failure time model of Robins and Tsiatis 1991).</li>
+<li>
+<code>switch_pre</code>, <code>prog_switch</code> and
+<code>death_switch_pre</code> describe switching before progression, and
+<code>pfs_switch</code> in <code><a href="../reference/ms_scenario.html">ms_scenario()</a></code> sets whether PFS
+is censored at such a switch.</li>
+<li>
+<code>dropout_pfs</code> adds a censoring of PFS only, for example
+the end of tumour assessments.</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
 <h2 id="choice-of-the-covariance">Choice of the covariance<a class="anchor" aria-label="anchor" href="#choice-of-the-covariance"></a>
 </h2>
 <p>The argument <code>variance</code> of <code><a href="../reference/ms_test.html">ms_test()</a></code> (and of
@@ -264,7 +341,7 @@ With <code>"studentized"</code>, the covariance is the asymptotic
 covariance of the statistic that is computed in practice, standardized
 by the estimated variance and, for event-driven analyses, taken at a
 random analysis time.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>alternative <span class="op">=</span> <span class="st">"alternative"</span>, studentized <span class="op">=</span> <span class="st">"studentized"</span><span class="op">)</span>,</span>
 <span>             <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="../reference/lr_moments.html">lr_moments</a></span><span class="op">(</span><span class="va">scn</span>, n <span class="op">=</span> <span class="fl">700</span>, calendar_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">24</span>, <span class="va">t_fin</span><span class="op">)</span>,</span>
 <span>                                    variance <span class="op">=</span> <span class="va">v</span><span class="op">)</span><span class="op">)</span></span>
@@ -298,6 +375,12 @@ endpoints in group-sequential trials. Statistics in Medicine
 <p>Luo X, Mao X, Chen X, Qiu J, Bai S, Quan H (2019). Design and
 monitoring of survival trials in complex scenarios. Statistics in
 Medicine 38:192-209.</p>
+<p>Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.</p>
+<p>Robins JM, Tsiatis AA (1991). Correcting for non-compliance in
+randomized trials using rank preserving structural failure time models.
+Communications in Statistics - Theory and Methods 20:2609-2631.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -32,7 +32,11 @@ A data frame with `time`, the survival function `surv`, the hazard `haz`
 
 PFS has the hazard `prog + death`. OS combines death before progression
 with death after progression, with or without switch; its hazard is not
-piecewise constant when `prog` is positive.
+piecewise constant when `prog` is positive. With a switch before
+progression (`switch_pre`), PFS is the time to progression or death
+whatever `pfs_switch` of
+[`ms_scenario`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md),
+and its hazard is not piecewise constant.
 
 ## See also
 

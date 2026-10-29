@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,26 @@
       <small>Source: <a href="https://github.com/gosukehommaEX/DesignComplexSurvival/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="designcomplexsurvival-030">DesignComplexSurvival 0.3.0<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-030"></a></h2>
+<ul><li>Stage 3 of the development plan: further models of switching and censoring, switching that starts at a calendar time, and recycling of the level between PFS and OS. With the default values of the new arguments the results are unchanged: the outputs of <code>inst/reproduce/</code> and <code>inst/validation/</code> of version 0.2.2 are reproduced without any numerical difference.</li>
+<li>
+<code><a href="../reference/ms_model.html">ms_model()</a></code> gains <code>switch_clock</code>: with <code>"switch"</code>, the death hazard after a switch is a function of the time since the switch instead of the post-progression clock (<code>"same"</code>, the default).</li>
+<li>
+<code><a href="../reference/ms_model.html">ms_model()</a></code> gains <code>switch_af</code>, an accelerated failure time effect of the switch: the remaining time after the switch is the remaining time without switch divided by <code>switch_af</code> (the rank preserving structural failure time model of Robins and Tsiatis 1991).</li>
+<li>
+<code><a href="../reference/ms_model.html">ms_model()</a></code> gains switching before progression: <code>switch_pre</code> (hazard of switching while progression-free), <code>prog_switch</code> and <code>death_switch_pre</code> (hazards of progression and death after such a switch). After a later progression these patients die with the hazard <code>death_switch</code> (with <code>switch_af</code>, <code>switch_af * death_prog</code>). <code><a href="../reference/ms_prob.html">ms_prob()</a></code> then adds the column <code>progression_free_switched</code>.</li>
+<li>
+<code><a href="../reference/ms_scenario.html">ms_scenario()</a></code> gains <code>pfs_switch</code>: PFS is followed up to progression or death (<code>"event"</code>, the default) or censored at a switch before progression (<code>"censor"</code>).</li>
+<li>
+<code><a href="../reference/ms_model.html">ms_model()</a></code> gains <code>dropout_pfs</code>, a censoring of PFS only (for example the end of tumour assessments). The PFS dropouts of <code><a href="../reference/ms_events.html">ms_events()</a></code> include it and, with <code>pfs_switch = "censor"</code>, the censoring at a switch.</li>
+<li>
+<code><a href="../reference/ms_scenario.html">ms_scenario()</a></code> gains <code>switch_start</code>, a calendar time before which nobody switches (for example when switching is allowed only after an interim analysis). The distribution of OS then depends on the entry time, and the moments and covariances of the OS statistic integrate over the entry time. Under the null hypothesis the score no longer has independent increments, and the correlations between the looks come from the per-patient influence functions. The OS statistic alone with <code>mean = "direct"</code> is covered, at calendar times or at looks driven by OS events; PFS is not affected. Two endpoints together give an error.</li>
+<li>
+<code><a href="../reference/ms_test.html">ms_test()</a></code> gains <code>transition</code> for <code>mtp = "bonferroni"</code>: the level of a rejected hypothesis is passed on to the other (graphical procedure of Maurer and Bretz 2013, Algorithm 1), and <code><a href="../reference/gs_prob_mtp.html">gs_prob_mtp()</a></code> gains <code>upper_recycled</code>. The bounds after recycling are checked not to exceed the bounds at the initial level at every look. With recycling, the table of <code><a href="../reference/ms_power.html">ms_power()</a></code> gains the columns <code>z_upper_recycled</code> and <code>p_upper_recycled</code>.</li>
+<li>Reproduction scripts added for Maurer and Bretz (2013) and Torres-Saavedra et al. (2026) (<code>inst/reproduce/</code>).</li>
+<li>Validation: Python simulations of the new options (switch clock and accelerated failure time effect; switching before progression and censoring of PFS only, with PFS and OS together; switching from a calendar time), the Bonferroni procedure with recycling in the simulations of PFS and OS together, and a comparison of the rejection probabilities with the decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code> and of the bounds with <code><a href="https://kaifenglu.github.io/lrstat/reference/getBound.html" class="external-link">lrstat::getBound()</a></code> (<code>inst/validation/</code>).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.2" id="designcomplexsurvival-022">DesignComplexSurvival 0.2.2<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-022"></a></h2>
 <ul><li>Bug fix: rectangle probabilities of nine or more coordinates with two finite limits for some coordinate (designs with futility bounds and nine or more looks of an endpoint) were wrong with the Miwa algorithm of mvtnorm, which leaves out the terms of nine or more coordinates of the inclusion-exclusion over the limits (errors of 7.5e-4 with nine and 6.9e-3 with ten coordinates under the correlation of independent increments, so also with the default <code>variance = "null"</code>). They now use the Genz-Bretz algorithm with a fixed seed. Rectangles with one-sided limits only (no futility bounds) and designs with at most eight looks per endpoint are unchanged.</li>

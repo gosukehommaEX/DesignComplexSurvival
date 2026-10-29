@@ -16,7 +16,8 @@ gs_prob_mtp(
   sigma,
   analysis = NULL,
   mtp = c("fixed_sequence", "bonferroni"),
-  hierarchical = c("overall", "stagewise")
+  hierarchical = c("overall", "stagewise"),
+  upper_recycled = NULL
 )
 ```
 
@@ -60,6 +61,13 @@ gs_prob_mtp(
 
   `"overall"` or `"stagewise"` (used with `mtp = "fixed_sequence"`).
 
+- upper_recycled:
+
+  For `mtp = "bonferroni"`, an optional list of two numeric vectors: the
+  efficacy bounds of the first and of the second endpoint at their looks
+  at the level after the other hypothesis has been rejected (not above
+  `upper`). `NULL` means no recycling.
+
 ## Value
 
 A list with
@@ -94,6 +102,23 @@ until the trial stops, with bounds computed at levels that add up to
 alpha. The trial stops when both hypotheses are rejected or for
 futility.
 
+With `mtp = "bonferroni"` and `upper_recycled`, the level of a rejected
+hypothesis is passed on to the other hypothesis (the graphical procedure
+of Maurer and Bretz 2013, Algorithm 1, for two hypotheses). Each
+hypothesis is tested with its bounds in `upper` until the other
+hypothesis is rejected, and with its bounds in `upper_recycled` from the
+analysis at which the other is rejected on: a hypothesis rejected with
+its bound in `upper` at an analysis makes the other be tested with its
+bound in `upper_recycled` at the same analysis. The bounds in
+`upper_recycled` are those of the level after recycling, for example
+`(w1 + g21 w2) alpha` for the first hypothesis with the weights w and
+the fraction g21 of the level of the second hypothesis that is passed on
+to the first. They must not exceed the bounds in `upper`, which holds
+when the nominal levels of the spending function do not decrease with
+the level (Maurer and Bretz 2013, Section 3.1). The futility stop of the
+first endpoint also applies after the second hypothesis has been
+rejected.
+
 With `mtp = "fixed_sequence"`, the second hypothesis is tested only
 after the first has been rejected. With `hierarchical = "overall"` it is
 tested at the analysis at which the first hypothesis is rejected and at
@@ -107,7 +132,16 @@ The probabilities are sums of rectangle probabilities of the
 multivariate normal distribution, one for each combination of the
 outcome of the first endpoint (rejection or stop for futility at a look,
 or no rejection) and the look at which the second hypothesis is
-rejected. They are computed with
+rejected. With `upper_recycled`, the probabilities are summed over the
+outcomes at each analysis: at an analysis at which both hypotheses are
+tested and neither has been rejected, with the bounds A1, A2 in `upper`
+and B1, B2 in `upper_recycled`, both hypotheses are rejected when Z1 \>=
+A1 and Z2 \>= B2 or when B1 \<= Z1 \< A1 and Z2 \>= A2, only the first
+when Z1 \>= A1 and Z2 \< B2, only the second when Z1 \< B1 and Z2 \>=
+A2, and neither when Z1 \< A1 and Z2 \< A2; at an analysis at which one
+hypothesis is tested, it is rejected or not. The futility stop splits
+the outcomes in which the first hypothesis is tested and not rejected at
+an interim look. The rectangle probabilities are computed with
 [`mvtnorm::pmvnorm()`](https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html) (at
 most 20 looks in total): with the Genz-Bretz algorithm for the
 rectangles that involve both endpoints and have four or more coordinates
@@ -126,6 +160,10 @@ changed with `options(DesignComplexSurvival.genz_abseps = ...)`.
 
 Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
 endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
+
+Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.
 
 Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
 endpoint in a group sequential design. Biometrics 66:1174-1184.
@@ -153,4 +191,12 @@ gs_prob_mtp(list(b1, b2), mean = c(2, 2.9, 1.5, 2.1), sigma = sigma)$reject
 gs_prob_mtp(list(b1, b2), mean = c(2, 2.9, 0, 0), sigma = sigma)$reject
 #>      first     second       both        any 
 #> 0.82488393 0.02068571 0.02068571 0.82488393 
+# Bonferroni with the level alpha / 2 for each endpoint and the level
+# alpha after the other hypothesis has been rejected (full recycling)
+h1 <- gs_bounds(tt, alpha = 0.0125, sf_eff = "OF")$upper
+h2 <- gs_bounds(tt, alpha = 0.0125, sf_eff = "Pocock")$upper
+gs_prob_mtp(list(h1, h2), mean = c(2, 2.9, 1.5, 2.1), sigma = sigma,
+            mtp = "bonferroni", upper_recycled = list(b1, b2))$reject
+#>     first    second      both       any 
+#> 0.7620396 0.4654847 0.4417205 0.7858038 
 ```

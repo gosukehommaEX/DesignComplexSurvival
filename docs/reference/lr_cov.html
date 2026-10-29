@@ -11,7 +11,7 @@ together."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,7 @@ together.</p>
 <dd><p>Endpoint whose observed number of events determines each
 calendar time (<code>"os"</code> or <code>"pfs"</code>; one value or one per time),
 or <code>NULL</code> or <code>NA</code> for fixed calendar times. Used only with
-<code>variance = "studentized"</code>.</p></dd>
+<code>variance = "studentized"</code>, and with switching from a calendar time.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -126,6 +126,18 @@ endpoints are the covariances of the scores divided by
 <code>sqrt(V_P V_O)</code>. Under the null hypothesis the three choices agree,
 and the covariance between the endpoints is that of Danzer et al. (2025,
 Theorem 1).</p>
+<p>With switching from a calendar time (<code>switch_start</code> of
+<code><a href="ms_scenario.html">ms_scenario</a></code>), the hazard of OS depends on the entry time
+and the score has no independent increments, even under the null
+hypothesis. The means, information and covariances of OS then integrate
+over the entry time, with the proportion in the risk set and the pooled
+hazard of each calendar time. With <code>"null"</code> the statistics have unit
+variances and the correlations of the studentized statistics (which,
+under the null hypothesis, are the exact correlations), with
+<code>"alternative"</code> the covariances of the scores divided by
+<code>sqrt(V_j V_k)</code>, and with <code>"studentized"</code> the covariances of
+the studentized statistics; <code>trigger</code> is used with all three. Only
+OS alone with <code>mean = "direct"</code> is covered; PFS is not affected.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>

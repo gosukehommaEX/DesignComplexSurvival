@@ -48,7 +48,8 @@ lr_cov(
 
   Endpoint whose observed number of events determines each calendar time
   (`"os"` or `"pfs"`; one value or one per time), or `NULL` or `NA` for
-  fixed calendar times. Used only with `variance = "studentized"`.
+  fixed calendar times. Used only with `variance = "studentized"`, and
+  with switching from a calendar time.
 
 ## Value
 
@@ -83,6 +84,20 @@ statistics. With `"alternative"` the covariances between the endpoints
 are the covariances of the scores divided by `sqrt(V_P V_O)`. Under the
 null hypothesis the three choices agree, and the covariance between the
 endpoints is that of Danzer et al. (2025, Theorem 1).
+
+With switching from a calendar time (`switch_start` of
+[`ms_scenario`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)),
+the hazard of OS depends on the entry time and the score has no
+independent increments, even under the null hypothesis. The means,
+information and covariances of OS then integrate over the entry time,
+with the proportion in the risk set and the pooled hazard of each
+calendar time. With `"null"` the statistics have unit variances and the
+correlations of the studentized statistics (which, under the null
+hypothesis, are the exact correlations), with `"alternative"` the
+covariances of the scores divided by `sqrt(V_j V_k)`, and with
+`"studentized"` the covariances of the studentized statistics; `trigger`
+is used with all three. Only OS alone with `mean = "direct"` is covered;
+PFS is not affected.
 
 ## References
 

@@ -23,7 +23,8 @@ ms_test(
   spending_time = c("events", "information"),
   mtp = c("none", "bonferroni", "fixed_sequence"),
   weights = NULL,
-  hierarchical = c("overall", "stagewise")
+  hierarchical = c("overall", "stagewise"),
+  transition = c(0, 0)
 )
 ```
 
@@ -107,6 +108,14 @@ ms_test(
 
   `"overall"` or `"stagewise"` (for `mtp = "fixed_sequence"`).
 
+- transition:
+
+  For `mtp = "bonferroni"`, the fractions of the level passed on after a
+  rejection, `c(g12, g21)`: g12 from the first endpoint to the second
+  after the first hypothesis is rejected and g21 from the second to the
+  first after the second is rejected (numbers between 0 and 1). The
+  default `c(0, 0)` means no recycling.
+
 ## Value
 
 An object of class `ms_test`.
@@ -132,7 +141,30 @@ With two endpoints, each endpoint has its own efficacy bounds, computed
 as above from the looks at which it is tested (see
 [`ms_looks`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_looks.md)).
 With `mtp = "bonferroni"`, the endpoint k is tested at level
-`weights[k] * alpha`; the levels are not recycled after a rejection.
+`weights[k] * alpha`. By default the levels are not recycled after a
+rejection. With `transition = c(g12, g21)`, the level of a rejected
+hypothesis is passed on to the other in the graphical procedure of
+Maurer and Bretz (2013, Algorithm 1): after the first hypothesis has
+been rejected, the second is tested at level
+`(weights[2] + g12 * weights[1]) * alpha`, and after the second has been
+rejected, the first at level `(weights[1] + g21 * weights[2]) * alpha`.
+The bounds at the level after recycling are computed with the spending
+function of the endpoint for all its looks (Maurer and Bretz 2013,
+Section 3.2). The procedure controls the familywise error rate when the
+nominal levels of the spending functions do not decrease with the level
+(Maurer and Bretz 2013, Section 3.1). The spending functions of
+[`gs_spend`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_spend.md)
+other than `"OF"` are proportional to the level and have this property,
+and `"OF"` has it for levels below 0.318 (Maurer and Bretz 2013, p.
+313).
+[`ms_power`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+checks at every look that the bounds after recycling do not exceed the
+bounds at the initial level and stops with an error otherwise. With
+binding futility bounds, the bounds of the first endpoint after
+recycling are computed with the futility bounds of the initial level as
+binding bounds. A hypothesis rejected at an analysis makes the other be
+tested at its level after recycling at the same analysis (see
+[`gs_prob_mtp`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob_mtp.md)).
 With `mtp = "fixed_sequence"`, both endpoints are tested at level
 `alpha` and the second endpoint is tested only after the first has been
 rejected: with `hierarchical = "overall"` at the analysis at which the
@@ -169,6 +201,10 @@ Genz-Bretz algorithm (see
 
 Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
 endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
+
+Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.
 
 Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
 endpoint in a group sequential design. Biometrics 66:1174-1184.
@@ -208,6 +244,16 @@ ms_test(endpoints = c("pfs", "os"), sf_eff = c("OF", "Pocock"),
 ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", weights = c(0.8, 0.2))
 #> One-sided log-rank tests of PFS and OS at familywise level 0.025
 #>   Bonferroni: PFS at level 0.02, OS at level 0.005
+#>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)
+#>   Futility (PFS): none
+#>   Mean: "direct"; variance: "null"; spending time: "events"
+# The same with the level of PFS passed on to OS after the rejection of
+# PFS, and the level of OS to PFS after the rejection of OS
+ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", weights = c(0.8, 0.2),
+        transition = c(1, 1))
+#> One-sided log-rank tests of PFS and OS at familywise level 0.025
+#>   Bonferroni: PFS at level 0.02, OS at level 0.005
+#>   Recycling: fraction 1 from PFS to OS and 1 from OS to PFS; OS at level 0.025 after PFS is rejected, PFS at level 0.025 after OS is rejected
 #>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)
 #>   Futility (PFS): none
 #>   Mean: "direct"; variance: "null"; spending time: "events"

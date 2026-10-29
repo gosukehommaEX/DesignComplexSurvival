@@ -15,7 +15,7 @@ one."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,8 @@ one.</p>
 <span>  <span class="va">sigma</span>,</span>
 <span>  analysis <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mtp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed_sequence"</span>, <span class="st">"bonferroni"</span><span class="op">)</span>,</span>
-<span>  hierarchical <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"overall"</span>, <span class="st">"stagewise"</span><span class="op">)</span></span>
+<span>  hierarchical <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"overall"</span>, <span class="st">"stagewise"</span><span class="op">)</span>,</span>
+<span>  upper_recycled <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,6 +104,13 @@ increasing within an endpoint; equal numbers mean the same analysis).
 <dd><p><code>"overall"</code> or <code>"stagewise"</code> (used with
 <code>mtp = "fixed_sequence"</code>).</p></dd>
 
+
+<dt id="arg-upper-recycled">upper_recycled<a class="anchor" aria-label="anchor" href="#arg-upper-recycled"></a></dt>
+<dd><p>For <code>mtp = "bonferroni"</code>, an optional list of
+two numeric vectors: the efficacy bounds of the first and of the second
+endpoint at their looks at the level after the other hypothesis has been
+rejected (not above <code>upper</code>). <code>NULL</code> means no recycling.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -134,6 +142,21 @@ of the first endpoint is not used.</p>
 <p>With <code>mtp = "bonferroni"</code>, each endpoint is tested at all its looks
 until the trial stops, with bounds computed at levels that add up to
 alpha. The trial stops when both hypotheses are rejected or for futility.</p>
+<p>With <code>mtp = "bonferroni"</code> and <code>upper_recycled</code>, the level of a
+rejected hypothesis is passed on to the other hypothesis (the graphical
+procedure of Maurer and Bretz 2013, Algorithm 1, for two hypotheses).
+Each hypothesis is tested with its bounds in <code>upper</code> until the other
+hypothesis is rejected, and with its bounds in <code>upper_recycled</code> from
+the analysis at which the other is rejected on: a hypothesis rejected with
+its bound in <code>upper</code> at an analysis makes the other be tested with its
+bound in <code>upper_recycled</code> at the same analysis. The bounds in
+<code>upper_recycled</code> are those of the level after recycling, for example
+<code>(w1 + g21 w2) alpha</code> for the first hypothesis with the weights w and
+the fraction g21 of the level of the second hypothesis that is passed on
+to the first. They must not exceed the bounds in <code>upper</code>, which holds
+when the nominal levels of the spending function do not decrease with the
+level (Maurer and Bretz 2013, Section 3.1). The futility stop of the first
+endpoint also applies after the second hypothesis has been rejected.</p>
 <p>With <code>mtp = "fixed_sequence"</code>, the second hypothesis is tested only
 after the first has been rejected. With <code>hierarchical = "overall"</code> it
 is tested at the analysis at which the first hypothesis is rejected and at
@@ -145,7 +168,17 @@ et al. 2010, the procedure of Tamhane et al. 2010).</p>
 <p>The probabilities are sums of rectangle probabilities of the multivariate
 normal distribution, one for each combination of the outcome of the first
 endpoint (rejection or stop for futility at a look, or no rejection) and
-the look at which the second hypothesis is rejected. They are computed
+the look at which the second hypothesis is rejected. With
+<code>upper_recycled</code>, the probabilities are summed over the outcomes at
+each analysis: at an analysis at which both hypotheses are tested and
+neither has been rejected, with the bounds A1, A2 in <code>upper</code> and B1,
+B2 in <code>upper_recycled</code>, both hypotheses are rejected when Z1 &gt;= A1 and
+Z2 &gt;= B2 or when B1 &lt;= Z1 &lt; A1 and Z2 &gt;= A2, only the first when Z1 &gt;= A1
+and Z2 &lt; B2, only the second when Z1 &lt; B1 and Z2 &gt;= A2, and neither when
+Z1 &lt; A1 and Z2 &lt; A2; at an analysis at which one hypothesis is tested, it
+is rejected or not. The futility stop splits the outcomes in which the
+first hypothesis is tested and not rejected at an interim look. The
+rectangle probabilities are computed
 with <code><a href="https://rdrr.io/pkg/mvtnorm/man/pmvnorm.html" class="external-link">mvtnorm::pmvnorm()</a></code> (at most 20 looks in total): with the
 Genz-Bretz algorithm for the rectangles that involve both endpoints and
 have four or more coordinates and, as in <code><a href="gs_prob.html">gs_prob</a></code>, for the
@@ -162,6 +195,9 @@ error tolerance of 1e-5 for each rectangle, which can be changed with
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
 endpoints in group-sequential trials. Statistics in Medicine 29:219-228.</p>
+<p>Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.</p>
 <p>Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
 endpoint in a group sequential design. Biometrics 66:1174-1184.</p>
     </div>
@@ -187,6 +223,14 @@ endpoint in a group sequential design. Biometrics 66:1174-1184.</p>
 <span class="r-in"><span><span class="fu">gs_prob_mtp</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">b1</span>, <span class="va">b2</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2.9</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span><span class="op">$</span><span class="va">reject</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      first     second       both        any </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 0.82488393 0.02068571 0.02068571 0.82488393 </span>
+<span class="r-in"><span><span class="co"># Bonferroni with the level alpha / 2 for each endpoint and the level</span></span></span>
+<span class="r-in"><span><span class="co"># alpha after the other hypothesis has been rejected (full recycling)</span></span></span>
+<span class="r-in"><span><span class="va">h1</span> <span class="op">&lt;-</span> <span class="fu"><a href="gs_bounds.html">gs_bounds</a></span><span class="op">(</span><span class="va">tt</span>, alpha <span class="op">=</span> <span class="fl">0.0125</span>, sf_eff <span class="op">=</span> <span class="st">"OF"</span><span class="op">)</span><span class="op">$</span><span class="va">upper</span></span></span>
+<span class="r-in"><span><span class="va">h2</span> <span class="op">&lt;-</span> <span class="fu"><a href="gs_bounds.html">gs_bounds</a></span><span class="op">(</span><span class="va">tt</span>, alpha <span class="op">=</span> <span class="fl">0.0125</span>, sf_eff <span class="op">=</span> <span class="st">"Pocock"</span><span class="op">)</span><span class="op">$</span><span class="va">upper</span></span></span>
+<span class="r-in"><span><span class="fu">gs_prob_mtp</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">h1</span>, <span class="va">h2</span><span class="op">)</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2.9</span>, <span class="fl">1.5</span>, <span class="fl">2.1</span><span class="op">)</span>, sigma <span class="op">=</span> <span class="va">sigma</span>,</span></span>
+<span class="r-in"><span>            mtp <span class="op">=</span> <span class="st">"bonferroni"</span>, upper_recycled <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">b1</span>, <span class="va">b2</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">reject</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     first    second      both       any </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.7620396 0.4654847 0.4417205 0.7858038 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -9,7 +9,7 @@ survival implied by an ms_model, without dropout."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,10 @@ survival implied by an <code>ms_model</code>, without dropout.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>PFS has the hazard <code>prog + death</code>. OS combines death before
 progression with death after progression, with or without switch; its
-hazard is not piecewise constant when <code>prog</code> is positive.</p>
+hazard is not piecewise constant when <code>prog</code> is positive. With a
+switch before progression (<code>switch_pre</code>), PFS is the time to
+progression or death whatever <code>pfs_switch</code> of
+<code><a href="ms_scenario.html">ms_scenario</a></code>, and its hazard is not piecewise constant.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

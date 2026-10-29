@@ -2,11 +2,15 @@
 
 Computes the operating characteristics of two-group time-to-event trials
 analysed with the log-rank test, without patient-level simulation. Each
-group is described by a four-state model (progression-free, progressed,
-switched, dead) with piecewise constant intensities, so that
-progression-free survival, overall survival and treatment switching
-after progression are handled within one model. Accrual is piecewise
-uniform and dropout is piecewise exponential.
+group is described by a multistate model with piecewise constant
+intensities: progression-free, progressed, switched and dead, and, when
+patients may switch before progression, progression-free after a switch.
+Progression-free survival, overall survival and treatment switching
+before, at or after progression are handled within one model. The effect
+of a switch is a change of the death hazard or an accelerated failure
+time effect, and switching may start at a calendar time. Accrual is
+piecewise uniform, dropout is piecewise exponential, and
+progression-free survival may have a censoring of its own.
 
 ## Details
 
@@ -18,11 +22,12 @@ normal probabilities.
 
 A design may test one endpoint, progression-free survival (PFS) or
 overall survival (OS), or both with a fixed-sequence or Bonferroni
-procedure. With two endpoints, the analyses may be driven by the events
-of either endpoint or by calendar time, and the joint distribution of
-the PFS and OS statistics gives the power of each endpoint, the
-probability of rejecting both or at least one hypothesis, and the
-familywise error rate.
+procedure; the Bonferroni procedure may pass the level of a rejected
+hypothesis on to the other (Maurer and Bretz 2013). With two endpoints,
+the analyses may be driven by the events of either endpoint or by
+calendar time, and the joint distribution of the PFS and OS statistics
+gives the power of each endpoint, the probability of rejecting both or
+at least one hypothesis, and the familywise error rate.
 
 ## Workflow
 
@@ -60,6 +65,12 @@ The building blocks
 and
 [`gs_prob_mtp`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/gs_prob_mtp.md)
 are exported so that each step can be checked separately.
+
+## References
+
+Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.
 
 ## See also
 

@@ -1,6 +1,6 @@
 # State occupation probabilities
 
-Probabilities of being in each state of the four-state model at given
+Probabilities of being in each state of the multistate model at given
 times since randomization, without dropout.
 
 ## Usage
@@ -22,7 +22,11 @@ ms_prob(model, time)
 ## Value
 
 A data frame with `time` and the probabilities `progression_free`,
-`progressed` (without switch), `switched` and `dead`.
+`progressed` (without switch), `switched` and `dead`. With `switch_pre`
+positive in some interval, `progression_free` is the probability of
+being progression-free without a switch, and the column
+`progression_free_switched` (progression-free after a switch before
+progression) follows it.
 
 ## Details
 
@@ -32,7 +36,9 @@ probabilities of the progressed and switched states are integrals over
 the time of progression of the progression density times the transition
 probabilities after progression, which have closed forms for piecewise
 constant intensities. The integrals are computed with Gauss-Legendre
-rules.
+rules. With a switch before progression, the probability of the switched
+progression-free state also has a closed form, and the switched state
+includes the patients who progressed after such a switch.
 
 ## See also
 

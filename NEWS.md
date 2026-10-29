@@ -1,3 +1,55 @@
+# DesignComplexSurvival 0.3.0
+
+* Stage 3 of the development plan: further models of switching and
+  censoring, switching that starts at a calendar time, and recycling of the
+  level between PFS and OS. With the default values of the new arguments
+  the results are unchanged: the outputs of `inst/reproduce/` and
+  `inst/validation/` of version 0.2.2 are reproduced without any numerical
+  difference.
+* `ms_model()` gains `switch_clock`: with `"switch"`, the death hazard after
+  a switch is a function of the time since the switch instead of the
+  post-progression clock (`"same"`, the default).
+* `ms_model()` gains `switch_af`, an accelerated failure time effect of the
+  switch: the remaining time after the switch is the remaining time without
+  switch divided by `switch_af` (the rank preserving structural failure time
+  model of Robins and Tsiatis 1991).
+* `ms_model()` gains switching before progression: `switch_pre` (hazard of
+  switching while progression-free), `prog_switch` and `death_switch_pre`
+  (hazards of progression and death after such a switch). After a later
+  progression these patients die with the hazard `death_switch` (with
+  `switch_af`, `switch_af * death_prog`). `ms_prob()` then adds the column
+  `progression_free_switched`.
+* `ms_scenario()` gains `pfs_switch`: PFS is followed up to progression or
+  death (`"event"`, the default) or censored at a switch before progression
+  (`"censor"`).
+* `ms_model()` gains `dropout_pfs`, a censoring of PFS only (for example the
+  end of tumour assessments). The PFS dropouts of `ms_events()` include it
+  and, with `pfs_switch = "censor"`, the censoring at a switch.
+* `ms_scenario()` gains `switch_start`, a calendar time before which nobody
+  switches (for example when switching is allowed only after an interim
+  analysis). The distribution of OS then depends on the entry time, and the
+  moments and covariances of the OS statistic integrate over the entry
+  time. Under the null hypothesis the score no longer has independent
+  increments, and the correlations between the looks come from the
+  per-patient influence functions. The OS statistic alone with
+  `mean = "direct"` is covered, at calendar times or at looks driven by OS
+  events; PFS is not affected. Two endpoints together give an error.
+* `ms_test()` gains `transition` for `mtp = "bonferroni"`: the level of a
+  rejected hypothesis is passed on to the other (graphical procedure of
+  Maurer and Bretz 2013, Algorithm 1), and `gs_prob_mtp()` gains
+  `upper_recycled`. The bounds after recycling are checked not to exceed the
+  bounds at the initial level at every look. With recycling, the table of
+  `ms_power()` gains the columns `z_upper_recycled` and `p_upper_recycled`.
+* Reproduction scripts added for Maurer and Bretz (2013) and
+  Torres-Saavedra et al. (2026) (`inst/reproduce/`).
+* Validation: Python simulations of the new options (switch clock and
+  accelerated failure time effect; switching before progression and
+  censoring of PFS only, with PFS and OS together; switching from a
+  calendar time), the Bonferroni procedure with recycling in the
+  simulations of PFS and OS together, and a comparison of the rejection
+  probabilities with the decisions of `lrstat::fseqbon()` and of the bounds
+  with `lrstat::getBound()` (`inst/validation/`).
+
 # DesignComplexSurvival 0.2.2
 
 * Bug fix: rectangle probabilities of nine or more coordinates with two

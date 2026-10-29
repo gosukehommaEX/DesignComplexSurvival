@@ -40,7 +40,12 @@ events by calendar time t is `n p_g` times the integral from 0 to t of
 A(t - s) f_g(s) G_g(s), where A is the enrolled fraction, f_g the
 density of the endpoint and G_g the probability of no dropout. The
 expected number of dropouts is obtained in the same way with the dropout
-density.
+density. For PFS, the dropouts include the censoring of PFS only
+(`dropout_pfs` of
+[`ms_model`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_model.md))
+and, with `pfs_switch = "censor"` in
+[`ms_scenario`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md),
+the censoring at a switch before progression.
 
 ## See also
 

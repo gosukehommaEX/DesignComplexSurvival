@@ -7,12 +7,13 @@ library(DesignComplexSurvival)
 
 DesignComplexSurvival computes the operating characteristics of
 two-group time-to-event trials analysed with the log-rank test, without
-patient-level simulation. Each group follows a four-state model
-(progression-free, progressed, switched, dead) with piecewise constant
-intensities. This vignette shows a single endpoint with a delayed
-treatment effect, then overall survival (OS) with treatment switching
-after progression, and finally progression-free survival (PFS) and OS
-tested together.
+patient-level simulation. Each group follows a multistate model
+(progression-free, progressed, switched, dead, and progression-free
+after a switch before progression) with piecewise constant intensities.
+This vignette shows a single endpoint with a delayed treatment effect,
+then overall survival (OS) with treatment switching after progression,
+and progression-free survival (PFS) and OS tested together, and finally
+the options added in version 0.3.0.
 
 ## A delayed treatment effect
 
@@ -227,6 +228,82 @@ ms_power(fl, n = 450, looks = lk2,
 #> 2 null_scenarios[[1]]             OS 0.02405394 0.02405394
 ```
 
+## New in version 0.3.0
+
+### Switching from a calendar time
+
+Switching is sometimes allowed only from a calendar time, for example
+after an interim analysis. With `switch_start` in
+[`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md),
+nobody switches before that time, and a patient enrolled at time e can
+switch from the follow-up time max(switch_start - e, 0) on. In the
+example of switching after progression, switching allowed from month 12
+gives
+
+``` r
+
+scn_cal <- ms_scenario(ctl_sw, trt_sw, accrual = ms_accrual(rate = 25),
+                       switch_start = 12)
+pw_cal <- ms_power(scn_cal, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
+                   test = ms_test(), events = 300)
+c(from_randomization = pw$power, from_month_12 = pw_cal$power,
+  no_switching = pw_ns$power)
+#> from_randomization      from_month_12       no_switching 
+#>          0.2205938          0.3446201          0.8426871
+```
+
+The power is 0.345 with switching from month 12, against 0.221 with
+switching from randomization and 0.843 without switching. The
+distribution of OS now depends on the entry time, and under the null
+hypothesis the statistics no longer have independent increments. The
+efficacy bounds still come from the event fractions, and the type I
+error of this design is 0.025. The computations cover the OS statistic
+alone with `mean = "direct"`.
+
+### Recycling of the level
+
+With `transition` in
+[`ms_test()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md),
+the Bonferroni procedure passes the level of a rejected hypothesis on to
+the other (Maurer and Bretz 2013). With `transition = c(1, 1)` and the
+weights 0.8 and 0.2, OS is tested at level 0.025 once PFS has been
+rejected, and PFS at level 0.025 once OS has been rejected.
+
+``` r
+
+rc <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+                              weights = c(0.8, 0.2), transition = c(1, 1)),
+               events = c(pfs = 300, os = 220))
+rbind(bonferroni = bf$power, recycling = rc$power)
+#>                  pfs        os      both       any
+#> bonferroni 0.9265375 0.3237669 0.3173922 0.9329122
+#> recycling  0.9266956 0.5479409 0.5417243 0.9329122
+```
+
+The power for OS is 0.324 without and 0.548 with recycling, and the
+familywise error rate under the global null hypothesis is 0.0242. The
+table of
+[`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+gives the bounds after recycling in the columns `z_upper_recycled` and
+`p_upper_recycled`.
+
+### Other options of the model
+
+- `switch_clock = "switch"` in
+  [`ms_model()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_model.md)
+  measures the death hazard after a switch from the time of the switch.
+- `switch_af` gives the switch an accelerated failure time effect: the
+  remaining time after the switch is the remaining time without switch
+  divided by `switch_af` (the rank preserving structural failure time
+  model of Robins and Tsiatis 1991).
+- `switch_pre`, `prog_switch` and `death_switch_pre` describe switching
+  before progression, and `pfs_switch` in
+  [`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)
+  sets whether PFS is censored at such a switch.
+- `dropout_pfs` adds a censoring of PFS only, for example the end of
+  tumour assessments.
+
 ## Choice of the covariance
 
 The argument `variance` of
@@ -281,3 +358,11 @@ endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
 Luo X, Mao X, Chen X, Qiu J, Bai S, Quan H (2019). Design and monitoring
 of survival trials in complex scenarios. Statistics in Medicine
 38:192-209.
+
+Maurer W, Bretz F (2013). Multiple testing in group sequential trials
+using graphical approaches. Statistics in Biopharmaceutical Research
+5:311-320.
+
+Robins JM, Tsiatis AA (1991). Correcting for non-compliance in
+randomized trials using rank preserving structural failure time models.
+Communications in Statistics - Theory and Methods 20:2609-2631.

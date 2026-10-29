@@ -37,4 +37,12 @@ print(ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"))
 #>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)
 #>   Futility (PFS): none
 #>   Mean: "direct"; variance: "null"; spending time: "events"
+print(ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+              weights = c(0.8, 0.2), transition = c(1, 1)))
+#> One-sided log-rank tests of PFS and OS at familywise level 0.025
+#>   Bonferroni: PFS at level 0.02, OS at level 0.005
+#>   Recycling: fraction 1 from PFS to OS and 1 from OS to PFS; OS at level 0.025 after PFS is rejected, PFS at level 0.025 after OS is rejected
+#>   Efficacy: alpha spending "OF" (PFS), "OF" (OS)
+#>   Futility (PFS): none
+#>   Mean: "direct"; variance: "null"; spending time: "events"
 ```
