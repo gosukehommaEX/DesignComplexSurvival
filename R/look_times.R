@@ -9,6 +9,8 @@
 #' at its calendar time. With \code{targets}, the event-driven looks take
 #' place when the expected numbers of events reach \code{targets} (used under
 #' the null scenarios) and \code{events} and \code{followup} are not used.
+#' The time of a final analysis fixed by \code{followup} is not searched for
+#' from its expected number of events.
 #'
 #' @param scenario An \code{ms_scenario} object.
 #' @param acc Output of \code{.acc_setup()}.
@@ -77,13 +79,17 @@
       targets[ev] <- lk$fraction[ev] * unname(final[lk$trigger[ev]])
     }
   }
-  for (e in eps) {
-    i <- which(lk$trigger == e)
-    times[i] <- .event_times(scenario, acc, targets[i], e)
-  }
+  searched <- ev
   if (!is.null(t_fixed)) {
+    searched[k] <- FALSE
     times[k] <- t_fixed
     trig[k] <- NA_character_
+  }
+  for (e in eps) {
+    i <- which(lk$trigger == e & searched)
+    if (length(i) > 0L) {
+      times[i] <- .event_times(scenario, acc, targets[i], e)
+    }
   }
   if (k > 1L && any(diff(times) <= 1e-6 * max(1, times))) {
     stop(sprintf("The analysis times under %s are not increasing (%s).", what,

@@ -1,3 +1,15 @@
+# DesignComplexSurvival 0.3.1
+
+* Faster designs whose final analysis is fixed by `followup` (`ms_power()`
+  with `followup`, and the searches of `ms_size()`): the time of the final
+  analysis, `followup` after the end of accrual, is no longer also searched
+  for from its expected number of events. The results are unchanged. The
+  gain is largest with switching from a calendar time, where these times
+  come from Newton's method.
+* Tests of `ms_size()` with recycling of the level and with switching from
+  a calendar time, with expected values from
+  `inst/validation/python/expected_size_stage3.py`.
+
 # DesignComplexSurvival 0.3.0
 
 * Stage 3 of the development plan: further models of switching and
