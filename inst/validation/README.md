@@ -45,6 +45,15 @@ same way; its result `results/sim_python_calendar.csv` is part of the folder:
 python3 inst/validation/python/simulate_calendar.py
 ```
 
+The larger simulations of V2 and V7 under the null hypothesis use
+`python/simulate_type1.py` (about 11 minutes); its result
+`results/sim_python_type1.csv` is part of the folder and is not read by
+`run_all.R` (see "Type I error at the looks driven by OS events" below):
+
+```
+python3 inst/validation/python/simulate_type1.py
+```
+
 The FastSurvival simulation (V1-V5, about 30 minutes) is reused by later runs
 as long as `helpers.R` and `validate_fastsurvival.R` are unchanged; set
 `rerun_fastsurvival <- TRUE` before sourcing `run_all.R` to force a new
@@ -147,6 +156,35 @@ with `lrstat::getBound()`.
 | L2 | V6 | 330 PFS events (PFS and OS), then 250 OS events (OS) | PFS, then OS (both O'Brien-Fleming type) | 0.8, 0.2 | c(1, 1) |
 | L3 | V3 | as L1 | OS (O'Brien-Fleming type, non-binding futility bound by O'Brien-Fleming type beta spending, beta 0.2), then PFS (Hwang-Shih-DeCani, gamma -4) | 0.6, 0.4 | c(0.5, 1) |
 
+## Type I error at the looks driven by OS events
+
+Under the null hypothesis, the simulated rejection rates of the
+O'Brien-Fleming design at the looks driven by OS events (`info` rows of
+`results/summary.csv`) were 0.0287 in V2 and 0.0285 in V7, about 3 standard
+errors above the level 0.025 computed by the package, while those of the other
+10 scenarios with such looks were within 2 standard errors of it.
+`python/simulate_type1.py` repeats the two simulations with new seeds and more
+trials (standard errors at most 0.0004):
+
+| Simulation | Trials | Rejection in the direction of benefit | Rejection in the opposite direction |
+|---|---|---|---|
+| V7 | 200000 | 0.025 | 0.025 |
+| Scenario B with the group sizes of V2 (100 control, 200 treatment) | 400000 | 0.028 | 0.023 |
+| Scenario B with 200 control and 100 treatment | 400000 | 0.023 | 0.028 |
+| Scenario B with 150 in each group | 400000 | 0.025 | 0.025 |
+
+The rate of V7 in `results/summary.csv` is thus a chance deviation. The rate
+of V2 is a property of the log-rank test with unequal allocation in small
+trials, which the normal approximation of the package does not describe: at
+each death the indicator of the treatment group has the third cumulant
+q (1 - q) (1 - 2 q), with q the proportion of the treatment group in the risk
+set, so that after d deaths the skewness of Z is about
+(2 q - 1) / sqrt(q (1 - q) d), 0.08 and 0.06 for q = 2/3 and 75 and 150
+deaths (simulated: 0.08 and 0.06). With the treatment group the larger group
+this raises the probability of rejecting in the direction of benefit, and with
+the control group the larger group it lowers it; the effect decreases as the
+number of deaths increases.
+
 ## Judgements
 
 | Quantity | Criterion |
@@ -194,6 +232,7 @@ results are missing, when the perturbation check fails, or when an id of
 | `compare_two_endpoints.R` | Designs with two endpoints (definitions of V11 and V12); PFS and OS results versus the package |
 | `python/simulate_calendar.py` | Python simulation of switching from a calendar time (V13-V15), writes `results/sim_python_calendar.csv` |
 | `compare_calendar.R` | Definitions of V13-V15; switching from a calendar time versus the package |
+| `python/simulate_type1.py` | Larger simulations of V2 and V7 under the null hypothesis, writes `results/sim_python_type1.csv` (not read by `run_all.R`) |
 | `compare_pweall.R` | PWEALL versus the package (Luo et al. 2019, Examples 1-3; Barthel et al. 2006, Table IV, rows 5 and 12) |
 | `compare_graph_lrstat.R` | Graphical procedure with recycling of the level versus `lrstat::fseqbon()` and `lrstat::getBound()` |
 | `run_all.R` | Runs the comparisons and writes the summaries |

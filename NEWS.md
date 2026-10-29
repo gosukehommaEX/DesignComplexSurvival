@@ -1,3 +1,14 @@
+# DesignComplexSurvival 0.3.2
+
+* Documentation: `ms_power()` notes that the normal approximation does not
+  describe the skewness of the log-rank statistic with unequal allocation and
+  few events (by simulation, a type I error of about 0.028 instead of 0.025
+  with 2:1 allocation and looks at 75 and 150 deaths).
+* Validation: larger simulations of V2 and V7 under the null hypothesis
+  (`inst/validation/python/simulate_type1.py`): the excess type I error of
+  V2 comes from this skewness and that of V7 is a chance deviation
+  (`inst/validation/README.md`).
+
 # DesignComplexSurvival 0.3.1
 
 * Faster designs whose final analysis is fixed by `followup` (`ms_power()`
