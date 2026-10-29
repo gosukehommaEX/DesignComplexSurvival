@@ -104,3 +104,54 @@ test_that("ms_size checks the scope of the switching from a calendar time", {
   expect_error(ms_size(scn_cal(), lo, ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni"),
                        solve_for = "n", interval = c(100, 1000)), "one endpoint only")
 })
+
+# Stage 3: recycling of the level and switching from a calendar time, with one look. Expected
+# values: inst/validation/python/results/size_stage3.csv (expected_size_stage3.py: moments from
+# the references of design2.csv and calendar_looks.csv, powers at one look by one-dimensional
+# integrals, solutions by root finding over the time of the look)
+
+size_expected <- function(design) {
+  ex <- expected_csv("size_stage3.csv")
+  e <- ex[ex$design == design, ]
+  stats::setNames(e$value, e$quantity)
+}
+
+test_that("ms_size solves for the final number of events with recycling of the level", {
+  e <- size_expected("recycling")
+  te <- ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni", weights = c(0.8, 0.2),
+                transition = c(1, 1))
+  res <- ms_size(scn_f(), looks = ms_looks("os"), test = te, power = 0.8, solve_for = "events",
+                 n = 400, target = "each")
+  # OS has the smaller power; without recycling, its power at the solution is about 0.63
+  expect_lt(abs(res$solution - e[["solution"]]), 1e-4)
+  expect_equal(unname(res$final_events), e[["events_rounded"]])
+  expect_equal(res$study_duration, e[["time_rounded"]], tolerance = 1e-8)
+  q <- c("pfs", "os", "both", "any")
+  expect_lt(max(abs(res$power[q] - e[paste0("power_", q)])), 1e-6)
+  expect_gte(min(res$power[c("pfs", "os")]), 0.8)
+  # one look: the bounds after recycling are those at the level alpha
+  expect_equal(res$looks$z_upper_recycled, rep(qnorm(0.975), 2), tolerance = 1e-10)
+})
+
+test_that("ms_size solves for the sample size with switching from a calendar time", {
+  e <- size_expected("calendar_n")
+  res <- ms_size(scn_cal(), looks = ms_looks("calendar", time = 36), test = ms_test(),
+                 power = 0.8, solve_for = "n", interval = c(700, 850))
+  # one look: n = ((z_0.975 + z_0.8) sqrt(v) / mu)^2 with the per-patient score mean mu and
+  # information v at month 36
+  expect_lt(abs(res$solution - e[["solution"]]), 1e-4)
+  expect_equal(res$n, e[["n_rounded"]])
+  expect_equal(res$events, e[["events_rounded"]], tolerance = 1e-9)
+  expect_equal(res$power, e[["power"]], tolerance = 1e-8)
+  expect_equal(res$type1[["nonbinding"]], 0.025, tolerance = 1e-10)
+})
+
+test_that("ms_size solves for the number of events with switching from a calendar time", {
+  e <- size_expected("calendar_events")
+  res <- ms_size(scn_cal(), looks = ms_looks("os"), test = ms_test(), power = 0.8,
+                 solve_for = "events", n = 1000)
+  expect_lt(abs(res$solution - e[["solution"]]), 1e-4)
+  expect_equal(res$events, e[["events_rounded"]], tolerance = 1e-9)
+  expect_equal(res$study_duration, e[["time_rounded"]], tolerance = 1e-8)
+  expect_equal(res$power, e[["power"]], tolerance = 1e-8)
+})

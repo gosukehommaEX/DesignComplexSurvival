@@ -19,6 +19,7 @@ different numerical methods:
 | Model options of stage 3 (switch clock, AFT effect of the switch, switch before progression, censoring of PFS only) | closed forms on the pieces of the intensities (`.post_general()`, `.pre_states()`, `.from_state5()`) and Gauss-Legendre rules | adaptive quadrature over the switch, progression and switch-before-progression times (`ref_model5.py`); products of matrix exponentials for Markov models |
 | Products of the PFS and OS functionals with a switch before progression or a censoring of PFS only | terms C1 to C4 of the covariance note split by the progression-free state (addendum of the covariance note) | Markov models: state probabilities, generator and transition matrices with nested adaptive quadrature over the PFS and OS times (`ref_cross5.py`); other models: Monte Carlo with 10 million patients |
 | Rejection probabilities of two endpoints with recycling of the level (`gs_prob_mtp()` with `upper_recycled`, stage 3) | sums of rectangle probabilities over the outcomes at each analysis (`.mtp_graph()`) | numerical integration over the analyses of the joint density, with the decisions of Algorithm 1 of Maurer and Bretz (2013) applied on the sample path (canonical joint distribution, `ref_graph.py`); Monte Carlo simulation of the algorithm with 2 million trials |
+| Number of events and sample size for a target power with recycling of the level or with switching from a calendar time (`ms_size()`, stage 3) | `.solve_power()` (doubling or halving, a grid of 8 points and `uniroot()`) on `.design_core2()` and `.design_core()` | one look: moments from the references above (`expected_design.joint()`, `ref_calendar.Design.look()`), rejection probabilities of the procedure with recycling as one-dimensional integrals of the bivariate normal density (adaptive quadrature), root finding (`brentq`) over the time of the look and the closed form of the sample size |
 
 The influence-function derivation used in the R code was checked against the
 formulas of Luo et al. (2019) in Python (function `influence_cov()` in
@@ -124,6 +125,12 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   `model_post_cal()` in `tests/testthat/helper-scenarios.R`); it also
   prints checks of the reference (matrix exponentials against quadrature,
   null correlation from the closed form against the moments).
+* `expected_size_stage3.py`: expected values for the tests of `ms_size()`
+  with recycling of the level and with switching from a calendar time
+  (designs with one look in `tests/testthat/test-ms_size.R`), written to
+  `results/size_stage3.csv`; it also prints checks of the reference (the
+  rejection probabilities by `ref_graph.recursion()`, the moments at month
+  36 against `results/calendar_looks.csv`).
 
 ## Running
 
@@ -140,6 +147,7 @@ python3 danzer_check.py               # estimator of Danzer et al. (2025) (about
 python3 expected_model5.py            # model options of stage 3 (about 10 minutes)
 python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
 python3 expected_calendar.py          # switching from a calendar time, stage 3 (about 4 minutes)
+python3 expected_size_stage3.py       # ms_size() with recycling and switching from a calendar time (about 2 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and
