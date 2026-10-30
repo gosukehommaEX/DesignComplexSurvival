@@ -185,8 +185,9 @@ groups <- c("B_1:2" = "100 control, 200 treatment",
             "B_2:1" = "200 control, 100 treatment",
             "B_1:1" = "150 in each group")
 tab <- data.frame(groups = unname(groups),
-                  trials = sapply(names(groups), function(v) as.integer(
-                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"])),
+                  trials = format(sapply(names(groups), function(v)
+                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"]),
+                    big.mark = ",", scientific = FALSE),
                   benefit = sapply(names(groups), rate, q = "reject_upper_any"),
                   opposite = sapply(names(groups), rate, q = "reject_lower_any"),
                   row.names = NULL)
