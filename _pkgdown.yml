@@ -2,6 +2,23 @@ url: https://gosukehommaEX.github.io/DesignComplexSurvival/
 template:
   bootstrap: 5
 
+articles:
+  - title: Getting started
+    navbar: ~
+    contents:
+      - DesignComplexSurvival
+  - title: Models and designs
+    navbar: Models and designs
+    contents:
+      - switching
+      - group-sequential
+      - two-endpoints
+      - calendar-switching
+  - title: Validation
+    navbar: Validation
+    contents:
+      - validation
+
 reference:
   - title: Model and scenario
     contents:

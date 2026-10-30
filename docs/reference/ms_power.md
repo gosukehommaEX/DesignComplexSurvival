@@ -136,6 +136,14 @@ applied to the scenario, with event-driven looks at the same numbers of
 events of the trigger endpoint; the non-binding value ignores the
 futility bounds and the binding value applies them.
 
+The power and the type I error rest on the normal approximation of the
+log-rank statistics. With unequal allocation and few events the
+statistic is skewed, so that the probability of rejecting in favour of
+the treatment exceeds the computed type I error when the treatment group
+is the larger group, and falls below it when the control group is: by
+simulation (`inst/validation` of the source package), about 0.028
+instead of 0.025 with 2:1 allocation and looks at 75 and 150 deaths.
+
 The hazard ratios at the bounds are `exp(-z / sqrt(p0 p1 d))`, where d
 is the expected number of events of the tested endpoint.
 

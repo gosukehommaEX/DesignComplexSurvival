@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,6 +17,18 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/DesignComplexSurvival.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Models and designs</h6></li>
+    <li><a class="dropdown-item" href="../articles/switching.html">Multistate model and treatment switching</a></li>
+    <li><a class="dropdown-item" href="../articles/group-sequential.html">Group sequential designs and the covariance of the statistics</a></li>
+    <li><a class="dropdown-item" href="../articles/two-endpoints.html">PFS and OS tested together</a></li>
+    <li><a class="dropdown-item" href="../articles/calendar-switching.html">Switching from a calendar time</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Validation</h6></li>
+    <li><a class="dropdown-item" href="../articles/validation.html">Validation and reproduction of published results</a></li>
+  </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -33,6 +45,21 @@
       <small>Source: <a href="https://github.com/gosukehommaEX/DesignComplexSurvival/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.3" id="designcomplexsurvival-033">DesignComplexSurvival 0.3.3<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-033"></a></h2>
+<ul><li>Documentation: the introductory vignette covers the workflow of a design with one endpoint, and five new vignettes describe the multistate model and treatment switching, group sequential designs and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package. The pkgdown site lists them under Articles.</li>
+<li>Validation: in <code>inst/validation/validate_fastsurvival.R</code> (V1-V4), the death that defines a look driven by OS deaths was lost in some trials, because the follow-up time cut - entry could be smaller than its time by rounding (on average, about 0.1 to 0.3 deaths fewer than the target at these looks). The comparisons now use the cut times (1 + 1e-12), and the script checks that every trial has the target number of deaths and that the log-rank Z agrees with <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code>. The package code is unchanged.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.2" id="designcomplexsurvival-032">DesignComplexSurvival 0.3.2<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-032"></a></h2>
+<ul><li>Documentation: <code><a href="../reference/ms_power.html">ms_power()</a></code> notes that the normal approximation does not describe the skewness of the log-rank statistic with unequal allocation and few events (by simulation, a type I error of about 0.028 instead of 0.025 with 2:1 allocation and looks at 75 and 150 deaths).</li>
+<li>Validation: larger simulations of V2 and V7 under the null hypothesis (<code>inst/validation/python/simulate_type1.py</code>): the excess type I error of V2 comes from this skewness and that of V7 is a chance deviation (<code>inst/validation/README.md</code>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.1" id="designcomplexsurvival-031">DesignComplexSurvival 0.3.1<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-031"></a></h2>
+<ul><li>Faster designs whose final analysis is fixed by <code>followup</code> (<code><a href="../reference/ms_power.html">ms_power()</a></code> with <code>followup</code>, and the searches of <code><a href="../reference/ms_size.html">ms_size()</a></code>): the time of the final analysis, <code>followup</code> after the end of accrual, is no longer also searched for from its expected number of events. The results are unchanged. The gain is largest with switching from a calendar time, where these times come from Newton’s method.</li>
+<li>Tests of <code><a href="../reference/ms_size.html">ms_size()</a></code> with recycling of the level and with switching from a calendar time, with expected values from <code>inst/validation/python/expected_size_stage3.py</code>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="designcomplexsurvival-030">DesignComplexSurvival 0.3.0<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-030"></a></h2>
 <ul><li>Stage 3 of the development plan: further models of switching and censoring, switching that starts at a calendar time, and recycling of the level between PFS and OS. With the default values of the new arguments the results are unchanged: the outputs of <code>inst/reproduce/</code> and <code>inst/validation/</code> of version 0.2.2 are reproduced without any numerical difference.</li>

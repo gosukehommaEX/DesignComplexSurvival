@@ -1,5 +1,52 @@
 # Changelog
 
+## DesignComplexSurvival 0.3.3
+
+- Documentation: the introductory vignette covers the workflow of a
+  design with one endpoint, and five new vignettes describe the
+  multistate model and treatment switching, group sequential designs and
+  the covariance of the statistics, PFS and OS tested together,
+  switching from a calendar time, and the validation of the package. The
+  pkgdown site lists them under Articles.
+- Validation: in `inst/validation/validate_fastsurvival.R` (V1-V4), the
+  death that defines a look driven by OS deaths was lost in some trials,
+  because the follow-up time cut - entry could be smaller than its time
+  by rounding (on average, about 0.1 to 0.3 deaths fewer than the target
+  at these looks). The comparisons now use the cut times (1 + 1e-12),
+  and the script checks that every trial has the target number of deaths
+  and that the log-rank Z agrees with
+  [`survival::survdiff()`](https://rdrr.io/pkg/survival/man/survdiff.html).
+  The package code is unchanged.
+
+## DesignComplexSurvival 0.3.2
+
+- Documentation:
+  [`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+  notes that the normal approximation does not describe the skewness of
+  the log-rank statistic with unequal allocation and few events (by
+  simulation, a type I error of about 0.028 instead of 0.025 with 2:1
+  allocation and looks at 75 and 150 deaths).
+- Validation: larger simulations of V2 and V7 under the null hypothesis
+  (`inst/validation/python/simulate_type1.py`): the excess type I error
+  of V2 comes from this skewness and that of V7 is a chance deviation
+  (`inst/validation/README.md`).
+
+## DesignComplexSurvival 0.3.1
+
+- Faster designs whose final analysis is fixed by `followup`
+  ([`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+  with `followup`, and the searches of
+  [`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)):
+  the time of the final analysis, `followup` after the end of accrual,
+  is no longer also searched for from its expected number of events. The
+  results are unchanged. The gain is largest with switching from a
+  calendar time, where these times come from Newton’s method.
+- Tests of
+  [`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)
+  with recycling of the level and with switching from a calendar time,
+  with expected values from
+  `inst/validation/python/expected_size_stage3.py`.
+
 ## DesignComplexSurvival 0.3.0
 
 - Stage 3 of the development plan: further models of switching and

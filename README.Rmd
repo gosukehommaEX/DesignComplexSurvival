@@ -47,6 +47,14 @@ simulation:
 remotes::install_github("gosukehommaEX/DesignComplexSurvival")
 ```
 
+## Documentation
+
+The articles on the package website
+(<https://gosukehommaEX.github.io/DesignComplexSurvival/>) cover the
+workflow of a design, the multistate model and treatment switching, group
+sequential designs and the covariance of the statistics, PFS and OS tested
+together, switching from a calendar time, and the validation of the package.
+
 ## Examples
 
 A delayed treatment effect: the hazard ratio is 1 for 6 months and 0.65

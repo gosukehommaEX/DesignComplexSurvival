@@ -1,0 +1,182 @@
+---
+title: "PFS and OS tested together"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PFS and OS tested together}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(DesignComplexSurvival)
+```
+
+Progression-free survival (PFS) and overall survival (OS) come from the same
+multistate model, so that their log-rank statistics are correlated. The
+package computes the joint distribution of the two statistics over calendar
+time and tests the two hypotheses with a group sequential fixed-sequence or
+Bonferroni procedure, the latter with recycling of the level after a
+rejection.
+
+## Scenario and analyses
+
+Both groups follow the model of Fleischer et al. (2009): the times to
+progression and to death are exponential and the hazard of death does not
+change at progression, so that PFS and OS are exponential. The medians of
+PFS and OS are 4 and 12 months in the control group and 6 and 16 months in
+the treatment group, and 450 patients are enrolled at 25 per month.
+
+PFS is tested at 300 PFS events, where OS is also tested, and OS is tested
+again at 220 OS events. Each look has its own trigger, and `test` lists the
+endpoints tested at each look:
+
+```{r scenario}
+fl <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
+                  ms_fleischer(median_pfs = 6, median_os = 16),
+                  accrual = ms_accrual(rate = 25))
+lk2 <- ms_looks(c("pfs", "os"), fraction = c(1, 1),
+                test = list(c("pfs", "os"), "os"))
+ev2 <- c(pfs = 300, os = 220)
+```
+
+## Fixed sequence
+
+With the fixed-sequence procedure, both hypotheses are tested at level 0.025
+and OS is tested only after PFS has been rejected: at the analysis at which
+PFS is rejected and at the later analyses (procedure (b) of Glimm et al.
+2010, `hierarchical = "overall"`). Each endpoint has its own efficacy bounds
+of O'Brien-Fleming type.
+
+```{r fixed-sequence}
+fs <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+               events = ev2)
+fs
+```
+
+The power is `r round(fs$power[["pfs"]], 3)` for PFS and
+`r round(fs$power[["os"]], 3)` for OS, and both hypotheses are rejected
+with probability `r round(fs$power[["both"]], 3)`. The final OS analysis
+takes place at month `r round(fs$study_duration, 1)`.
+
+With `hierarchical = "stagewise"`, OS is tested only at the analysis at which
+PFS is rejected, where the trial stops (procedure (a) of Glimm et al. 2010;
+Tamhane et al. 2010). Here PFS is tested at the first analysis only, so OS
+can be rejected only there:
+
+```{r stagewise}
+fs_a <- ms_power(fl, n = 450, looks = lk2,
+                 test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence",
+                                hierarchical = "stagewise"),
+                 events = ev2)
+rbind(overall = fs$power, stagewise = fs_a$power)
+```
+
+## Bonferroni and recycling of the level
+
+The Bonferroni procedure with the weights 0.8 and 0.2 tests PFS at level
+0.02 and OS at level 0.005, whatever happens to the other hypothesis. With
+`transition` in `ms_test()` the level of a rejected hypothesis is passed on
+to the other in the graphical procedure of Maurer and Bretz (2013). With
+`transition = c(1, 1)`, OS is tested at level 0.025 once PFS has been
+rejected, and PFS at level 0.025 once OS has been rejected.
+
+```{r bonferroni}
+bf <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+                              weights = c(0.8, 0.2)),
+               events = ev2)
+rc <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
+                              weights = c(0.8, 0.2), transition = c(1, 1)),
+               events = ev2)
+rbind(fixed_sequence = fs$power, bonferroni = bf$power, recycling = rc$power)
+rc$looks[, c("endpoint", "look", "time", "z_upper", "z_upper_recycled",
+             "p_upper", "p_upper_recycled")]
+```
+
+The power for OS is `r round(bf$power[["os"]], 3)` without and
+`r round(rc$power[["os"]], 3)` with recycling. The columns
+`z_upper_recycled` and `p_upper_recycled` give the bounds at the level after
+the other hypothesis has been rejected. The procedure controls the
+familywise error rate when the nominal levels of the spending functions do
+not decrease with the level (Maurer and Bretz 2013, Section 3.1), and
+`ms_power()` checks at every look that the bounds after recycling do not
+exceed the bounds at the initial level.
+
+## Familywise error rate
+
+The familywise error rate is computed under the global null hypothesis,
+where the correlation between the PFS and OS statistics is that of Danzer et
+al. (2025, Theorem 1). A partial null hypothesis, in which OS is the same in
+both groups but PFS is not, cannot be derived from the design scenario and is
+given through `null_scenarios`:
+
+```{r fwer}
+os_null <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
+                       ms_fleischer(median_pfs = 6, median_os = 12),
+                       accrual = ms_accrual(rate = 25))
+fw <- ms_power(fl, n = 450, looks = lk2,
+               test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+               events = ev2, null_scenarios = list(os = os_null))
+fw$fwer
+```
+
+## An interim analysis of PFS
+
+The following design adds an interim analysis of PFS at 60 percent of the PFS
+events, as in the example of `ms_looks()`:
+
+```{r interim}
+lk3 <- ms_looks(c("pfs", "pfs", "os"), fraction = c(0.6, 1, 1),
+                test = list("pfs", c("pfs", "os"), "os"))
+fs3 <- ms_power(fl, n = 450, looks = lk3,
+                test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
+                events = ev2)
+fs3$looks[, c("endpoint", "look", "trigger", "time", "events", "z_upper",
+              "prob_upper")]
+rbind(two_analyses = fs$power, three_analyses = fs3$power)
+```
+
+The interim analysis of PFS takes place at month
+`r round(fs3$looks$time[fs3$looks$endpoint == "pfs"][1], 1)`. Futility bounds, when given, are placed on
+the first endpoint of the test.
+
+## Correlation between the statistics
+
+`lr_cov()` gives the joint distribution of the statistics. At month 24 the
+correlation between the PFS and OS statistics is
+
+```{r correlation}
+cv <- lr_cov(fl, n = 450, calendar_time = 24, endpoint = c("pfs", "os"),
+             variance = "studentized")
+cv0 <- lr_cov(ms_null(fl), n = 450, calendar_time = 24, endpoint = c("pfs", "os"))
+c(design = stats::cov2cor(cv$sigma)[1, 2], global_null = stats::cov2cor(cv0$sigma)[1, 2])
+```
+
+`ms_size()` finds the sample size, number of events, accrual duration or
+follow-up for a target power of the first endpoint, of each endpoint, of
+both or of at least one (argument `target`).
+
+## References
+
+Danzer MF, Rufibach K, Beyersmann J, Schmidt R (2025). Exhausting the type I
+error level in event-driven group-sequential designs with a closed testing
+procedure for progression-free and overall survival. arXiv:2512.08658.
+
+Fleischer F, Gaschler-Markefski B, Bluhmki E (2009). A statistical model for
+the dependence between progression-free survival and overall survival.
+Statistics in Medicine 28:2669-2686.
+
+Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
+endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
+
+Maurer W, Bretz F (2013). Multiple testing in group sequential trials using
+graphical approaches. Statistics in Biopharmaceutical Research 5:311-320.
+
+Tamhane AC, Mehta CR, Liu L (2010). Testing a primary and a secondary
+endpoint in a group sequential design. Biometrics 66:1174-1184.

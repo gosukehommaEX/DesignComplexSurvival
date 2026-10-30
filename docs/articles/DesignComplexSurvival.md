@@ -10,10 +10,29 @@ two-group time-to-event trials analysed with the log-rank test, without
 patient-level simulation. Each group follows a multistate model
 (progression-free, progressed, switched, dead, and progression-free
 after a switch before progression) with piecewise constant intensities.
-This vignette shows a single endpoint with a delayed treatment effect,
-then overall survival (OS) with treatment switching after progression,
-and progression-free survival (PFS) and OS tested together, and finally
-the options added in version 0.3.0.
+A design is built in four steps:
+
+1.  the scenario: the models of the two groups
+    ([`ms_model()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_model.md),
+    or
+    [`ms_fleischer()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_fleischer.md)
+    for exponential progression-free survival (PFS) and overall survival
+    (OS)), the allocation and the accrual
+    ([`ms_accrual()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_accrual.md),
+    [`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md));
+2.  the timing of the analyses
+    ([`ms_looks()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_looks.md));
+3.  the test: the endpoints, the spending functions, the futility bounds
+    and the approximations of the distribution of the statistics
+    ([`ms_test()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md));
+4.  the evaluation: the power and type I error of a given design
+    ([`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)),
+    or the number of events, sample size, accrual duration or follow-up
+    for a target power
+    ([`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)).
+
+This article goes through the four steps for a single endpoint with a
+delayed treatment effect. The other articles are listed at the end.
 
 ## A delayed treatment effect
 
@@ -75,8 +94,9 @@ takes place at month 58.7. The type I error is 0.025 when the futility
 bounds are ignored.
 
 The mean of the standardized statistic can be computed directly from the
-hazards (default) or with the Schoenfeld approximation, which uses the
-event-weighted average of the log hazard ratio.
+hazards (the default, following Yung and Liu 2020) or with the
+approximation of Schoenfeld (1981), which uses the event-weighted
+average of the log hazard ratio.
 
 ``` r
 
@@ -88,281 +108,89 @@ rbind(direct = lr_moments(scn, 700, t_fin)$z_mean,
 #> schoenfeld 3.417165
 ```
 
-## Overall survival with switching after progression
+## Summaries of a design
 
-In the control group the hazard of progression is 0.10 per month in the
-first 4 months and 0.08 afterwards. At progression, 30 percent of the
-patients switch to the experimental treatment; the others may switch
-later with a hazard of 0.04 per month. After progression the hazard of
-death is 0.06 without switch and 0.035 after a switch. The treatment
-group has a lower hazard of progression and no switching.
+[`summary()`](https://rdrr.io/r/base/summary.html) gives an overview of
+the design, and
+[`as.data.frame()`](https://rdrr.io/r/base/as.data.frame.html) the table
+of the looks:
 
 ``` r
 
-ctl_sw <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,
-                   switch_prob = 0.3, death_prog = 0.06, switch_rate = 0.04,
-                   death_switch = 0.035, dropout = 0.003)
-trt_sw <- ms_model(time = c(0, 4), prog = c(0.06, 0.05), death = 0.008,
-                   death_prog = 0.055, dropout = 0.003)
-ms_prob(ctl_sw, time = c(6, 12, 24))
-#>   time progression_free progressed  switched      dead
-#> 1    6        0.5379444  0.2102858 0.1417831 0.1099867
-#> 2   12        0.3134862  0.2176410 0.2161661 0.2527068
-#> 3   24        0.1064585  0.1329666 0.2539857 0.5065892
+summary(des)
+#> Group sequential log-rank design: summary
+#>   Tested endpoint: OS; trigger: os; mean: "direct"; variance: "null"
+#>   Futility: beta (non-binding); spending time: "events"; alpha: 0.025
+#> 
+#> Overview:
+#>                n accrual_duration   study_duration           events 
+#>        700.00000         25.33000         58.66000        588.00000 
+#>            power type1_nonbinding    type1_binding 
+#>          0.90010          0.02500          0.02482 
+#> 
+#> By look:
+#>  look  time enrolled events events_control events_treatment info_frac z_upper
+#>     1 25.45      700    294          156.3            137.7      0.50   2.963
+#>     2 35.51      700    441          237.0            204.0      0.75   2.359
+#>     3 58.66      700    588          309.3            278.7      1.00   2.014
+#>   p_upper hr_upper z_lower hr_lower z_mean z_sd prob_upper prob_lower cum_power
+#>  0.001525   0.7078 -0.5039   1.0605  1.425    1    0.06203    0.02689   0.06203
+#>  0.009162   0.7988  0.7166   0.9340  2.424    1    0.46398    0.02760   0.52601
+#>  0.022000   0.8469  2.0141   0.8469  3.396    1    0.37413    0.04536   0.90014
+#>  alpha_spent cum_alpha
+#>     0.001525  0.001525
+#>     0.009649  0.009649
+#>     0.025000  0.025000
+as.data.frame(des)[, c("time", "events", "z_upper", "hr_upper", "z_lower",
+                       "cum_power")]
+#>       time events  z_upper  hr_upper    z_lower  cum_power
+#> 1 25.44525    294 2.962588 0.7078215 -0.5039193 0.06202802
+#> 2 35.50958    441 2.359018 0.7987811  0.7165938 0.52601131
+#> 3 58.66078    588 2.014084 0.8469456  2.0140837 0.90014124
 ```
 
-The post-progression intensities are measured from the time of
-progression (`clock = "reset"`, the default). OS and progression-free
-survival (PFS) of the control group at 12 months are 0.747 and 0.313.
-
-``` r
-
-scn_sw <- ms_scenario(ctl_sw, trt_sw, accrual = ms_accrual(rate = 25))
-pw <- ms_power(scn_sw, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
-               test = ms_test(), events = 300)
-pw
-#> Group sequential log-rank design
-#>   Tested endpoint: OS; looks driven by OS events
-#>   Sample size: 500; accrual duration: 20; final analysis at: 43.89
-#>   Power: 0.2206
-#>   Type I error: 0.025 (non-binding), 0.025 (binding)
-#>  look  time events info_frac z_upper  p_upper hr_upper z_lower hr_lower
-#>     1 28.82    180       0.6   2.669 0.003808   0.6718    -Inf       NA
-#>     2 43.89    300       1.0   1.981 0.023798   0.7955   1.981   0.7955
-#>  prob_upper prob_lower cum_power
-#>     0.08221     0.0000   0.08221
-#>     0.13839     0.7794   0.22059
-```
-
-With 300 OS events the power is 0.221. Switching to the experimental
-treatment in the control group moves the hazard ratio for OS towards 1.
-For comparison, the same design without switching (all switching
-intensities set to zero) has the power
-
-``` r
-
-ctl_ns <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,
-                   death_prog = 0.06, dropout = 0.003)
-scn_ns <- ms_scenario(ctl_ns, trt_sw, accrual = ms_accrual(rate = 25))
-pw_ns <- ms_power(scn_ns, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
-                  test = ms_test(), events = 300)
-pw_ns$power
-#> [1] 0.8426871
-```
-
-## PFS and OS tested together
-
-Both groups follow the model of Fleischer et al. (2009): the times to
-progression and to death are exponential and the hazard of death does
-not change at progression, so that PFS and OS are exponential. The
-medians of PFS and OS are 4 and 12 months in the control group and 6 and
-16 months in the treatment group, and patients are enrolled at 25 per
-month.
-
-PFS is tested at 300 PFS events, where OS is also tested, and OS is
-tested again at 220 OS events. With the fixed-sequence procedure, both
-hypotheses are tested at level 0.025 and OS is tested only after PFS has
-been rejected (procedure (b) of Glimm et al. 2010). Each endpoint has
-its own efficacy bounds of O’Brien-Fleming type.
-
-``` r
-
-fl <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
-                  ms_fleischer(median_pfs = 6, median_os = 16),
-                  accrual = ms_accrual(rate = 25))
-lk2 <- ms_looks(c("pfs", "os"), fraction = c(1, 1),
-                test = list(c("pfs", "os"), "os"))
-fs <- ms_power(fl, n = 450, looks = lk2,
-               test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
-               events = c(pfs = 300, os = 220))
-fs
-#> Group sequential log-rank design with two endpoints
-#>   Endpoints: PFS, then OS (fixed sequence, overall); looks driven by PFS events and OS events
-#>   Sample size: 450; accrual duration: 18; final analysis at: 23.05
-#>   Power: PFS 0.9387, OS 0.5452; both 0.5452; at least one 0.9387
-#>   FWER under global null: 0.025 (non-binding), 0.025 (binding)
-#>  endpoint look  time events info_frac z_upper  p_upper hr_upper z_lower
-#>       PFS    1 18.62    300    1.0000   1.960 0.025000   0.7975   1.960
-#>        OS    1 18.62    163    0.7407   2.357 0.009207   0.6912    -Inf
-#>        OS    2 23.05    220    1.0000   2.009 0.022243   0.7626   2.009
-#>  hr_lower prob_upper prob_lower cum_power
-#>    0.7975     0.9387          0    0.9387
-#>        NA     0.2966          0    0.2966
-#>    0.7626     0.2486          0    0.5452
-```
-
-The power is 0.939 for PFS and 0.545 for OS, and both hypotheses are
-rejected with probability 0.545. The final OS analysis takes place at
-month 23.1.
-
-The Bonferroni procedure tests PFS at level 0.02 and OS at level 0.005,
-whatever happens to the other hypothesis.
-
-``` r
-
-bf <- ms_power(fl, n = 450, looks = lk2,
-               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
-                              weights = c(0.8, 0.2)),
-               events = c(pfs = 300, os = 220))
-rbind(fixed_sequence = fs$power, bonferroni = bf$power)
-#>                      pfs        os      both       any
-#> fixed_sequence 0.9387378 0.5451639 0.5451639 0.9387378
-#> bonferroni     0.9265375 0.3237669 0.3173922 0.9329122
-```
-
-The familywise error rate is computed under the global null hypothesis,
-where the correlation between the PFS and OS statistics is that of
-Danzer et al. (2025). A partial null hypothesis, in which OS is the same
-in both groups but PFS is not, can be given through `null_scenarios`:
-
-``` r
-
-os_null <- ms_scenario(ms_fleischer(median_pfs = 4, median_os = 12),
-                       ms_fleischer(median_pfs = 6, median_os = 12),
-                       accrual = ms_accrual(rate = 25))
-ms_power(fl, n = 450, looks = lk2,
-         test = ms_test(endpoints = c("pfs", "os"), mtp = "fixed_sequence"),
-         events = c(pfs = 300, os = 220), null_scenarios = list(os = os_null))$fwer
-#>              scenario null_endpoints nonbinding    binding
-#> 1              global        PFS, OS 0.02500000 0.02500000
-#> 2 null_scenarios[[1]]             OS 0.02405394 0.02405394
-```
-
-## New in version 0.3.0
-
-### Switching from a calendar time
-
-Switching is sometimes allowed only from a calendar time, for example
-after an interim analysis. With `switch_start` in
-[`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md),
-nobody switches before that time, and a patient enrolled at time e can
-switch from the follow-up time max(switch_start - e, 0) on. In the
-example of switching after progression, switching allowed from month 12
-gives
-
-``` r
-
-scn_cal <- ms_scenario(ctl_sw, trt_sw, accrual = ms_accrual(rate = 25),
-                       switch_start = 12)
-pw_cal <- ms_power(scn_cal, n = 500, looks = ms_looks("os", fraction = c(0.6, 1)),
-                   test = ms_test(), events = 300)
-c(from_randomization = pw$power, from_month_12 = pw_cal$power,
-  no_switching = pw_ns$power)
-#> from_randomization      from_month_12       no_switching 
-#>          0.2205938          0.3446201          0.8426871
-```
-
-The power is 0.345 with switching from month 12, against 0.221 with
-switching from randomization and 0.843 without switching. The
-distribution of OS now depends on the entry time, and under the null
-hypothesis the statistics no longer have independent increments. The
-efficacy bounds still come from the event fractions, and the type I
-error of this design is 0.025. The computations cover the OS statistic
-alone with `mean = "direct"`.
-
-### Recycling of the level
-
-With `transition` in
-[`ms_test()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md),
-the Bonferroni procedure passes the level of a rejected hypothesis on to
-the other (Maurer and Bretz 2013). With `transition = c(1, 1)` and the
-weights 0.8 and 0.2, OS is tested at level 0.025 once PFS has been
-rejected, and PFS at level 0.025 once OS has been rejected.
-
-``` r
-
-rc <- ms_power(fl, n = 450, looks = lk2,
-               test = ms_test(endpoints = c("pfs", "os"), mtp = "bonferroni",
-                              weights = c(0.8, 0.2), transition = c(1, 1)),
-               events = c(pfs = 300, os = 220))
-rbind(bonferroni = bf$power, recycling = rc$power)
-#>                  pfs        os      both       any
-#> bonferroni 0.9265375 0.3237669 0.3173922 0.9329122
-#> recycling  0.9266956 0.5479409 0.5417243 0.9329122
-```
-
-The power for OS is 0.324 without and 0.548 with recycling, and the
-familywise error rate under the global null hypothesis is 0.0242. The
-table of
 [`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
-gives the bounds after recycling in the columns `z_upper_recycled` and
-`p_upper_recycled`.
-
-### Other options of the model
-
-- `switch_clock = "switch"` in
-  [`ms_model()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_model.md)
-  measures the death hazard after a switch from the time of the switch.
-- `switch_af` gives the switch an accelerated failure time effect: the
-  remaining time after the switch is the remaining time without switch
-  divided by `switch_af` (the rank preserving structural failure time
-  model of Robins and Tsiatis 1991).
-- `switch_pre`, `prog_switch` and `death_switch_pre` describe switching
-  before progression, and `pfs_switch` in
-  [`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)
-  sets whether PFS is censored at such a switch.
-- `dropout_pfs` adds a censoring of PFS only, for example the end of
-  tumour assessments.
-
-## Choice of the covariance
-
-The argument `variance` of
-[`ms_test()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md)
-(and of
-[`lr_moments()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/lr_moments.md)
-and
-[`lr_cov()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/lr_cov.md))
-chooses the covariance of the standardized statistics. By default
-(`"null"`) the statistics of one endpoint have unit variances and the
-correlations of independent increments. With `"alternative"`, the
-variance and covariance of the score under the alternative hypothesis
-(Luo et al. 2019) are used instead. With `"studentized"`, the covariance
-is the asymptotic covariance of the statistic that is computed in
-practice, standardized by the estimated variance and, for event-driven
-analyses, taken at a random analysis time.
+evaluates a design with a given final number of events, a given
+follow-up after the end of accrual, or analyses at calendar times. With
+the same looks and test and the final analysis 12 months after the end
+of accrual:
 
 ``` r
 
-mo <- lapply(c(alternative = "alternative", studentized = "studentized"),
-             function(v) lr_moments(scn, n = 700, calendar_time = c(24, t_fin),
-                                    variance = v))
-sapply(mo, function(m) m$z_var)
-#>      alternative studentized
-#> [1,]   0.9985616   1.0004021
-#> [2,]   0.9530797   0.9900072
+pw12 <- ms_power(scn, n = 700, looks = looks, test = test, followup = 12)
+c(power = pw12$power, final_analysis = pw12$study_duration,
+  events = pw12$events)
+#>          power final_analysis         events 
+#>      0.7066646     37.3333333    459.7884476
 ```
 
-Here the largest difference of the variances from 1 is 0.047 with
-`"alternative"` and 0.01 with `"studentized"`. The choice affects the
-power and the futility bounds by beta spending, but not the efficacy
-bounds or the non-binding type I error. In the simulations of
-`inst/validation/` with PFS and OS tested together, `"studentized"`
-agreed best with the simulated standard deviations and correlations of
-the statistics, and the powers with `"null"` and `"studentized"` agreed
-with the simulated powers within the Monte Carlo error.
+The final analysis then takes place at month 37.3 with 460 expected
+events, and the power is 0.707.
+
+## Further articles
+
+- [`vignette("switching")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/switching.md):
+  the multistate model, switching at, after and before progression, the
+  clocks of the post-progression intensities, and the censoring of PFS
+  only.
+- [`vignette("group-sequential")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/group-sequential.md):
+  the timing of the analyses, the spending functions, the futility
+  bounds and the approximations of the covariance of the statistics.
+- [`vignette("two-endpoints")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/two-endpoints.md):
+  PFS and OS tested together with a fixed-sequence or Bonferroni
+  procedure, recycling of the level and the familywise error rate.
+- [`vignette("calendar-switching")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/calendar-switching.md):
+  switching that starts at a calendar time, for example after an interim
+  analysis.
+- [`vignette("validation")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/validation.md):
+  the reproduction of published results and the comparison with
+  patient-level simulations.
 
 ## References
 
-Danzer MF, Rufibach K, Beyersmann J, Schmidt R (2025). Exhausting the
-type I error level in event-driven group-sequential designs with a
-closed testing procedure for progression-free and overall survival.
-arXiv:2512.08658.
+Schoenfeld D (1981). The asymptotic properties of nonparametric tests
+for comparing survival distributions. Biometrika 68:316-319.
 
-Fleischer F, Gaschler-Markefski B, Bluhmki E (2009). A statistical model
-for the dependence between progression-free survival and overall
-survival. Statistics in Medicine 28:2669-2686.
-
-Glimm E, Maurer W, Bretz F (2010). Hierarchical testing of multiple
-endpoints in group-sequential trials. Statistics in Medicine 29:219-228.
-
-Luo X, Mao X, Chen X, Qiu J, Bai S, Quan H (2019). Design and monitoring
-of survival trials in complex scenarios. Statistics in Medicine
-38:192-209.
-
-Maurer W, Bretz F (2013). Multiple testing in group sequential trials
-using graphical approaches. Statistics in Biopharmaceutical Research
-5:311-320.
-
-Robins JM, Tsiatis AA (1991). Correcting for non-compliance in
-randomized trials using rank preserving structural failure time models.
-Communications in Statistics - Theory and Methods 20:2609-2631.
+Yung G, Liu Y (2020). Sample size and power for the weighted log-rank
+test and Kaplan-Meier based tests with allowance for nonproportional
+hazards. Biometrics 76:939-950.
