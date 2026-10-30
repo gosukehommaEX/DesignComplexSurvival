@@ -225,19 +225,20 @@ groups <- c("B_1:2" = "100 control, 200 treatment",
             "B_2:1" = "200 control, 100 treatment",
             "B_1:1" = "150 in each group")
 tab <- data.frame(groups = unname(groups),
-                  trials = sapply(names(groups), function(v) as.integer(
-                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"])),
+                  trials = format(sapply(names(groups), function(v)
+                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"]),
+                    big.mark = ",", scientific = FALSE),
                   benefit = sapply(names(groups), rate, q = "reject_upper_any"),
                   opposite = sapply(names(groups), rate, q = "reject_lower_any"),
                   row.names = NULL)
 knitr::kable(tab, digits = 4, format.args = list(big.mark = ","))
 ```
 
-| groups                     | trials | benefit | opposite |
-|:---------------------------|-------:|--------:|---------:|
-| 100 control, 200 treatment |  4e+05 |  0.0276 |   0.0229 |
-| 200 control, 100 treatment |  4e+05 |  0.0226 |   0.0277 |
-| 150 in each group          |  4e+05 |  0.0251 |   0.0247 |
+| groups                     | trials  | benefit | opposite |
+|:---------------------------|:--------|--------:|---------:|
+| 100 control, 200 treatment | 400,000 |  0.0276 |   0.0229 |
+| 200 control, 100 treatment | 400,000 |  0.0226 |   0.0277 |
+| 150 in each group          | 400,000 |  0.0251 |   0.0247 |
 
 When the treatment group is the larger group, the probability of
 rejecting in favour of the treatment is 0.0276 instead of 0.025; it

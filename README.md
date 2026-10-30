@@ -3,6 +3,23 @@
 
 # DesignComplexSurvival
 
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/gosukehommaEX/DesignComplexSurvival/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gosukehommaEX/DesignComplexSurvival/actions/workflows/R-CMD-check.yaml)
+[![License: GPL (\>=
+2)](https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg)](https://www.r-project.org/Licenses/)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/DesignComplexSurvival)](https://CRAN.R-project.org/package=DesignComplexSurvival)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/DesignComplexSurvival)](https://cran.r-project.org/package=DesignComplexSurvival)
+[![CRAN downloads
+total](https://cranlogs.r-pkg.org/badges/grand-total/DesignComplexSurvival)](https://cran.r-project.org/package=DesignComplexSurvival)
+[![pkgdown
+site](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://gosukehommaEX.github.io/DesignComplexSurvival/)
+[![Codecov test
+coverage](https://codecov.io/gh/gosukehommaEX/DesignComplexSurvival/graph/badge.svg)](https://app.codecov.io/gh/gosukehommaEX/DesignComplexSurvival)
+<!-- badges: end -->
+
 DesignComplexSurvival computes the operating characteristics of
 two-group time-to-event trials analysed with the log-rank test, without
 patient-level simulation:

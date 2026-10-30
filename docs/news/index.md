@@ -2,12 +2,13 @@
 
 ## DesignComplexSurvival 0.3.3
 
-- Documentation: the introductory vignette covers the workflow of a
-  design with one endpoint, and five new vignettes describe the
-  multistate model and treatment switching, group sequential designs and
-  the covariance of the statistics, PFS and OS tested together,
-  switching from a calendar time, and the validation of the package. The
-  pkgdown site lists them under Articles.
+- Documentation: the introductory vignette gives an overview of the
+  model and of what can be specified, with a diagram of the states, and
+  covers the workflow of a design with one endpoint; five new vignettes
+  describe the multistate model and treatment switching, group
+  sequential designs and the covariance of the statistics, PFS and OS
+  tested together, switching from a calendar time, and the validation of
+  the package. The pkgdown site lists them under Articles.
 - Validation: in `inst/validation/validate_fastsurvival.R` (V1-V4), the
   death that defines a look driven by OS deaths was lost in some trials,
   because the follow-up time cut - entry could be smaller than its time

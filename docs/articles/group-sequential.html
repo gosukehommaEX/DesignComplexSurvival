@@ -258,8 +258,9 @@ and in the opposite direction:</p>
 <span>            <span class="st">"B_2:1"</span> <span class="op">=</span> <span class="st">"200 control, 100 treatment"</span>,</span>
 <span>            <span class="st">"B_1:1"</span> <span class="op">=</span> <span class="st">"150 in each group"</span><span class="op">)</span></span>
 <span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>,</span>
-<span>                  trials <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span></span>
-<span>                    <span class="va">sim</span><span class="op">$</span><span class="va">n</span><span class="op">[</span><span class="va">sim</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="va">v</span> <span class="op">&amp;</span> <span class="va">sim</span><span class="op">$</span><span class="va">quantity</span> <span class="op">==</span> <span class="st">"reject_upper_any"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                  trials <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
+<span>                    <span class="va">sim</span><span class="op">$</span><span class="va">n</span><span class="op">[</span><span class="va">sim</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="va">v</span> <span class="op">&amp;</span> <span class="va">sim</span><span class="op">$</span><span class="va">quantity</span> <span class="op">==</span> <span class="st">"reject_upper_any"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                    big.mark <span class="op">=</span> <span class="st">","</span>, scientific <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>                  benefit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="va">rate</span>, q <span class="op">=</span> <span class="st">"reject_upper_any"</span><span class="op">)</span>,</span>
 <span>                  opposite <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="va">rate</span>, q <span class="op">=</span> <span class="st">"reject_lower_any"</span><span class="op">)</span>,</span>
 <span>                  row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
@@ -267,26 +268,26 @@ and in the opposite direction:</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">groups</th>
-<th align="right">trials</th>
+<th align="left">trials</th>
 <th align="right">benefit</th>
 <th align="right">opposite</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">100 control, 200 treatment</td>
-<td align="right">4e+05</td>
+<td align="left">400,000</td>
 <td align="right">0.0276</td>
 <td align="right">0.0229</td>
 </tr>
 <tr class="even">
 <td align="left">200 control, 100 treatment</td>
-<td align="right">4e+05</td>
+<td align="left">400,000</td>
 <td align="right">0.0226</td>
 <td align="right">0.0277</td>
 </tr>
 <tr class="odd">
 <td align="left">150 in each group</td>
-<td align="right">4e+05</td>
+<td align="left">400,000</td>
 <td align="right">0.0251</td>
 <td align="right">0.0247</td>
 </tr>

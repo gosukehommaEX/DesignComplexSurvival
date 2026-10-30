@@ -47,7 +47,7 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.3" id="designcomplexsurvival-033">DesignComplexSurvival 0.3.3<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-033"></a></h2>
-<ul><li>Documentation: the introductory vignette covers the workflow of a design with one endpoint, and five new vignettes describe the multistate model and treatment switching, group sequential designs and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package. The pkgdown site lists them under Articles.</li>
+<ul><li>Documentation: the introductory vignette gives an overview of the model and of what can be specified, with a diagram of the states, and covers the workflow of a design with one endpoint; five new vignettes describe the multistate model and treatment switching, group sequential designs and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package. The pkgdown site lists them under Articles.</li>
 <li>Validation: in <code>inst/validation/validate_fastsurvival.R</code> (V1-V4), the death that defines a look driven by OS deaths was lost in some trials, because the follow-up time cut - entry could be smaller than its time by rounding (on average, about 0.1 to 0.3 deaths fewer than the target at these looks). The comparisons now use the cut times (1 + 1e-12), and the script checks that every trial has the target number of deaths and that the log-rank Z agrees with <code><a href="https://rdrr.io/pkg/survival/man/survdiff.html" class="external-link">survival::survdiff()</a></code>. The package code is unchanged.</li>
 </ul></div>
     <div class="section level2">

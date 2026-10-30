@@ -17,10 +17,144 @@ library(DesignComplexSurvival)
 
 DesignComplexSurvival computes the operating characteristics of two-group
 time-to-event trials analysed with the log-rank test, without patient-level
-simulation. Each group follows a multistate model (progression-free,
-progressed, switched, dead, and progression-free after a switch before
-progression) with piecewise constant intensities. A design is built in four
-steps:
+simulation. This article first describes what the package computes and which
+trial settings it covers, and then goes through a design with a single
+endpoint. The other articles are listed at the end.
+
+## What the package computes
+
+* The expected numbers of enrolled patients, events and dropouts over
+  calendar time.
+* The calendar times at which given numbers of events are expected, that is,
+  the times of the interim and final analyses.
+* The efficacy and futility bounds at each analysis and the probabilities of
+  crossing them.
+* The power and the type I error; with two endpoints, the power of each, the
+  probabilities of rejecting both or at least one hypothesis, and the
+  familywise error rate.
+* The number of events, sample size, accrual duration or follow-up needed for
+  a target power.
+
+The analyses can be driven by the events of progression-free survival (PFS)
+or overall survival (OS), take place at calendar times, or mix the two. The
+computations use closed forms, numerical integration and multivariate normal
+probabilities, so that they are fast and give the same result every time;
+they rest on the normal approximation of the log-rank statistics.
+
+## The model of each group
+
+Each group follows a multistate model with five states:
+
+```{=html}
+<figure style="margin: 1.5em 0;">
+<svg viewBox="0 0 720 420" width="100%" style="max-width: 720px; height: auto; color: inherit;" role="img" aria-label="The five states of the model of one group and the transitions between them">
+<defs>
+<marker id="dcs-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="currentColor" fill-opacity="0.7"></path>
+</marker>
+</defs>
+<g fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4">
+<path d="M95,58 C95,20 625,20 625,58" marker-end="url(#dcs-arrow)"></path>
+<line x1="180" y1="90" x2="273" y2="90" marker-end="url(#dcs-arrow)"></line>
+<line x1="445" y1="90" x2="538" y2="90" marker-end="url(#dcs-arrow)"></line>
+<line x1="130" y1="120" x2="318" y2="308" marker-end="url(#dcs-arrow)"></line>
+<line x1="360" y1="120" x2="360" y2="308" marker-end="url(#dcs-arrow)"></line>
+<line x1="610" y1="120" x2="410" y2="308" marker-end="url(#dcs-arrow)"></line>
+<line x1="95" y1="120" x2="95" y2="198" marker-end="url(#dcs-arrow)"></line>
+<line x1="180" y1="245" x2="273" y2="336" marker-end="url(#dcs-arrow)"></line>
+<path d="M95,262 V400 H715 V90 H712" marker-end="url(#dcs-arrow)"></path>
+</g>
+<g fill="currentColor" fill-opacity="0.75" font-family="monospace" font-size="11.5">
+<text x="360" y="14" text-anchor="middle">switch at progression (prog, switch_prob)</text>
+<text x="226" y="82" text-anchor="middle">prog</text>
+<text x="491" y="110" text-anchor="middle">switch_rate</text>
+<text x="222" y="196">death</text>
+<text x="368" y="226">death_prog</text>
+<text x="516" y="214">death_switch</text>
+<text x="103" y="164">switch_pre</text>
+<text x="200" y="318" text-anchor="end">death_switch_pre</text>
+<text x="420" y="392" text-anchor="middle">progression after a switch (prog_switch)</text>
+</g>
+<g fill="none" stroke="currentColor" stroke-width="1.6">
+<rect x="10" y="60" width="170" height="60" rx="8"></rect>
+<rect x="275" y="60" width="170" height="60" rx="8"></rect>
+<rect x="540" y="60" width="170" height="60" rx="8"></rect>
+<rect x="10" y="200" width="170" height="60" rx="8"></rect>
+<rect x="275" y="310" width="170" height="60" rx="8" fill="currentColor" fill-opacity="0.08"></rect>
+</g>
+<g fill="currentColor" font-family="sans-serif" font-size="13">
+<text x="20" y="78" font-family="monospace" font-size="12" fill-opacity="0.7">1</text>
+<text x="95" y="96" text-anchor="middle">Progression-free</text>
+<text x="285" y="78" font-family="monospace" font-size="12" fill-opacity="0.7">2</text>
+<text x="360" y="88" text-anchor="middle">Progressed</text>
+<text x="360" y="106" text-anchor="middle">(no switch)</text>
+<text x="550" y="78" font-family="monospace" font-size="12" fill-opacity="0.7">3</text>
+<text x="625" y="96" text-anchor="middle">Switched</text>
+<text x="20" y="218" font-family="monospace" font-size="12" fill-opacity="0.7">5</text>
+<text x="95" y="228" text-anchor="middle">Progression-free</text>
+<text x="95" y="246" text-anchor="middle">after a switch</text>
+<text x="285" y="328" font-family="monospace" font-size="12" fill-opacity="0.7">4</text>
+<text x="360" y="346" text-anchor="middle">Dead</text>
+</g>
+</svg>
+<figcaption style="font-size: 0.9em; margin-top: 0.5em;">The states of the model of one group and the arguments of <code>ms_model()</code> that give the transitions between them. State 5 is used only when <code>switch_pre</code> is positive.</figcaption>
+</figure>
+```
+
+PFS is the time to leave the progression-free states 1 and 5, and OS is the
+time to enter state 4. Since both come from the same course of each patient,
+the dependence between them is part of the model and needs no separate
+assumption. A switch (also called treatment switching or crossover) is a move
+to the experimental treatment or to another treatment; it can be specified in
+either group:
+
+* at progression, with probability `switch_prob`, or after progression, with
+  hazard `switch_rate`;
+* before progression, with hazard `switch_pre`; PFS is then followed up to
+  progression or death, or censored at the switch (`pfs_switch` in
+  `ms_scenario()`);
+* from a calendar time on, for example after an interim analysis
+  (`switch_start` in `ms_scenario()`).
+
+All intensities are piecewise constant, and the number of intervals is not
+limited, so that a delayed or diminishing treatment effect is given through
+the intervals. Before progression the intensities are functions of the time
+since randomization. After progression they are functions of the time since
+progression (`clock = "reset"`) or since randomization (`"forward"`). The
+death hazard after a switch can be measured on the same clock or from the
+switch (`switch_clock = "switch"`), or the switch can have an accelerated
+failure time effect (`switch_af`). Dropout is piecewise exponential by group,
+the same in all states, and `dropout_pfs` adds a censoring of PFS only.
+
+## What can be specified
+
+| Feature | Options | Status |
+|---|---|---|
+| Accrual | piecewise uniform, by rates or by proportions and a duration | supported |
+| Allocation | any ratio, for example 2:1 | supported |
+| Dropout | piecewise exponential by group; a censoring of PFS only | supported |
+| Hazards | piecewise constant, with delayed or diminishing effects through the intervals | supported |
+| Switching at and after progression | probability at progression, hazard after progression, death hazard after the switch | supported |
+| Effect of a switch | death hazard on the post-progression clock or from the switch, or an accelerated failure time effect | supported |
+| Switching before progression | PFS followed up or censored at the switch | supported |
+| Switching from a calendar time | OS tested alone | partly |
+| Timing of the analyses | events of OS or PFS, calendar times, or a mix; final analysis at a given follow-up after the end of accrual | supported |
+| Efficacy bounds | alpha spending: O'Brien-Fleming and Pocock types, Hwang-Shih-DeCani, power family, user-defined | supported |
+| Futility bounds | fixed (Z or hazard ratio scale) or beta spending; binding or non-binding | supported |
+| Two endpoints | PFS and OS by fixed sequence (two procedures) or Bonferroni, with recycling of the level after a rejection | supported |
+| Familywise error rate | under the global null hypothesis and under partial null scenarios given by the user | supported |
+| Solving for | number of events, sample size, accrual duration or follow-up | supported |
+| Approximations | mean of the statistic (two choices) and covariance (three choices) | supported |
+| Smooth hazards (Weibull), cure fractions, delays that vary between patients | piecewise constant approximation of the hazard of each group (one endpoint) | approximate |
+| Not covered | weighted log-rank tests, restricted mean survival time, stratification, non-inferiority and equivalence, a fixed follow-up for each patient, repeated switches back and forth, dropout that depends on the state, switching started by interim results, more than two groups | not supported |
+
+PFS and OS can be tested together with switching and with group sequential
+designs; the exception is switching from a calendar time, which covers the OS
+statistic alone. The other articles describe each part in detail.
+
+## Building a design
+
+A design is built in four steps:
 
 1. the scenario: the models of the two groups (`ms_model()`, or
    `ms_fleischer()` for exponential progression-free survival (PFS) and
@@ -33,8 +167,8 @@ steps:
    (`ms_power()`), or the number of events, sample size, accrual duration or
    follow-up for a target power (`ms_size()`).
 
-This article goes through the four steps for a single endpoint with a
-delayed treatment effect. The other articles are listed at the end.
+The following example goes through the four steps for a single endpoint with
+a delayed treatment effect.
 
 ## A delayed treatment effect
 

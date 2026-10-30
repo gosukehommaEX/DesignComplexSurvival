@@ -7,9 +7,98 @@ library(DesignComplexSurvival)
 
 DesignComplexSurvival computes the operating characteristics of
 two-group time-to-event trials analysed with the log-rank test, without
-patient-level simulation. Each group follows a multistate model
-(progression-free, progressed, switched, dead, and progression-free
-after a switch before progression) with piecewise constant intensities.
+patient-level simulation. This article first describes what the package
+computes and which trial settings it covers, and then goes through a
+design with a single endpoint. The other articles are listed at the end.
+
+## What the package computes
+
+- The expected numbers of enrolled patients, events and dropouts over
+  calendar time.
+- The calendar times at which given numbers of events are expected, that
+  is, the times of the interim and final analyses.
+- The efficacy and futility bounds at each analysis and the
+  probabilities of crossing them.
+- The power and the type I error; with two endpoints, the power of each,
+  the probabilities of rejecting both or at least one hypothesis, and
+  the familywise error rate.
+- The number of events, sample size, accrual duration or follow-up
+  needed for a target power.
+
+The analyses can be driven by the events of progression-free survival
+(PFS) or overall survival (OS), take place at calendar times, or mix the
+two. The computations use closed forms, numerical integration and
+multivariate normal probabilities, so that they are fast and give the
+same result every time; they rest on the normal approximation of the
+log-rank statistics.
+
+## The model of each group
+
+Each group follows a multistate model with five states:
+
+![](data:image/svg+xml;base64,PHN2ZyB2aWV3Ym94PSIwIDAgNzIwIDQyMCIgd2lkdGg9IjEwMCUiIHN0eWxlPSJtYXgtd2lkdGg6IDcyMHB4OyBoZWlnaHQ6IGF1dG87IGNvbG9yOiBpbmhlcml0OyIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJUaGUgZml2ZSBzdGF0ZXMgb2YgdGhlIG1vZGVsIG9mIG9uZSBncm91cCBhbmQgdGhlIHRyYW5zaXRpb25zIGJldHdlZW4gdGhlbSI+PGRlZnM+PG1hcmtlciBpZD0iZGNzLWFycm93IiB2aWV3Ym94PSIwIDAgMTAgMTAiIHJlZng9IjkiIHJlZnk9IjUiIG1hcmtlcndpZHRoPSI3IiBtYXJrZXJoZWlnaHQ9IjciIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIj48cGF0aCBkPSJNMCwwIEwxMCw1IEwwLDEwIHoiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1vcGFjaXR5PSIwLjciIC8+PC9tYXJrZXI+PC9kZWZzPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utb3BhY2l0eT0iMC42IiBzdHJva2Utd2lkdGg9IjEuNCI+PHBhdGggZD0iTTk1LDU4IEM5NSwyMCA2MjUsMjAgNjI1LDU4IiBtYXJrZXItZW5kPSJ1cmwoI2Rjcy1hcnJvdykiIC8+PGxpbmUgeDE9IjE4MCIgeTE9IjkwIiB4Mj0iMjczIiB5Mj0iOTAiIG1hcmtlci1lbmQ9InVybCgjZGNzLWFycm93KSI+PC9saW5lPjxsaW5lIHgxPSI0NDUiIHkxPSI5MCIgeDI9IjUzOCIgeTI9IjkwIiBtYXJrZXItZW5kPSJ1cmwoI2Rjcy1hcnJvdykiPjwvbGluZT48bGluZSB4MT0iMTMwIiB5MT0iMTIwIiB4Mj0iMzE4IiB5Mj0iMzA4IiBtYXJrZXItZW5kPSJ1cmwoI2Rjcy1hcnJvdykiPjwvbGluZT48bGluZSB4MT0iMzYwIiB5MT0iMTIwIiB4Mj0iMzYwIiB5Mj0iMzA4IiBtYXJrZXItZW5kPSJ1cmwoI2Rjcy1hcnJvdykiPjwvbGluZT48bGluZSB4MT0iNjEwIiB5MT0iMTIwIiB4Mj0iNDEwIiB5Mj0iMzA4IiBtYXJrZXItZW5kPSJ1cmwoI2Rjcy1hcnJvdykiPjwvbGluZT48bGluZSB4MT0iOTUiIHkxPSIxMjAiIHgyPSI5NSIgeTI9IjE5OCIgbWFya2VyLWVuZD0idXJsKCNkY3MtYXJyb3cpIj48L2xpbmU+PGxpbmUgeDE9IjE4MCIgeTE9IjI0NSIgeDI9IjI3MyIgeTI9IjMzNiIgbWFya2VyLWVuZD0idXJsKCNkY3MtYXJyb3cpIj48L2xpbmU+PHBhdGggZD0iTTk1LDI2MiBWNDAwIEg3MTUgVjkwIEg3MTIiIG1hcmtlci1lbmQ9InVybCgjZGNzLWFycm93KSIgLz48L2c+PGcgZmlsbD0iY3VycmVudENvbG9yIiBmaWxsLW9wYWNpdHk9IjAuNzUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTEuNSI+PHRleHQgeD0iMzYwIiB5PSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+c3dpdGNoIGF0IHByb2dyZXNzaW9uIChwcm9nLCBzd2l0Y2hfcHJvYik8L3RleHQ+PHRleHQgeD0iMjI2IiB5PSI4MiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+cHJvZzwvdGV4dD48dGV4dCB4PSI0OTEiIHk9IjExMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+c3dpdGNoX3JhdGU8L3RleHQ+PHRleHQgeD0iMjIyIiB5PSIxOTYiPmRlYXRoPC90ZXh0Pjx0ZXh0IHg9IjM2OCIgeT0iMjI2Ij5kZWF0aF9wcm9nPC90ZXh0Pjx0ZXh0IHg9IjUxNiIgeT0iMjE0Ij5kZWF0aF9zd2l0Y2g8L3RleHQ+PHRleHQgeD0iMTAzIiB5PSIxNjQiPnN3aXRjaF9wcmU8L3RleHQ+PHRleHQgeD0iMjAwIiB5PSIzMTgiIHRleHQtYW5jaG9yPSJlbmQiPmRlYXRoX3N3aXRjaF9wcmU8L3RleHQ+PHRleHQgeD0iNDIwIiB5PSIzOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPnByb2dyZXNzaW9uIGFmdGVyIGEgc3dpdGNoIChwcm9nX3N3aXRjaCk8L3RleHQ+PC9nPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjEuNiI+PHJlY3QgeD0iMTAiIHk9IjYwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjYwIiByeD0iOCIgLz48cmVjdCB4PSIyNzUiIHk9IjYwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjYwIiByeD0iOCIgLz48cmVjdCB4PSI1NDAiIHk9IjYwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjYwIiByeD0iOCIgLz48cmVjdCB4PSIxMCIgeT0iMjAwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjYwIiByeD0iOCIgLz48cmVjdCB4PSIyNzUiIHk9IjMxMCIgd2lkdGg9IjE3MCIgaGVpZ2h0PSI2MCIgcng9IjgiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1vcGFjaXR5PSIwLjA4IiAvPjwvZz48ZyBmaWxsPSJjdXJyZW50Q29sb3IiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjEzIj48dGV4dCB4PSIyMCIgeT0iNzgiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTIiIGZpbGwtb3BhY2l0eT0iMC43Ij4xPC90ZXh0Pjx0ZXh0IHg9Ijk1IiB5PSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UHJvZ3Jlc3Npb24tZnJlZTwvdGV4dD48dGV4dCB4PSIyODUiIHk9Ijc4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsLW9wYWNpdHk9IjAuNyI+MjwvdGV4dD48dGV4dCB4PSIzNjAiIHk9Ijg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9ncmVzc2VkPC90ZXh0Pjx0ZXh0IHg9IjM2MCIgeT0iMTA2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4obm8gc3dpdGNoKTwvdGV4dD48dGV4dCB4PSI1NTAiIHk9Ijc4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsLW9wYWNpdHk9IjAuNyI+MzwvdGV4dD48dGV4dCB4PSI2MjUiIHk9Ijk2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Td2l0Y2hlZDwvdGV4dD48dGV4dCB4PSIyMCIgeT0iMjE4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsLW9wYWNpdHk9IjAuNyI+NTwvdGV4dD48dGV4dCB4PSI5NSIgeT0iMjI4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Qcm9ncmVzc2lvbi1mcmVlPC90ZXh0Pjx0ZXh0IHg9Ijk1IiB5PSIyNDYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPmFmdGVyIGEgc3dpdGNoPC90ZXh0Pjx0ZXh0IHg9IjI4NSIgeT0iMzI4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsLW9wYWNpdHk9IjAuNyI+NDwvdGV4dD48dGV4dCB4PSIzNjAiIHk9IjM0NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RGVhZDwvdGV4dD48L2c+PC9zdmc+)
+
+The states of the model of one group and the arguments of
+[`ms_model()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_model.md)
+that give the transitions between them. State 5 is used only when
+`switch_pre` is positive.
+
+PFS is the time to leave the progression-free states 1 and 5, and OS is
+the time to enter state 4. Since both come from the same course of each
+patient, the dependence between them is part of the model and needs no
+separate assumption. A switch (also called treatment switching or
+crossover) is a move to the experimental treatment or to another
+treatment; it can be specified in either group:
+
+- at progression, with probability `switch_prob`, or after progression,
+  with hazard `switch_rate`;
+- before progression, with hazard `switch_pre`; PFS is then followed up
+  to progression or death, or censored at the switch (`pfs_switch` in
+  [`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md));
+- from a calendar time on, for example after an interim analysis
+  (`switch_start` in
+  [`ms_scenario()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_scenario.md)).
+
+All intensities are piecewise constant, and the number of intervals is
+not limited, so that a delayed or diminishing treatment effect is given
+through the intervals. Before progression the intensities are functions
+of the time since randomization. After progression they are functions of
+the time since progression (`clock = "reset"`) or since randomization
+(`"forward"`). The death hazard after a switch can be measured on the
+same clock or from the switch (`switch_clock = "switch"`), or the switch
+can have an accelerated failure time effect (`switch_af`). Dropout is
+piecewise exponential by group, the same in all states, and
+`dropout_pfs` adds a censoring of PFS only.
+
+## What can be specified
+
+| Feature | Options | Status |
+|----|----|----|
+| Accrual | piecewise uniform, by rates or by proportions and a duration | supported |
+| Allocation | any ratio, for example 2:1 | supported |
+| Dropout | piecewise exponential by group; a censoring of PFS only | supported |
+| Hazards | piecewise constant, with delayed or diminishing effects through the intervals | supported |
+| Switching at and after progression | probability at progression, hazard after progression, death hazard after the switch | supported |
+| Effect of a switch | death hazard on the post-progression clock or from the switch, or an accelerated failure time effect | supported |
+| Switching before progression | PFS followed up or censored at the switch | supported |
+| Switching from a calendar time | OS tested alone | partly |
+| Timing of the analyses | events of OS or PFS, calendar times, or a mix; final analysis at a given follow-up after the end of accrual | supported |
+| Efficacy bounds | alpha spending: O’Brien-Fleming and Pocock types, Hwang-Shih-DeCani, power family, user-defined | supported |
+| Futility bounds | fixed (Z or hazard ratio scale) or beta spending; binding or non-binding | supported |
+| Two endpoints | PFS and OS by fixed sequence (two procedures) or Bonferroni, with recycling of the level after a rejection | supported |
+| Familywise error rate | under the global null hypothesis and under partial null scenarios given by the user | supported |
+| Solving for | number of events, sample size, accrual duration or follow-up | supported |
+| Approximations | mean of the statistic (two choices) and covariance (three choices) | supported |
+| Smooth hazards (Weibull), cure fractions, delays that vary between patients | piecewise constant approximation of the hazard of each group (one endpoint) | approximate |
+| Not covered | weighted log-rank tests, restricted mean survival time, stratification, non-inferiority and equivalence, a fixed follow-up for each patient, repeated switches back and forth, dropout that depends on the state, switching started by interim results, more than two groups | not supported |
+
+PFS and OS can be tested together with switching and with group
+sequential designs; the exception is switching from a calendar time,
+which covers the OS statistic alone. The other articles describe each
+part in detail.
+
+## Building a design
+
 A design is built in four steps:
 
 1.  the scenario: the models of the two groups
@@ -31,8 +120,8 @@ A design is built in four steps:
     for a target power
     ([`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)).
 
-This article goes through the four steps for a single endpoint with a
-delayed treatment effect. The other articles are listed at the end.
+The following example goes through the four steps for a single endpoint
+with a delayed treatment effect.
 
 ## A delayed treatment effect
 
