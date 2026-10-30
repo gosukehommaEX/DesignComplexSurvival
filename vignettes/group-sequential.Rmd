@@ -15,6 +15,12 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(DesignComplexSurvival)
 ```
 
+```{r helpers, include = FALSE}
+f3 <- function(x) sprintf("%.3f", x)
+f4 <- function(x) sprintf("%.4f", x)
+f2s <- function(x) format(signif(x, 2), scientific = FALSE)
+```
+
 This article describes the choices of `ms_looks()` and `ms_test()`: when the
 analyses take place, how the efficacy and futility bounds are obtained, and
 which approximation of the distribution of the log-rank statistics is used.
@@ -44,7 +50,7 @@ pw$looks[, cols]
 ```
 
 The final analysis takes place at month `r round(pw$study_duration, 1)`
-and the power is `r round(pw$power, 3)`. Analyses can also take place at
+and the power is `r f3(pw$power)`. Analyses can also take place at
 calendar times; the numbers of events then follow from the scenario:
 
 ```{r looks-calendar}
@@ -55,7 +61,7 @@ pw_cal$looks[, cols]
 
 At the calendar times 24, 30 and 40 months, `r round(pw_cal$looks$events[1])`,
 `r round(pw_cal$looks$events[2])` and `r round(pw_cal$looks$events[3])`
-deaths are expected and the power is `r round(pw_cal$power, 3)`. The final
+deaths are expected and the power is `r f3(pw_cal$power)`. The final
 analysis can also be placed at a given time after the end of accrual with
 `followup` in `ms_power()`, and the looks can mix triggers, for example an
 interim analysis at a calendar time and a final analysis driven by events
@@ -110,10 +116,11 @@ fut$beta_nonbinding$looks[, c("time", "z_upper", "z_lower", "hr_lower", "prob_lo
 ```
 
 The fixed bound stops the trial at an interim analysis when the estimated
-hazard ratio exceeds 1. Its power is `r round(fut$fixed_hr$power, 3)`, against
-`r round(pw$power, 3)` without futility bounds: with a delayed effect, the
-early hazard ratio is close to 1 and the trial stops for futility with
-probability `r round(sum(fut$fixed_hr$looks$prob_lower), 3)`.
+hazard ratio exceeds 1. Its power is `r f3(fut$fixed_hr$power)`, against
+`r f3(pw$power)` without futility bounds: with a delayed effect, the early
+hazard ratio is close to 1, and the trial stops for futility at one of the
+interim analyses with probability
+`r f3(sum(head(fut$fixed_hr$looks$prob_lower, -1)))`.
 
 ## The covariance of the statistics
 
@@ -138,10 +145,10 @@ pv
 ```
 
 The variances of the statistic differ from 1 by at most
-`r signif(max(abs(mo$alternative$z_var - 1)), 2)` with `"alternative"` and
-`r signif(max(abs(mo$studentized$z_var - 1)), 2)` with `"studentized"`, and
-the power is `r round(pv[["null"]], 4)`, `r round(pv[["alternative"]], 4)`
-and `r round(pv[["studentized"]], 4)`. The choice affects the power, the
+`r f2s(max(abs(mo$alternative$z_var - 1)))` with `"alternative"` and
+`r f2s(max(abs(mo$studentized$z_var - 1)))` with `"studentized"`, and
+the power is `r f4(pv[["null"]])`, `r f4(pv[["alternative"]])`
+and `r f4(pv[["studentized"]])`. The choice affects the power, the
 futility bounds by beta spending and, with two endpoints, the familywise
 error rate under a partial null hypothesis, but not the efficacy bounds or
 the non-binding type I error. In the simulations of `inst/validation/` with
@@ -178,17 +185,17 @@ groups <- c("B_1:2" = "100 control, 200 treatment",
             "B_2:1" = "200 control, 100 treatment",
             "B_1:1" = "150 in each group")
 tab <- data.frame(groups = unname(groups),
-                  trials = sapply(names(groups), function(v) sim$n[sim$variant == v &
-                    sim$quantity == "reject_upper_any"]),
+                  trials = sapply(names(groups), function(v) as.integer(
+                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"])),
                   benefit = sapply(names(groups), rate, q = "reject_upper_any"),
                   opposite = sapply(names(groups), rate, q = "reject_lower_any"),
                   row.names = NULL)
-knitr::kable(tab, digits = 4)
+knitr::kable(tab, digits = 4, format.args = list(big.mark = ","))
 ```
 
 When the treatment group is the larger group, the probability of rejecting
-in favour of the treatment is `r round(rate("B_1:2", "reject_upper_any"), 4)`
-instead of `r round(pw_b$type1[["nonbinding"]], 3)`; it falls below the
+in favour of the treatment is `r f4(rate("B_1:2", "reject_upper_any"))`
+instead of `r f3(pw_b$type1[["nonbinding"]])`; it falls below the
 nominal level when the control group is the larger group, and the deviation
 disappears with equal allocation. This is a property of the log-rank test
 with few events, not of the computations of the package.

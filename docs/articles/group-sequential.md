@@ -43,7 +43,7 @@ pw$looks[, cols]
 #> 3 33.65519    420      1.00 2.014084 0.8215566 0.59987406
 ```
 
-The final analysis takes place at month 33.7 and the power is 0.6.
+The final analysis takes place at month 33.7 and the power is 0.600.
 Analyses can also take place at calendar times; the numbers of events
 then follow from the scenario:
 
@@ -142,9 +142,10 @@ fut$beta_nonbinding$looks[, c("time", "z_upper", "z_lower", "hr_lower", "prob_lo
 ```
 
 The fixed bound stops the trial at an interim analysis when the
-estimated hazard ratio exceeds 1. Its power is 0.58, against 0.6 without
-futility bounds: with a delayed effect, the early hazard ratio is close
-to 1 and the trial stops for futility with probability 0.42.
+estimated hazard ratio exceeds 1. Its power is 0.580, against 0.600
+without futility bounds: with a delayed effect, the early hazard ratio
+is close to 1, and the trial stops for futility at one of the interim
+analyses with probability 0.168.
 
 ## The covariance of the statistics
 
@@ -182,8 +183,8 @@ pv
 ```
 
 The variances of the statistic differ from 1 by at most 0.0094 with
-`"alternative"` and 4.7^{-4} with `"studentized"`, and the power is
-0.5999, 0.6005 and 0.599. The choice affects the power, the futility
+`"alternative"` and 0.00047 with `"studentized"`, and the power is
+0.5999, 0.6005 and 0.5990. The choice affects the power, the futility
 bounds by beta spending and, with two endpoints, the familywise error
 rate under a partial null hypothesis, but not the efficacy bounds or the
 non-binding type I error. In the simulations of `inst/validation/` with
@@ -224,12 +225,12 @@ groups <- c("B_1:2" = "100 control, 200 treatment",
             "B_2:1" = "200 control, 100 treatment",
             "B_1:1" = "150 in each group")
 tab <- data.frame(groups = unname(groups),
-                  trials = sapply(names(groups), function(v) sim$n[sim$variant == v &
-                    sim$quantity == "reject_upper_any"]),
+                  trials = sapply(names(groups), function(v) as.integer(
+                    sim$n[sim$variant == v & sim$quantity == "reject_upper_any"])),
                   benefit = sapply(names(groups), rate, q = "reject_upper_any"),
                   opposite = sapply(names(groups), rate, q = "reject_lower_any"),
                   row.names = NULL)
-knitr::kable(tab, digits = 4)
+knitr::kable(tab, digits = 4, format.args = list(big.mark = ","))
 ```
 
 | groups                     | trials | benefit | opposite |

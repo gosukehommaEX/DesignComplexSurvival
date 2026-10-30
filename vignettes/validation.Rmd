@@ -15,6 +15,10 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6, fig.height
 library(DesignComplexSurvival)
 ```
 
+```{r helpers, include = FALSE}
+nf <- function(x) format(x, big.mark = ",")
+```
+
 The results of the package are checked in three ways:
 
 * the unit tests (`tests/testthat/`) compare the results with an independent
@@ -99,7 +103,7 @@ knitr::kable(as.data.frame(table(criterion = judged$criterion,
                                  judgement = judged$judgement)))
 ```
 
-In total `r sum(vd$judgement == "PASS")` values pass and
+In total `r nf(sum(vd$judgement == "PASS"))` values pass and
 `r sum(vd$judgement == "FAIL")` fail.
 
 The mean, standard deviation and correlation of the log-rank statistics, the
@@ -109,11 +113,11 @@ INFO with the difference in units of the standard error:
 ```{r info-z, fig.alt = "Histogram of the differences between the package and the simulations in standard errors for the rows that are not judged"}
 info <- vd[vd$judgement == "INFO" & is.finite(vd$se_used) & vd$se_used > 0, ]
 z <- info$diff / info$se_used
-hist(z, breaks = 40, main = "", xlab = "(package - simulation) / standard error")
+hist(z, breaks = 40, main = "", xlab = "(simulation - package) / standard error")
 ```
 
-Of the `r nrow(info)` INFO rows with a standard error, `r sum(abs(z) <= 2)`
-are within 2 standard errors and `r sum(abs(z) > 4)` differ by more than 4.
+Of the `r nf(nrow(info))` INFO rows with a standard error,
+`r nf(sum(abs(z) <= 2))` are within 2 standard errors and `r sum(abs(z) > 4)` differ by more than 4.
 These rows, by quantity and by the approximation compared (column `variant`),
 and the ten largest differences:
 

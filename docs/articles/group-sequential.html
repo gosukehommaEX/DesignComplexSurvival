@@ -104,7 +104,7 @@ at 420 deaths with interim analyses at 50 and 75 percent:</p>
 <span><span class="co">#&gt; 1 21.04696    210      0.50 2.962588 0.6643966 0.02547217</span></span>
 <span><span class="co">#&gt; 2 26.54149    315      0.75 2.359018 0.7665685 0.20443870</span></span>
 <span><span class="co">#&gt; 3 33.65519    420      1.00 2.014084 0.8215566 0.59987406</span></span></code></pre></div>
-<p>The final analysis takes place at month 33.7 and the power is 0.6.
+<p>The final analysis takes place at month 33.7 and the power is 0.600.
 Analyses can also take place at calendar times; the numbers of events
 then follow from the scenario:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -186,9 +186,10 @@ them:</p>
 <span><span class="co">#&gt; 2 26.54149 2.359018 -0.1784277 1.0203100 0.02760043</span></span>
 <span><span class="co">#&gt; 3 33.65519 2.014084  2.0140837 0.8215566 0.34651269</span></span></code></pre></div>
 <p>The fixed bound stops the trial at an interim analysis when the
-estimated hazard ratio exceeds 1. Its power is 0.58, against 0.6 without
-futility bounds: with a delayed effect, the early hazard ratio is close
-to 1 and the trial stops for futility with probability 0.42.</p>
+estimated hazard ratio exceeds 1. Its power is 0.580, against 0.600
+without futility bounds: with a delayed effect, the early hazard ratio
+is close to 1, and the trial stops for futility at one of the interim
+analyses with probability 0.168.</p>
 </div>
 <div class="section level2">
 <h2 id="the-covariance-of-the-statistics">The covariance of the statistics<a class="anchor" aria-label="anchor" href="#the-covariance-of-the-statistics"></a>
@@ -219,9 +220,9 @@ random analysis time.</p>
 <span><span class="co">#&gt;        null alternative studentized </span></span>
 <span><span class="co">#&gt;   0.5998741   0.6004594   0.5989649</span></span></code></pre></div>
 <p>The variances of the statistic differ from 1 by at most 0.0094 with
-<code>"alternative"</code> and 4.7^{-4} with <code>"studentized"</code>,
-and the power is 0.5999, 0.6005 and 0.599. The choice affects the power,
-the futility bounds by beta spending and, with two endpoints, the
+<code>"alternative"</code> and 0.00047 with <code>"studentized"</code>,
+and the power is 0.5999, 0.6005 and 0.5990. The choice affects the
+power, the futility bounds by beta spending and, with two endpoints, the
 familywise error rate under a partial null hypothesis, but not the
 efficacy bounds or the non-binding type I error. In the simulations of
 <code>inst/validation/</code> with PFS and OS tested together,
@@ -257,12 +258,12 @@ and in the opposite direction:</p>
 <span>            <span class="st">"B_2:1"</span> <span class="op">=</span> <span class="st">"200 control, 100 treatment"</span>,</span>
 <span>            <span class="st">"B_1:1"</span> <span class="op">=</span> <span class="st">"150 in each group"</span><span class="op">)</span></span>
 <span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>,</span>
-<span>                  trials <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="va">sim</span><span class="op">$</span><span class="va">n</span><span class="op">[</span><span class="va">sim</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="va">v</span> <span class="op">&amp;</span></span>
-<span>                    <span class="va">sim</span><span class="op">$</span><span class="va">quantity</span> <span class="op">==</span> <span class="st">"reject_upper_any"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                  trials <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span></span>
+<span>                    <span class="va">sim</span><span class="op">$</span><span class="va">n</span><span class="op">[</span><span class="va">sim</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="va">v</span> <span class="op">&amp;</span> <span class="va">sim</span><span class="op">$</span><span class="va">quantity</span> <span class="op">==</span> <span class="st">"reject_upper_any"</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                  benefit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="va">rate</span>, q <span class="op">=</span> <span class="st">"reject_upper_any"</span><span class="op">)</span>,</span>
 <span>                  opposite <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>, <span class="va">rate</span>, q <span class="op">=</span> <span class="st">"reject_lower_any"</span><span class="op">)</span>,</span>
 <span>                  row.names <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">tab</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">tab</span>, digits <span class="op">=</span> <span class="fl">4</span>, format.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>big.mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">groups</th>

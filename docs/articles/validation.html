@@ -427,7 +427,7 @@ from the package value), and <code>abs:x</code> or <code>rel:x</code>
 </tr>
 </tbody>
 </table>
-<p>In total 1317 values pass and 0 fail.</p>
+<p>In total 1,317 values pass and 0 fail.</p>
 <p>The mean, standard deviation and correlation of the log-rank
 statistics, the power and the type I error are asymptotic approximations
 and are recorded as INFO with the difference in units of the standard
@@ -435,9 +435,9 @@ error:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">info</span> <span class="op">&lt;-</span> <span class="va">vd</span><span class="op">[</span><span class="va">vd</span><span class="op">$</span><span class="va">judgement</span> <span class="op">==</span> <span class="st">"INFO"</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">vd</span><span class="op">$</span><span class="va">se_used</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">vd</span><span class="op">$</span><span class="va">se_used</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span></span>
 <span><span class="va">z</span> <span class="op">&lt;-</span> <span class="va">info</span><span class="op">$</span><span class="va">diff</span> <span class="op">/</span> <span class="va">info</span><span class="op">$</span><span class="va">se_used</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">z</span>, breaks <span class="op">=</span> <span class="fl">40</span>, main <span class="op">=</span> <span class="st">""</span>, xlab <span class="op">=</span> <span class="st">"(package - simulation) / standard error"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">z</span>, breaks <span class="op">=</span> <span class="fl">40</span>, main <span class="op">=</span> <span class="st">""</span>, xlab <span class="op">=</span> <span class="st">"(simulation - package) / standard error"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="validation_files/figure-html/info-z-1.png" class="r-plt" alt="Histogram of the differences between the package and the simulations in standard errors for the rows that are not judged" width="576"></p>
-<p>Of the 2084 INFO rows with a standard error, 1672 are within 2
+<p>Of the 2,084 INFO rows with a standard error, 1,672 are within 2
 standard errors and 82 differ by more than 4. These rows, by quantity
 and by the approximation compared (column <code>variant</code>), and the
 ten largest differences:</p>

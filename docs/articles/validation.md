@@ -133,7 +133,7 @@ knitr::kable(as.data.frame(table(criterion = judged$criterion,
 | rel:0.002 | PASS      |  115 |
 | rel:1e-6  | PASS      |   12 |
 
-In total 1317 values pass and 0 fail.
+In total 1,317 values pass and 0 fail.
 
 The mean, standard deviation and correlation of the log-rank statistics,
 the power and the type I error are asymptotic approximations and are
@@ -143,17 +143,17 @@ recorded as INFO with the difference in units of the standard error:
 
 info <- vd[vd$judgement == "INFO" & is.finite(vd$se_used) & vd$se_used > 0, ]
 z <- info$diff / info$se_used
-hist(z, breaks = 40, main = "", xlab = "(package - simulation) / standard error")
+hist(z, breaks = 40, main = "", xlab = "(simulation - package) / standard error")
 ```
 
 ![Histogram of the differences between the package and the simulations
 in standard errors for the rows that are not
 judged](validation_files/figure-html/info-z-1.png)
 
-Of the 2084 INFO rows with a standard error, 1672 are within 2 standard
-errors and 82 differ by more than 4. These rows, by quantity and by the
-approximation compared (column `variant`), and the ten largest
-differences:
+Of the 2,084 INFO rows with a standard error, 1,672 are within 2
+standard errors and 82 differ by more than 4. These rows, by quantity
+and by the approximation compared (column `variant`), and the ten
+largest differences:
 
 ``` r
 
