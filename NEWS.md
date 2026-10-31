@@ -15,6 +15,11 @@
   script checks that every trial has the target number of deaths and that
   the log-rank Z agrees with `survival::survdiff()`. The package code is
   unchanged.
+* Infrastructure: GitHub Actions run R CMD check and the test coverage
+  (reported to Codecov), the README shows badges, DESCRIPTION gives the
+  address of the website and `Language: en-US`, and `inst/WORDLIST` lists
+  the names and terms accepted by `spelling::spell_check_package()`. The
+  help pages, vignettes, README and NEWS use American spelling.
 
 # DesignComplexSurvival 0.3.2
 
@@ -64,7 +69,7 @@
   death (`"event"`, the default) or censored at a switch before progression
   (`"censor"`).
 * `ms_model()` gains `dropout_pfs`, a censoring of PFS only (for example the
-  end of tumour assessments). The PFS dropouts of `ms_events()` include it
+  end of tumor assessments). The PFS dropouts of `ms_events()` include it
   and, with `pfs_switch = "censor"`, the censoring at a switch.
 * `ms_scenario()` gains `switch_start`, a calendar time before which nobody
   switches (for example when switching is allowed only after an interim
@@ -166,7 +171,7 @@
 * `print()`, `summary()` and `as.data.frame()` methods handle two endpoints.
 * Reproduction scripts added for Glimm et al. (2010), Tamhane et al. (2010),
   Sugimoto et al. (2017) and Erdmann et al. (2025) (`inst/reproduce/`).
-* Validation: a Python simulation of PFS and OS analysed together in four
+* Validation: a Python simulation of PFS and OS analyzed together in four
   scenarios, with designs of two endpoints, and the covariance estimator of
   Danzer et al. (2025) applied to large simulated trials under the null
   hypothesis (`inst/validation/`). The Python simulation of single endpoints
@@ -201,5 +206,5 @@
 * Scripts that reproduce published sample sizes, numbers of events, analysis
   times, bounds and powers (`inst/reproduce/`) and compare the package with
   patient-level simulations (FastSurvival and Python) and with PWEALL
-  (`inst/validation/`). Each folder writes its judgements to
+  (`inst/validation/`). Each folder writes its judgments to
   `results/summary.csv` and `results/summary.md`.

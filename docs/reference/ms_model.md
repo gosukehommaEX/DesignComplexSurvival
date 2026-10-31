@@ -165,7 +165,7 @@ before progression censors PFS is set in
 Dropout is piecewise exponential with intervals starting at `time`,
 independent of the event process, and censors both endpoints. The hazard
 `dropout_pfs` adds a censoring that acts on PFS only (for example the
-end of tumour assessments), independent of everything else.
+end of tumor assessments), independent of everything else.
 
 A model without progression (`prog = 0`) is a piecewise exponential
 model for a single endpoint with hazard `death`. With

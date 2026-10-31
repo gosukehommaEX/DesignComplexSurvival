@@ -241,11 +241,11 @@ knitr::kable(tab, digits = 4, format.args = list(big.mark = ","))
 | 150 in each group          | 400,000 |  0.0251 |   0.0247 |
 
 When the treatment group is the larger group, the probability of
-rejecting in favour of the treatment is 0.0276 instead of 0.025; it
-falls below the nominal level when the control group is the larger
-group, and the deviation disappears with equal allocation. This is a
-property of the log-rank test with few events, not of the computations
-of the package.
+rejecting in favor of the treatment is 0.0276 instead of 0.025; it falls
+below the nominal level when the control group is the larger group, and
+the deviation disappears with equal allocation. This is a property of
+the log-rank test with few events, not of the computations of the
+package.
 
 ## References
 

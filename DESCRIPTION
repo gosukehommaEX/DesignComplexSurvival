@@ -31,7 +31,8 @@ Description: Computes the expected numbers of events, the mean, variance and
     variance and covariance of the log-rank score under the alternative
     follow Luo et al. (2019) <doi:10.1002/sim.7975>.
 License: GPL (>= 2)
-URL: https://github.com/gosukehommaEX/DesignComplexSurvival
+URL: https://gosukehommaEX.github.io/DesignComplexSurvival/,
+    https://github.com/gosukehommaEX/DesignComplexSurvival
 BugReports: https://github.com/gosukehommaEX/DesignComplexSurvival/issues
 Depends: R (>= 4.1.0)
 Imports: mvtnorm (>= 1.2-0), stats
@@ -39,4 +40,5 @@ Suggests: gsDesign, gsDesign2, knitr, lrstat, rmarkdown, rpact, testthat (>= 3.0
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
+Language: en-US
 Config/roxygen2/version: 8.0.0

@@ -232,7 +232,7 @@ PFS.
 ## Censoring of PFS only
 
 `dropout` censors both endpoints. `dropout_pfs` adds a censoring of PFS
-only, for example the end of tumour assessments:
+only, for example the end of tumor assessments:
 
 ```{r dropout-pfs}
 ctl_dp <- ms_model(time = c(0, 4), prog = c(0.10, 0.08), death = 0.01,

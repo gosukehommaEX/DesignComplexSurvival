@@ -273,7 +273,7 @@ when it censors PFS.
 ## Censoring of PFS only
 
 `dropout` censors both endpoints. `dropout_pfs` adds a censoring of PFS
-only, for example the end of tumour assessments:
+only, for example the end of tumor assessments:
 
 ``` r
 

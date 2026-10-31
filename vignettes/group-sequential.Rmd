@@ -195,7 +195,7 @@ knitr::kable(tab, digits = 4, format.args = list(big.mark = ","))
 ```
 
 When the treatment group is the larger group, the probability of rejecting
-in favour of the treatment is `r f4(rate("B_1:2", "reject_upper_any"))`
+in favor of the treatment is `r f4(rate("B_1:2", "reject_upper_any"))`
 instead of `r f3(pw_b$type1[["nonbinding"]])`; it falls below the
 nominal level when the control group is the larger group, and the deviation
 disappears with equal allocation. This is a property of the log-rank test

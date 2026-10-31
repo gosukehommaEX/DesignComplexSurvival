@@ -224,7 +224,7 @@ events (see the last section of
 FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to
 rerun `inst/validation/`. The `README.md` of each folder describes how
 to run the scripts, the criteria and the files. Every compared value is
-listed with its judgement in `results/summary.csv`, and
+listed with its judgment in `results/summary.csv`, and
 `results/summary.md` summarizes the results.
 
 ## References

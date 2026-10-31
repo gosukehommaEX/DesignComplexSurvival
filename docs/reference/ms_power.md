@@ -138,7 +138,7 @@ futility bounds and the binding value applies them.
 
 The power and the type I error rest on the normal approximation of the
 log-rank statistics. With unequal allocation and few events the
-statistic is skewed, so that the probability of rejecting in favour of
+statistic is skewed, so that the probability of rejecting in favor of
 the treatment exceeds the computed type I error when the treatment group
 is the larger group, and falls below it when the control group is: by
 simulation (`inst/validation` of the source package), about 0.028

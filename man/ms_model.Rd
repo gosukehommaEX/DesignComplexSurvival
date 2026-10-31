@@ -137,7 +137,7 @@ censors PFS is set in \code{\link{ms_scenario}} (\code{pfs_switch}).
 Dropout is piecewise exponential with intervals starting at \code{time},
 independent of the event process, and censors both endpoints. The hazard
 \code{dropout_pfs} adds a censoring that acts on PFS only (for example
-the end of tumour assessments), independent of everything else.
+the end of tumor assessments), independent of everything else.
 
 A model without progression (\code{prog = 0}) is a piecewise
 exponential model for a single endpoint with hazard \code{death}. With

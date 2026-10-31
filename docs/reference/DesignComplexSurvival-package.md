@@ -1,7 +1,7 @@
 # DesignComplexSurvival: Simulation-Free Design of Complex Time-to-Event Trials
 
 Computes the operating characteristics of two-group time-to-event trials
-analysed with the log-rank test, without patient-level simulation. Each
+analyzed with the log-rank test, without patient-level simulation. Each
 group is described by a multistate model with piecewise constant
 intensities: progression-free, progressed, switched and dead, and, when
 patients may switch before progression, progression-free after a switch.
@@ -75,6 +75,8 @@ using graphical approaches. Statistics in Biopharmaceutical Research
 ## See also
 
 Useful links:
+
+- <https://gosukehommaEX.github.io/DesignComplexSurvival/>
 
 - <https://github.com/gosukehommaEX/DesignComplexSurvival>
 

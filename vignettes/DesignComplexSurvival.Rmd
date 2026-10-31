@@ -16,7 +16,7 @@ library(DesignComplexSurvival)
 ```
 
 DesignComplexSurvival computes the operating characteristics of two-group
-time-to-event trials analysed with the log-rank test, without patient-level
+time-to-event trials analyzed with the log-rank test, without patient-level
 simulation. This article first describes what the package computes and which
 trial settings it covers, and then goes through a design with a single
 endpoint. The other articles are listed at the end.

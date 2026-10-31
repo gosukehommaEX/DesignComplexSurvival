@@ -21,7 +21,7 @@ coverage](https://codecov.io/gh/gosukehommaEX/DesignComplexSurvival/graph/badge.
 <!-- badges: end -->
 
 DesignComplexSurvival computes the operating characteristics of
-two-group time-to-event trials analysed with the log-rank test, without
+two-group time-to-event trials analyzed with the log-rank test, without
 patient-level simulation:
 
 - each group follows a multistate model (progression-free, progressed,
@@ -145,7 +145,7 @@ The scripts in `inst/reproduce/` recompute sample sizes, numbers of
 events, analysis times, bounds and powers printed in 16 sources
 (articles and a statistical analysis plan). The scripts in
 `inst/validation/` compare the package with patient-level simulations of
-15 scenarios (FastSurvival and a Python simulation; PFS and OS analysed
+15 scenarios (FastSurvival and a Python simulation; PFS and OS analyzed
 together in 6 of them, switching from a calendar time in 3), with the
 covariance estimator of Danzer et al. (2025) applied to large simulated
 trials under the null hypothesis, with the package PWEALL in 8 designs,
@@ -163,9 +163,9 @@ approximation compared with simulation):
 | `inst/validation/` | 1317 |         0 |    0 | 2128 |  3445 |
 
 `run_all.R` also multiplies the compared values by 1.1 and checks that
-the judgements change as expected. The criteria are described in the
+the judgments change as expected. The criteria are described in the
 `README.md` of each folder and the registered explanations in its
-`explained.csv`. Every compared value is listed with its judgement in
+`explained.csv`. Every compared value is listed with its judgment in
 `results/summary.csv`, and `results/summary.md` summarizes the results.
 FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to
 rerun `inst/validation/`.
