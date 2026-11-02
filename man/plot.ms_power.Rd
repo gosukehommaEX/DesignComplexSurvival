@@ -42,7 +42,8 @@ The plotted values, invisibly: for \code{"bounds"} a data frame
   \code{cum_futility}, \code{x_null} (events or calendar time of the looks
   under the null scenario) and \code{cum_alpha}; for \code{"survival"} a
   data frame with \code{time}, \code{group}, \code{endpoint}, \code{surv}
-  and the legend label \code{label}.
+  and the legend label \code{label}, with the note on OS as the attribute
+  \code{"note"} when switching starts at a calendar time.
 }
 \description{
 Draws the bounds of a group sequential design, the cumulative probabilities
@@ -70,11 +71,13 @@ design scenario.
     is when the model allows progression. With switching from a calendar
     time (\code{switch_start} of \code{\link{ms_scenario}}), OS is that of
     the patients who enter after the start of switching, as given by
-    \code{\link{ms_surv}}, which the legend states.}
+    \code{\link{ms_surv}}, which a note above the plot states.}
 }
 The colors are those of \code{grDevices::palette.colors(palette =
-"Okabe-Ito")}. For designs with two endpoints only \code{"survival"} is
-available.
+"Okabe-Ito")}, and the default range of the vertical axis leaves room for
+the legend above the values of \code{"bounds"} (below them for
+\code{"p"}) and \code{"power"}. For
+designs with two endpoints only \code{"survival"} is available.
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)

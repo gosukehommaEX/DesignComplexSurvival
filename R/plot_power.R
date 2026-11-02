@@ -23,7 +23,9 @@
   } else {
     "Calendar time"
   }
-  args <- .plot_args(list(x = range(d$x, d$x_null), y = c(0, 1), type = "n", xlab = xlab,
+  # room for the legend above the values
+  top <- min(1, 1.5 * max(d$cum_efficacy, d$cum_futility, d$cum_alpha))
+  args <- .plot_args(list(x = range(d$x, d$x_null), y = c(0, top), type = "n", xlab = xlab,
                           ylab = "Cumulative probability"), dots)
   do.call(graphics::plot, args)
   graphics::lines(d$x, d$cum_efficacy, type = "b", pch = 19, col = col[["efficacy"]])

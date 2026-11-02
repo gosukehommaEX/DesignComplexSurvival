@@ -11,6 +11,7 @@ test_that(".plot_survival draws OS of the groups when PFS is OS", {
     expect_identical(s$surv, ms_surv(x$scenario[[g]], tt, "os")$surv)
   }
   expect_identical(unique(d$label), c("Control, OS", "Treatment, OS"))
+  expect_null(attr(d, "note"))
   d <- with_pdf(.plot_survival(x, 48, list(main = "OS")))
   expect_equal(max(d$time), 48)
   expect_error(.plot_survival(x, -1, list()), "positive number")
@@ -30,7 +31,6 @@ test_that(".plot_survival draws PFS and OS with switching from a calendar time",
     }
   }
   expect_identical(unique(d$label),
-                   c("Control, OS (entry after the start of switching)",
-                     "Treatment, OS (entry after the start of switching)",
-                     "Control, PFS", "Treatment, PFS"))
+                   c("Control, OS", "Treatment, OS", "Control, PFS", "Treatment, PFS"))
+  expect_identical(attr(d, "note"), "OS of the patients who enter after the start of switching")
 })

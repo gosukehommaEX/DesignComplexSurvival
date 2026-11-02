@@ -27,9 +27,11 @@
   }
   ylab <- switch(scale, z = "Standardized log-rank statistic", hr = "Hazard ratio",
                  p = "Nominal one-sided p-value")
-  y <- c(d$upper, if (fut) d$lower, d$mean)
-  args <- .plot_args(list(x = range(d$x), y = range(y, na.rm = TRUE), type = "n",
-                          xlab = xlab, ylab = ylab, log = if (scale == "p") "y" else ""),
+  # room for the legend above the values (below them for the p-values on the log scale)
+  r <- range(c(d$upper, if (fut) d$lower, d$mean), na.rm = TRUE)
+  y <- if (scale == "p") c(r[1L] / (r[2L] / r[1L])^0.4, r[2L]) else c(r[1L], r[2L] + 0.4 * diff(r))
+  args <- .plot_args(list(x = range(d$x), y = y, type = "n", xlab = xlab, ylab = ylab,
+                          log = if (scale == "p") "y" else ""),
                      dots)
   do.call(graphics::plot, args)
   graphics::lines(d$x, d$upper, type = "b", pch = 19, col = col[["efficacy"]])
@@ -44,7 +46,7 @@
   }
   leg <- c("Efficacy bound", if (fut) "Futility bound",
            if (scale == "z") "Mean under the design scenario")
-  graphics::legend(if (scale == "hr") "bottomright" else "topright", legend = leg,
+  graphics::legend(if (scale == "p") "bottomright" else "topright", legend = leg,
                    col = c(col[["efficacy"]], if (fut) col[["futility"]],
                            if (scale == "z") col[["mean"]]),
                    lty = c(1, if (fut) 1, if (scale == "z") 2),

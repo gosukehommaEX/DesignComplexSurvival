@@ -20,17 +20,18 @@
   os <- lapply(grp, function(g) ms_surv(scn[[g]], tt, "os")$surv)
   pfs <- lapply(grp, function(g) ms_surv(scn[[g]], tt, "pfs")$surv)
   eps <- if (max(abs(unlist(pfs) - unlist(os))) > 1e-10) c("os", "pfs") else "os"
-  os_note <- if (.is_calendar(scn)) " (entry after the start of switching)" else ""
   d <- do.call(rbind, lapply(eps, function(e) {
     do.call(rbind, lapply(1:2, function(j) {
-      lab <- sprintf("%s, %s%s", c("Control", "Treatment")[j], toupper(e),
-                     if (e == "os") os_note else "")
+      lab <- sprintf("%s, %s", c("Control", "Treatment")[j], toupper(e))
       data.frame(time = tt, group = grp[j], endpoint = e,
                  surv = if (e == "os") os[[j]] else pfs[[j]], label = lab,
                  stringsAsFactors = FALSE)
     }))
   }))
   rownames(d) <- NULL
+  if (.is_calendar(scn)) {
+    attr(d, "note") <- "OS of the patients who enter after the start of switching"
+  }
   col <- .plot_colors()
   args <- .plot_args(list(x = c(0, max_time), y = c(0, 1), type = "n",
                           xlab = "Time since randomization", ylab = "Survival probability"),
@@ -44,5 +45,8 @@
   }
   graphics::legend("topright", legend = key$label, col = col[key$group],
                    lty = ifelse(key$endpoint == "os", 1, 2), bty = "n")
+  if (!is.null(attr(d, "note"))) {
+    graphics::mtext(attr(d, "note"), side = 3, line = 0.25, cex = 0.8)
+  }
   d
 }
