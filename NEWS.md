@@ -16,6 +16,13 @@
   hazard ratio or a given scenario, with the futility bounds of the later
   interim looks (as `gsCP()` of gsDesign) and without them. `print()` shows
   the result.
+* `plot()` of an `ms_power` object draws the bounds of a design with one
+  endpoint on the scale of the statistic, the hazard ratio or the nominal
+  p-value, the cumulative probabilities of stopping for efficacy and for
+  futility and the cumulative type I error, or the survival functions of OS
+  and PFS of the groups of the design scenario, with the colors of the
+  Okabe-Ito palette, and returns the plotted values. graphics and grDevices
+  are imported.
 
 # DesignComplexSurvival 0.3.3
 

@@ -1,0 +1,30 @@
+test_that(".plot_bounds draws the bounds of the looks on the three scales", {
+  x <- plot_design_b()
+  lk <- x$looks
+  d <- with_pdf(.plot_bounds(x, "z", "events", list()))
+  expect_gt(attr(d, "pdf_size"), 0)
+  expect_identical(d$look, lk$look)
+  expect_identical(d$x, lk$events)
+  expect_identical(d$upper, lk$z_upper)
+  expect_identical(d$lower, lk$z_lower)
+  expect_identical(d$mean, lk$z_mean)
+  d <- with_pdf(.plot_bounds(x, "hr", "time", list()))
+  expect_identical(d$x, lk$time)
+  expect_identical(d$upper, lk$hr_upper)
+  expect_identical(d$lower, lk$hr_lower)
+  expect_null(d$mean)
+  d <- with_pdf(.plot_bounds(x, "p", "events", list(main = "p-values")))
+  expect_identical(d$upper, lk$p_upper)
+  expect_equal(d$lower, pnorm(lk$z_lower, lower.tail = FALSE))
+  expect_equal(d$lower[3], d$upper[3])
+})
+
+test_that(".plot_bounds gives no futility bounds at the interim looks without futility", {
+  x <- ms_power(scn_a(), n = 400, looks = ms_looks("os", fraction = c(0.5, 1)), test = ms_test(),
+                events = 300)
+  d <- with_pdf(.plot_bounds(x, "z", "events", list(ylim = c(-1, 4))))
+  expect_identical(d$lower, c(NA, x$looks$z_upper[2]))
+  d <- with_pdf(.plot_bounds(x, "p", "time", list()))
+  expect_identical(d$lower[1], NA_real_)
+  expect_identical(d$x, x$looks$time)
+})

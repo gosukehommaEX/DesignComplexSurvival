@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.ms_cond_power.R
 \name{print.ms_cond_power}
 \alias{print.ms_cond_power}
-\title{Print an ms_cond_power object}
+\title{Print an \code{ms_cond_power} object}
 \usage{
 \method{print}{ms_cond_power}(x, digits = 4, ...)
 }
@@ -17,7 +17,7 @@
 \code{x}, invisibly.
 }
 \description{
-Print an ms_cond_power object
+Print an \code{ms_cond_power} object
 }
 \examples{
 ctl <- ms_model(death = log(2) / 12)

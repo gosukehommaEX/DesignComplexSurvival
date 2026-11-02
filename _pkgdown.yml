@@ -58,6 +58,7 @@ reference:
       - print.ms_looks
       - print.ms_test
       - print.ms_power
+      - plot.ms_power
       - summary.ms_power
       - print.summary.ms_power
       - as.data.frame.ms_power

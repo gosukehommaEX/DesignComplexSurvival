@@ -1,4 +1,4 @@
-#' Print an ms_cond_power object
+#' Print an \code{ms_cond_power} object
 #'
 #' @param x An \code{ms_cond_power} object.
 #' @param digits Number of significant digits.
