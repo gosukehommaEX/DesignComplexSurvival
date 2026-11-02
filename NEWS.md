@@ -9,6 +9,13 @@
   (`targets`). The trial also stops at non-binding futility bounds, as in
   gsDesign. `summary()` prints the expected values. The other results are
   unchanged.
+* `ms_cond_power()` computes the conditional power at an interim look of a
+  design with one endpoint, given the observed statistic of the look (or the
+  statistics of the looks up to it), under the design scenario, the null
+  hypothesis (the conditional type I error), the current trend, a given
+  hazard ratio or a given scenario, with the futility bounds of the later
+  interim looks (as `gsCP()` of gsDesign) and without them. `print()` shows
+  the result.
 
 # DesignComplexSurvival 0.3.3
 

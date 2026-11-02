@@ -49,6 +49,7 @@ reference:
       - ms_test
       - ms_power
       - ms_size
+      - ms_cond_power
   - title: Methods
     contents:
       - print.ms_model
@@ -61,3 +62,4 @@ reference:
       - print.summary.ms_power
       - as.data.frame.ms_power
       - print.ms_size
+      - print.ms_cond_power

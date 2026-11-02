@@ -144,7 +144,14 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   written to `results/expected_stage4.csv`. Analysis times by root finding on
   `ref_logrank.events()`, bounds and stopping probabilities by
   `ref_gsd.bounds()` and `ref_gsd.stop_probs()`; for D4 the values under the
-  design scenario are those of `results/design2.csv`.
+  design scenario are those of `results/design2.csv`. It also writes the
+  conditional power of `ms_cond_power()` to `results/cond_power_stage4.csv`
+  (cases cm, B, S, M5 and G of the docstring, read by
+  `tests/testthat/test-cond_moments.R`, `test-cond_probs.R` and
+  `test-ms_cond_power.R`): the conditional moments from the independent
+  increments of the statistics or from the precision matrix, and the
+  probabilities of the later looks by `ref_gsd.stop_probs()`; the studentized
+  covariance of design S by `ref_zeta.zeta_cov()`.
 
 ## Running
 
@@ -163,7 +170,8 @@ python3 expected_model5.py            # model options of stage 3 (about 10 minut
 python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
 python3 expected_calendar.py          # switching from a calendar time, stage 3 (about 4 minutes)
 python3 expected_size_stage3.py       # ms_size() with recycling and switching from a calendar time (about 2 minutes)
-python3 expected_stage4.py            # expected values of version 0.4.0 (about 5 minutes)
+python3 expected_stage4.py            # expected values and conditional power of version 0.4.0 (about 30 minutes)
+python3 expected_stage4.py cond_power # conditional power only (about 25 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and

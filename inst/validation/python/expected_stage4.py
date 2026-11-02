@@ -1,9 +1,11 @@
 """Expected values for the tests of version 0.4.0 (Planning/stage4_plan.md in the project folder): the expected
-study duration, events and enrolled patients when the trial stops at the bounds (step 1).
+study duration, events and enrolled patients when the trial stops at the bounds (step 1) and the conditional power
+(step 2).
 
-Run from this folder with:  python3 expected_stage4.py
-Requires numpy and scipy. Results are written to results/expected_stage4.csv and read by tests/testthat
-(helper-expected.R, stage4_expected()).
+Run from this folder with:  python3 expected_stage4.py [expected | cond_power]
+Requires numpy and scipy. Results are written to results/expected_stage4.csv (step 1) and
+results/cond_power_stage4.csv (step 2), or only to the file of the argument, and read by tests/testthat
+(helper-expected.R, stage4_expected() and stage4_cp()).
 
 Designs (defined identically in tests/testthat/test-ms_power.R):
   B      scenario B of expected_values.py, n = 300, OS looks at 50, 75, 100 per cent of 120 events,
@@ -34,6 +36,30 @@ calendar-driven looks keep their times:
   expected values     sum over the looks of the stopping probability times the value at the look, with the
                       probability of stopping at the last look equal to one minus the probability of stopping
                       earlier
+
+Conditional power (step 2), with one row per case, quantity and look i (or pair of coordinates i, j):
+  cm_*   conditional mean and covariance of a normal vector with three coordinates (.cond_moments() in R)
+  B_*    design B at look 1 (z = 0.5) and at look 2 (z = 1) under the design scenario, the null scenario, the
+         current trend, the hazard ratio 0.75 and scenario B with the death hazards 0.05 and 0.03 in the treatment
+         group (same allocation and accrual, looks at 60, 90 and 120 expected deaths); and at look 2 with z = -1.5,
+         below the non-binding futility bound, under the design scenario; B_design has the bounds of the design
+  S_*    scenario B, n = 300, OS looks at 40, 80 and 120 events, O'Brien-Fleming type efficacy
+         bounds, variance "studentized" (covariance without independent increments, ref_zeta.zeta_cov() with the
+         moments of ref_zeta.same_moments() as in expected_design.py), under the design scenario, given the
+         statistic of the look or the statistics of the looks up to it; S_design has the analysis times, events,
+         means, covariance and efficacy bounds of the design
+  M5_*   a fixed mean vector, covariance matrix (not that of a Markov sequence) and bounds of five looks
+         (.cond_probs() in R) at look 1 (z = 0.9) and at look 2 (given 1.4, or 0.9 and 1.4)
+  G_*    scenario A, n = 400, OS looks at 100, 200 and 300 events, O'Brien-Fleming type efficacy bounds,
+         non-binding futility bounds by beta spending (HSD, -2, beta 0.1), mean "schoenfeld", variance "null",
+         under the design scenario with the correlations of the information under the design scenario (the
+         package, G_*_design) and of the events (gsDesign::gsCP() with theta = -log(0.7) / 2, G_*_events), at
+         look 1 (z = 0.5) and at look 2 (z = 1.5); G_design has the analysis times, events, means and bounds
+For statistics with the correlations sqrt(s_j / s_k), the conditional moments are written from the independent
+increments of W_k = Z_k sqrt(s_k); otherwise from the precision matrix Q of the coordinates involved (covariance
+inv(Q_FF), mean mu_F - inv(Q_FF) Q_FG (z - mu_G)), whereas the R code regresses on the given coordinates. The
+stopping probabilities of the later looks are ref_gsd.stop_probs() of the conditional moments, with the futility
+bounds of the later interim looks (cond_power) and without them (cond_power_nonbinding).
 """
 import csv
 import os
@@ -46,6 +72,7 @@ sys.path.insert(0, HERE)
 import ref_gsd as rg  # noqa: E402
 import ref_logrank as rl  # noqa: E402
 import ref_model as rm  # noqa: E402
+import ref_zeta as rz  # noqa: E402
 from expected_values import scenario_a, scenario_b  # noqa: E402
 from expected_zeta import scenario_f  # noqa: E402
 
@@ -191,17 +218,216 @@ def design_rpact(binding):
                    l0), inner
 
 
-def main():
-    rows = (design_b()[0] + design_a_cal()[0] + design_d4()[0] + design_rpact(True)[0] +
-            design_rpact(False)[0])
-    path = os.path.join(OUT, "expected_stage4.csv")
+# ---------------------------------------------------------------------------
+# Step 2: conditional power
+# ---------------------------------------------------------------------------
+def cond_markov(s, mu, look, z):
+    """Conditional moments of the statistics of the looks after 'look' given Z_look = z, for statistics with the
+    means mu and the correlations sqrt(s_j / s_k): W_k = Z_k sqrt(s_k) has increments W_k - W_look independent of
+    W_look, with means mu_k sqrt(s_k) - mu_look sqrt(s_look) and covariances min(s_k, s_l) - s_look."""
+    s = np.asarray(s, float)
+    mu = np.asarray(mu, float)
+    j = look - 1
+    sf = s[look:]
+    cm = (z * np.sqrt(s[j]) + mu[look:] * np.sqrt(sf) - mu[j] * np.sqrt(s[j])) / np.sqrt(sf)
+    cc = (np.minimum.outer(sf, sf) - s[j]) / np.sqrt(np.outer(sf, sf))
+    return cm, cc
+
+
+def cond_general(mean, sig, given, future, z):
+    """Conditional moments of the coordinates 'future' given the coordinates 'given' (0-based) from the precision
+    matrix Q of the coordinates given + future: covariance inv(Q_FF), mean mu_F - inv(Q_FF) Q_FG (z - mu_G)."""
+    mean = np.asarray(mean, float)
+    idx = list(given) + list(future)
+    q = np.linalg.inv(np.asarray(sig, float)[np.ix_(idx, idx)])
+    g = len(given)
+    cc = np.linalg.inv(q[g:, g:])
+    cm = mean[list(future)] - cc @ q[g:, :g] @ (np.asarray(z, float) - mean[list(given)])
+    return cm, (cc + cc.T) / 2
+
+
+def is_markov(sig, tol=1e-8):
+    sd = np.sqrt(np.diag(sig))
+    prec = np.linalg.inv(sig / np.outer(sd, sd))
+    k = sig.shape[0]
+    off = np.abs(np.subtract.outer(np.arange(k), np.arange(k))) >= 2
+    return k <= 2 or np.max(np.abs(prec[off])) <= tol * np.max(np.abs(prec))
+
+
+def cp_rows(case, look, cm, cc, lo, up, time=None, events=None, extra=None):
+    """Rows of a case: the conditional power with and without the futility bounds of the later interim looks and,
+    at each later look, the conditional moments and stopping probabilities (and the time and events)."""
+    lo = np.asarray(lo, float)
+    up = np.asarray(up, float)
+    pu, pl = rg.stop_probs(lo, up, cm, cc)
+    lo_nb = np.append(np.full(lo.size - 1, -np.inf), lo[-1])
+    pu_nb, _ = rg.stop_probs(lo_nb, up, cm, cc)
+    rows = [dict(case=case, quantity="cond_power", i="", j="", value=float(np.sum(pu))),
+            dict(case=case, quantity="cond_power_nonbinding", i="", j="", value=float(np.sum(pu_nb)))]
+    for a in range(len(cm)):
+        k = look + 1 + a
+        vals = [("cond_mean", cm[a]), ("cond_sd", np.sqrt(cc[a, a])), ("prob_upper", pu[a]), ("prob_lower", pl[a])]
+        if time is not None:
+            vals += [("time", time[look + a]), ("events", events[look + a])]
+        for q, v in vals:
+            rows.append(dict(case=case, quantity=q, i=k, j="", value=float(v)))
+    for q, v in (extra or {}).items():
+        rows.append(dict(case=case, quantity=q, i="", j="", value=float(v)))
+    return rows
+
+
+def cp_moments_cases():
+    mean = np.array([0.5, 1.0, 1.5])
+    sig = np.array([[1.0, 0.6, 0.4], [0.6, 1.2, 0.7], [0.4, 0.7, 1.5]])
+    rows = []
+    for case, given, future, z in (("cm_1", [0], [1, 2], [0.2]), ("cm_12", [0, 1], [2], [0.2, 1.4]),
+                                   ("cm_13", [0, 2], [1], [0.2, 2.0])):
+        cm, cc = cond_general(mean, sig, given, future, z)
+        for a in range(len(future)):
+            rows.append(dict(case=case, quantity="mean", i=a + 1, j="", value=float(cm[a])))
+            for b in range(len(future)):
+                rows.append(dict(case=case, quantity="sigma", i=a + 1, j=b + 1, value=float(cc[a, b])))
+    return rows
+
+
+def scenario_b_trt3():
+    """Scenario B with the death hazards 0.05 and 0.03 (from months 0 and 6) in the treatment group."""
+    b = scenario_b()
+    trt = rm.Model(death=[0.05, 0.03], time=[0, 6], dropout=0.012)
+    return rl.Scenario(b.control, trt, b.p1 / b.p0, b.accrual)
+
+
+def cp_design_b():
+    _, inner = design_b()
+    scn, n = scenario_b(), 300
+    ds = inner["design"]
+    lo, up = np.asarray(ds["lower"]), np.asarray(ds["upper"])
+    times = ds["time"]
+    mos = [rl.moments(scn, n, t, "os") for t in times]
+    d = np.array([m["events"] for m in mos])
+    info = np.array([m["info"] for m in mos])
+    mu = np.array([m["z_direct"] for m in mos])
+    s0 = null_of(scn)
+    l0 = inner["null"]
+    v0 = np.array([rl.moments(s0, n, t, "os")["info"] for t in l0["time"]])
+    s2 = scenario_b_trt3()
+    t2 = [rl.event_time(s2, n, x, "os") for x in (60.0, 90.0, 120.0)]
+    m2 = [rl.moments(s2, n, t, "os") for t in t2]
+    d2 = [m["events"] for m in m2]
+    p01 = scn.p0 * scn.p1
+    rows = []
+    for k in range(3):
+        for q, v in (("z_upper", up[k]), ("z_lower", lo[k])):
+            rows.append(dict(case="B_design", quantity=q, i=k + 1, j="", value=float(v)))
+    for look, z in ((1, 0.5), (2, 1.0)):
+        fl = slice(look, 3)
+        h_tr = np.exp(-z / np.sqrt(p01 * d[look - 1]))
+        cases = (("design", info, mu, times, d, {}),
+                 ("null", v0, np.zeros(3), l0["time"], l0["events"], {}),
+                 ("trend", d, z * np.sqrt(d / d[look - 1]), times, d, dict(hr=h_tr)),
+                 ("hr", d, -np.log(0.75) * np.sqrt(p01 * d), times, d, dict(hr=0.75)),
+                 ("scenario", [m["info"] for m in m2], [m["z_direct"] for m in m2], t2, d2, {}))
+        for name, s, m, tm, ev, extra in cases:
+            cm, cc = cond_markov(s, m, look, z)
+            rows += cp_rows("B_l%d_%s" % (look, name), look, cm, cc, lo[fl], up[fl], tm, ev, extra)
+    cm, cc = cond_markov(info, mu, 2, -1.5)
+    rows += cp_rows("B_l2low_design", 2, cm, cc, lo[2:], up[2:], times, d)
+    return rows
+
+
+def cp_design_s():
+    scn, n = scenario_b(), 300
+    targets = [40.0, 80.0, 120.0]
+    times = [rl.event_time(scn, n, x, "os") for x in targets]
+    mos = [rl.moments(scn, n, t, "os") for t in times]
+    d = np.array([m["events"] for m in mos])
+    mu = np.array([m["z_direct"] for m in mos])
+    mean_, prod = rz.same_moments(scn, n, times, "os")
+    core = {("os", t): rz.per_patient_core(scn, n, t, "os") for t in times}
+    sig = rz.zeta_cov([("os", t, "os") for t in times], {"os": (list(times), mean_, prod)}, {}, core)
+    sig = (sig + sig.T) / 2
+    assert not is_markov(sig)
+    lo, up = rg.bounds(d / d[-1], corr=corr_of(d))
+    rows = []
+    for k in range(3):
+        for q, v in (("time", times[k]), ("events", d[k]), ("z_mean", mu[k]), ("z_upper", up[k])):
+            rows.append(dict(case="S_design", quantity=q, i=k + 1, j="", value=float(v)))
+        for m in range(3):
+            rows.append(dict(case="S_design", quantity="sigma", i=k + 1, j=m + 1, value=float(sig[k, m])))
+    for case, look, z in (("S_l1", 1, [0.8]), ("S_l2_hist", 2, [0.8, 1.2]), ("S_l2_cur", 2, [1.2])):
+        given = list(range(look)) if len(z) > 1 else [look - 1]
+        cm, cc = cond_general(mu, sig, given, list(range(look, 3)), z)
+        rows += cp_rows(case, look, cm, cc, lo[look:], up[look:], times, d)
+    return rows
+
+
+def m5_inputs():
+    t = np.arange(1.0, 6.0)
+    c = 0.9 * corr_of(t) + 0.1
+    sd = np.sqrt([1.0, 1.1, 0.95, 1.05, 1.0])
+    sig = c * np.outer(sd, sd)
+    mean = np.array([0.8, 1.3, 1.7, 2.0, 2.3])
+    lo = np.array([-0.5, 0.2, 0.8, 1.4, 2.0])
+    up = np.array([3.5, 2.9, 2.5, 2.2, 2.0])
+    return mean, sig, lo, up
+
+
+def cp_m5():
+    mean, sig, lo, up = m5_inputs()
+    rows = []
+    for case, look, z in (("M5_l1", 1, [0.9]), ("M5_l2_hist", 2, [0.9, 1.4]), ("M5_l2_cur", 2, [1.4])):
+        given = list(range(look)) if len(z) > 1 else [look - 1]
+        cm, cc = cond_general(mean, sig, given, list(range(look, 5)), z)
+        if look == 1:
+            assert not is_markov(cc)
+        rows += cp_rows(case, look, cm, cc, lo[look:], up[look:])
+    return rows
+
+
+def cp_design_g():
+    scn, n = scenario_a(), 400
+    targets = [100.0, 200.0, 300.0]
+    times = [rl.event_time(scn, n, x, "os") for x in targets]
+    mos = [rl.moments(scn, n, t, "os") for t in times]
+    d = np.array([m["events"] for m in mos])
+    info = np.array([m["info"] for m in mos])
+    mu = np.array([m["z_schoenfeld"] for m in mos])
+    lo, up = rg.bounds(d / d[-1], futility="beta", sf_fut="HSD", param_fut=-2, beta=0.1, mean=mu,
+                       corr=corr_of(d), sigma_alt=corr_of(info))
+    rows = []
+    for k in range(3):
+        for q, v in (("time", times[k]), ("events", d[k]), ("z_mean", mu[k]), ("z_upper", up[k]),
+                     ("z_lower", lo[k])):
+            rows.append(dict(case="G_design", quantity=q, i=k + 1, j="", value=float(v)))
+    for look, z in ((1, 0.5), (2, 1.5)):
+        for name, s in (("design", info), ("events", d)):
+            cm, cc = cond_markov(s, mu, look, z)
+            rows += cp_rows("G_l%d_%s" % (look, name), look, cm, cc, lo[look:], up[look:], times, d)
+    return rows
+
+
+def write_csv(name, fields, rows):
+    path = os.path.join(OUT, name)
     with open(path, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=["config", "hypothesis", "quantity", "look", "value"], lineterminator="\n")
+        w = csv.DictWriter(fh, fieldnames=fields, lineterminator="\n")
         w.writeheader()
         for r in rows:
             w.writerow(dict(r, value=repr(float(r["value"]))))
-    print("wrote", path, len(rows), "rows")
+    print("wrote", path, len(rows), "rows", flush=True)
+
+
+def main(parts):
+    if "expected" in parts:
+        rows = (design_b()[0] + design_a_cal()[0] + design_d4()[0] + design_rpact(True)[0] +
+                design_rpact(False)[0])
+        write_csv("expected_stage4.csv", ["config", "hypothesis", "quantity", "look", "value"], rows)
+    if "cond_power" in parts:
+        rows = []
+        for f in (cp_moments_cases, cp_design_b, cp_design_g, cp_m5, cp_design_s):
+            rows += f()
+            print(f.__name__, "done", flush=True)
+        write_csv("cond_power_stage4.csv", ["case", "quantity", "i", "j", "value"], rows)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:] or ["expected", "cond_power"])

@@ -30,3 +30,18 @@ stage4_expected <- function(config, quantity, hypothesis, by_look = FALSE) {
   }
   e$value[order(e$look)]
 }
+
+# Conditional power of version 0.4.0 (cond_power_stage4.csv, expected_stage4.py) of a case and a
+# quantity: a matrix with the rows i and columns j (quantities with both indices), the values in
+# the order of i, or a single value
+stage4_cp <- function(case, quantity) {
+  ex <- expected_csv("cond_power_stage4.csv")
+  e <- ex[ex$case == case & ex$quantity == quantity, ]
+  if (nrow(e) == 0L) {
+    stop("No conditional power values for ", case, ", ", quantity)
+  }
+  if (!anyNA(e$j)) {
+    return(matrix(e$value[order(e$j, e$i)], max(e$i), max(e$j)))
+  }
+  e$value[order(e$i)]
+}
