@@ -155,3 +155,14 @@ test_that("ms_size solves for the number of events with switching from a calenda
   expect_equal(res$study_duration, e[["time_rounded"]], tolerance = 1e-8)
   expect_equal(res$power, e[["power"]], tolerance = 1e-8)
 })
+
+test_that("ms_size gives the expected values of the solved design", {
+  lo <- ms_looks("os", fraction = c(0.5, 1))
+  res <- ms_size(scn_a(), looks = lo, test = ms_test(), power = 0.9, solve_for = "events",
+                 n = 500)
+  chk <- ms_power(scn_a(), n = 500, looks = lo, test = ms_test(),
+                  events = ceiling(res$solution - 1e-8))
+  expect_false(anyNA(res$expected))
+  expect_equal(res$expected, chk$expected)
+  expect_equal(res$looks_null, chk$looks_null)
+})

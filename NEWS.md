@@ -1,3 +1,15 @@
+# DesignComplexSurvival 0.4.0
+
+* `ms_power()` and `ms_size()` give, for a design with one endpoint, the
+  expected study duration, number of events and number of enrolled patients
+  when the trial stops at the bounds, under the design scenario and under the
+  null scenario (`expected`), the looks under the null scenario
+  (`looks_null`), the mean vector and covariance matrix of the statistics
+  (`mean`, `sigma`, `sigma_null`) and the event targets of the looks
+  (`targets`). The trial also stops at non-binding futility bounds, as in
+  gsDesign. `summary()` prints the expected values. The other results are
+  unchanged.
+
 # DesignComplexSurvival 0.3.3
 
 * Documentation: the introductory vignette gives an overview of the model

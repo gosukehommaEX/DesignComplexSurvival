@@ -17,3 +17,16 @@ expected_zeta_cal <- function(design, trigger, variance) {
   e <- ex[ex$design == design & ex$trigger == trigger & ex$variance == variance, ]
   matrix(e$value[order(e$j, e$i)], max(e$i), max(e$j))
 }
+
+# Expected values of version 0.4.0 (expected_stage4.csv, expected_stage4.py) of a design (config),
+# a quantity and a hypothesis ("design" or "null"): the expected values (by_look = FALSE) or the
+# values of the looks under the null scenario in the order of the looks (by_look = TRUE)
+stage4_expected <- function(config, quantity, hypothesis, by_look = FALSE) {
+  ex <- expected_csv("expected_stage4.csv")
+  e <- ex[ex$config == config & ex$quantity == quantity & ex$hypothesis == hypothesis &
+            is.na(ex$look) != by_look, ]
+  if (nrow(e) == 0L) {
+    stop("No expected values for ", config, ", ", quantity, ", ", hypothesis)
+  }
+  e$value[order(e$look)]
+}

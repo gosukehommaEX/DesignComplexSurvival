@@ -77,10 +77,16 @@
   if (length(unique(lk$trigger)) > 1L) {
     out <- cbind(out[1L], trigger = lk$trigger, out[-1L], stringsAsFactors = FALSE)
   }
+  ex <- .expected_values(pr$prob_upper, pr$prob_lower, times, d, out$enrolled)
+  ex0 <- ex
+  ex0[] <- NA_real_
   res <- list(looks = out, power = sum(pr$prob_upper), n = n,
               accrual_duration = acc$duration, study_duration = times[k_max],
               events = d[k_max],
               type1 = c(nonbinding = NA_real_, binding = NA_real_),
+              expected = data.frame(hypothesis = c("design", "null"), rbind(ex, ex0),
+                                    stringsAsFactors = FALSE),
+              mean = core$z_mean, sigma = sigma, targets = targets,
               settings = list(endpoint = ep, trigger = looks$trigger,
                               mean = test$mean, variance = test$variance,
                               futility = test$futility, binding = test$binding,
@@ -91,6 +97,11 @@
     t1 <- .type1_core(scenario, acc, looks, targets, ep, bnd)
     res$type1 <- t1$type1
     res$looks$cum_alpha <- t1$cum_nonbinding
+    l0 <- t1$looks
+    res$expected[2L, -1L] <- .expected_values(l0$prob_upper, l0$prob_lower, l0$time,
+                                              l0$events, l0$enrolled)
+    res$looks_null <- l0
+    res$sigma_null <- t1$sigma
   }
   res
 }

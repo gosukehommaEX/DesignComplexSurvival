@@ -5,8 +5,10 @@
 #'
 #' @return An object of class \code{summary.ms_power}: a list with the
 #'   design overview (\code{overview}), the per-look table (\code{looks}) and
-#'   the settings (\code{settings}); for two endpoints also the familywise
-#'   error rates (\code{fwer}).
+#'   the settings (\code{settings}); for one endpoint also the expected values
+#'   when the trial stops at the bounds (\code{expected}, see
+#'   \code{\link{ms_power}}), and for two endpoints the familywise error rates
+#'   (\code{fwer}).
 #'
 #' @examples
 #' ctl <- ms_model(death = log(2) / 12)
@@ -35,6 +37,6 @@ summary.ms_power <- function(object, ...) {
                 power = object$power, type1_nonbinding = object$type1[["nonbinding"]],
                 type1_binding = object$type1[["binding"]])
   structure(list(overview = overview, looks = object$looks,
-                 settings = object$settings),
+                 expected = object$expected, settings = object$settings),
             class = "summary.ms_power")
 }

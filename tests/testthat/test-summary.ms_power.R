@@ -18,3 +18,10 @@ test_that("summary.ms_power returns the overview of a design with two endpoints"
   expect_equal(s$overview[["fwer_nonbinding"]], res$type1[["nonbinding"]])
   expect_identical(s$fwer, res$fwer)
 })
+
+test_that("summary.ms_power returns the expected values of a design with one endpoint", {
+  res <- ms_power(scn_a(), n = 400, looks = ms_looks("os", fraction = c(0.5, 1)),
+                  test = ms_test(), events = 300)
+  expect_identical(summary(res)$expected, res$expected)
+  expect_null(summary(run_design("D3"))$expected)
+})

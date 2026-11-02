@@ -135,6 +135,16 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   `results/size_stage3.csv`; it also prints checks of the reference (the
   rejection probabilities by `ref_graph.recursion()`, the moments at month
   36 against `results/calendar_looks.csv`).
+* `expected_stage4.py`: expected values for the tests of version 0.4.0:
+  the expected study duration, events and enrolled patients when the trial
+  stops at the bounds and the looks under the null scenario, for the designs
+  B, A_cal, D4, R_binding and R_nonbinding (defined in the docstring and in
+  `tests/testthat/test-ms_power.R`; R_binding and R_nonbinding are the design of
+  the rpact vignette on survival designs with fixed futility bounds),
+  written to `results/expected_stage4.csv`. Analysis times by root finding on
+  `ref_logrank.events()`, bounds and stopping probabilities by
+  `ref_gsd.bounds()` and `ref_gsd.stop_probs()`; for D4 the values under the
+  design scenario are those of `results/design2.csv`.
 
 ## Running
 
@@ -153,6 +163,7 @@ python3 expected_model5.py            # model options of stage 3 (about 10 minut
 python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
 python3 expected_calendar.py          # switching from a calendar time, stage 3 (about 4 minutes)
 python3 expected_size_stage3.py       # ms_size() with recycling and switching from a calendar time (about 2 minutes)
+python3 expected_stage4.py            # expected values of version 0.4.0 (about 5 minutes)
 ```
 
 The results in `results/` were computed with Python 3.13, numpy 2.5.3 and

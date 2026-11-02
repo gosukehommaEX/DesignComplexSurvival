@@ -45,6 +45,10 @@ print.summary.ms_power <- function(x, digits = 4, ...) {
     cat("\nFamilywise error rate:\n")
     print(format(x$fwer, digits = digits), row.names = FALSE)
   }
+  if (!is.null(x$expected)) {
+    cat("\nExpected values when the trial stops at the bounds:\n")
+    print(format(x$expected, digits = digits), row.names = FALSE)
+  }
   cat("\nBy look:\n")
   print(format(x$looks, digits = digits), row.names = FALSE)
   invisible(x)

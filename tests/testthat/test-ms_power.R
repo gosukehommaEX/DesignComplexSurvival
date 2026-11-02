@@ -346,3 +346,184 @@ test_that("ms_power checks the scope of the switching from a calendar time", {
                         test = ms_test(endpoints = "pfs", variance = "alternative"),
                         events = 150), "needs variance = \"null\"")
 })
+
+# Expected values when the trial stops at the bounds (version 0.4.0). Expected values:
+# inst/validation/python/results/expected_stage4.csv (expected_stage4.py: analysis times by root
+# finding on quadrature-based events, bounds and stopping probabilities by recursive integration of
+# the multivariate normal density). Probabilities within 1e-6 give a relative error of the expected
+# values below 1e-5.
+
+compare_expected <- function(config, res) {
+  ex <- res$expected
+  expect_identical(ex$hypothesis, c("design", "null"))
+  for (h in c("design", "null")) {
+    r <- ex[ex$hypothesis == h, ]
+    for (q in c("prob_efficacy_early", "prob_futility_early")) {
+      expect_lt(abs(r[[q]] - stage4_expected(config, q, h)), 1e-6, label = paste(h, q))
+    }
+    for (q in c("study_duration", "events", "enrolled")) {
+      expect_equal(r[[q]], stage4_expected(config, q, h), tolerance = 1e-5, label = paste(h, q))
+    }
+  }
+  l0 <- res$looks_null
+  expect_identical(l0$look, seq_len(nrow(res$looks)))
+  for (q in c("time", "enrolled", "events")) {
+    expect_equal(l0[[q]], stage4_expected(config, q, "null", by_look = TRUE), tolerance = 1e-8,
+                 label = q)
+  }
+  for (q in c("prob_upper", "prob_lower")) {
+    expect_lt(max(abs(l0[[q]] - stage4_expected(config, q, "null", by_look = TRUE))), 1e-6,
+              label = q)
+  }
+  # the moments of the statistics under the design scenario and the null correlation give the
+  # stopping probabilities of the looks
+  lk <- res$looks
+  expect_equal(res$mean, lk$z_mean)
+  expect_equal(sqrt(diag(res$sigma)), lk$z_sd)
+  expect_equal(diag(res$sigma_null), rep(1, nrow(lk)))
+  pr <- gs_prob(lk$z_lower, lk$z_upper, 0, res$sigma_null)
+  expect_equal(l0$prob_upper, pr$prob_upper, tolerance = 1e-10)
+  expect_equal(l0$prob_lower, pr$prob_lower, tolerance = 1e-10)
+}
+
+test_that("ms_power gives the expected values of the reference design for scenario B", {
+  te <- ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2, beta = 0.1)
+  res <- ms_power(scn_b(), n = 300, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
+                  test = te, events = 120)
+  compare_expected("B", res)
+  expect_equal(res$targets, c(60, 90, 120))
+})
+
+test_that("ms_power gives the expected values of a design with calendar-driven looks", {
+  te <- ms_test(futility = "fixed", fut_bound = 1, fut_scale = "hr", binding = TRUE)
+  res <- ms_power(scn_a(), n = 400, looks = ms_looks("calendar", time = c(24, 36)), test = te)
+  compare_expected("A_cal", res)
+  expect_equal(res$looks_null$time, c(24, 36))
+  expect_identical(res$targets, c(NA_real_, NA_real_))
+})
+
+test_that("ms_power gives the expected values of design D4 (OS at a look driven by PFS events)", {
+  res <- run_design("D4")
+  compare_expected("D4", res)
+  expect_equal(res$targets, c(250, 220))
+})
+
+test_that("the expected values add up the looks and depend on the futility bounds", {
+  lo <- ms_looks("os", fraction = c(0.5, 0.75, 1))
+  te <- ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2, beta = 0.1)
+  res <- ms_power(scn_b(), n = 300, looks = lo, test = te, events = 120)
+  lk <- res$looks
+  p_early <- head(lk$prob_upper + lk$prob_lower, -1)
+  p_stop <- c(p_early, 1 - sum(p_early))
+  expect_equal(res$expected$study_duration[1], sum(p_stop * lk$time))
+  expect_equal(res$expected$events[1], sum(p_stop * lk$events))
+  expect_equal(res$expected$enrolled[1], sum(p_stop * lk$enrolled))
+  # without futility bounds: the same efficacy bounds (non-binding futility), no stopping for
+  # futility and longer expected study durations
+  r0 <- ms_power(scn_b(), n = 300, looks = lo, test = ms_test(), events = 120)
+  expect_equal(r0$looks$z_upper, lk$z_upper)
+  expect_equal(r0$expected$prob_futility_early, c(0, 0))
+  expect_true(all(r0$expected$study_duration > res$expected$study_duration))
+  # under the null scenario at the same numbers of events, the probability of stopping for
+  # efficacy at the interim looks is the alpha spent there
+  expect_equal(r0$expected$prob_efficacy_early[2], r0$looks$alpha_spent[2], tolerance = 1e-6)
+})
+
+test_that("the expected values agree with lrstat::lrpower()", {
+  skip_if_not_installed("lrstat")
+  message("Expected values compared with lrstat ", utils::packageVersion("lrstat"))
+  lr <- lrstat::lrpower(kMax = 3, informationRates = c(0.5, 0.75, 1), alpha = 0.025,
+                        typeAlphaSpending = "sfOF", futilityBounds = c(-0.5, 0),
+                        allocationRatioPlanned = 2, accrualTime = c(0, 3),
+                        accrualIntensity = c(10, 30), piecewiseSurvivalTime = c(0, 6),
+                        lambda1 = c(0.05, 0.025), lambda2 = c(0.05, 0.04), gamma1 = 0.012,
+                        gamma2 = 0.01, accrualDuration = 12, followupTime = 18,
+                        fixedFollowup = FALSE, typeOfComputation = "direct")
+  res <- ms_power(scn_b(), n = 300, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
+                  test = ms_test(futility = "fixed", fut_bound = c(-0.5, 0)), followup = 18)
+  bs <- lr$byStageResults
+  expect_lt(max(abs(res$looks$prob_upper - bs$rejectPerStage)), 1e-5)
+  expect_lt(max(abs(res$looks$prob_lower[1:2] - bs$futilityPerStage[1:2])), 1e-5)
+  o <- lr$overallResults
+  ex <- res$expected[res$expected$hypothesis == "design", ]
+  expect_equal(ex$events, o$expectedNumberOfEvents, tolerance = 1e-5)
+  expect_equal(ex$enrolled, o$expectedNumberOfSubjects, tolerance = 1e-5)
+  expect_equal(ex$study_duration, o$expectedStudyDuration, tolerance = 1e-5)
+})
+
+# The design of the rpact vignette "Designing Group Sequential Trials with Two Groups and a Survival
+# Endpoint with rpact" (getPowerSurvival(), hazard ratio 0.7, 387 events), with fixed futility
+# bounds; designs R_binding and R_nonbinding of expected_stage4.csv
+rpact_design <- function(binding) {
+  haz <- c(0.025, 0.04, 0.015, 0.01, 0.007)
+  drop <- -log(0.95) / 12
+  scn <- ms_scenario(ms_model(time = c(0, 6, 9, 15, 21), death = haz, dropout = drop),
+                     ms_model(time = c(0, 6, 9, 15, 21), death = 0.7 * haz, dropout = drop),
+                     accrual = ms_accrual(rate = 42))
+  ms_power(scn, n = 1000, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
+           test = ms_test(futility = "fixed", fut_bound = c(0, 0.5), binding = binding,
+                          mean = "schoenfeld"),
+           events = 387)
+}
+
+test_that("ms_power gives the expected values of the design of the rpact vignette", {
+  compare_expected("R_binding", rpact_design(TRUE))
+  compare_expected("R_nonbinding", rpact_design(FALSE))
+})
+
+test_that("the expected values agree with rpact::getPowerSurvival()", {
+  skip_if_not_installed("rpact")
+  message("Expected values compared with rpact ", utils::packageVersion("rpact"))
+  # Under the null hypothesis (hazard ratio 1) the looks take place at the same numbers of events.
+  # rpact 4.4.0 differs from the independent reference of the block above in two ways
+  # (Planning/stage4_python/diag_rpact_step1_output.txt in the project folder): its analysis
+  # times are found to about 2e-4 (look 2 under the hazard ratio 0.7: 34.72314 against 34.72294;
+  # look 1 under the null hypothesis: 3.3e-5, which changes the expected enrolled patients by
+  # 7e-4 at 42 patients per month), and it takes the correlations of the statistics from the event
+  # fractions, whereas variance = "null" takes them from the information under the design scenario
+  # (differences of the stopping probabilities of about 1.2e-5 under the hazard ratio 0.7; under
+  # the null hypothesis the two coincide). With the correlations from the event fractions, the
+  # bounds and means of the package give the stopping probabilities of rpact within 1e-6, which
+  # checks the definitions (stopping for futility, looks under the null hypothesis); the values
+  # of the package are then compared with tolerances above these differences.
+  pst <- list("0 - <6" = 0.025, "6 - <9" = 0.04, "9 - <15" = 0.015, "15 - <21" = 0.01,
+              ">= 21" = 0.007)
+  for (binding in c(TRUE, FALSE)) {
+    des <- rpact::getDesignGroupSequential(kMax = 3, alpha = 0.025, sided = 1,
+                                           typeOfDesign = "asOF",
+                                           informationRates = c(0.5, 0.75, 1),
+                                           futilityBounds = c(0, 0.5), bindingFutility = binding)
+    res <- rpact_design(binding)
+    expect_lt(max(abs(res$looks$z_upper - des$criticalValues)), 1e-5)
+    for (hr in c(0.7, 1)) {
+      pw <- rpact::getPowerSurvival(des, piecewiseSurvivalTime = pst, hazardRatio = hr,
+                                    dropoutRate1 = 0.05, dropoutRate2 = 0.05, dropoutTime = 12,
+                                    accrualTime = 0, accrualIntensity = 42,
+                                    maxNumberOfSubjects = 1000, maxNumberOfEvents = 387,
+                                    directionUpper = FALSE)
+      h <- if (hr == 1) "null" else "design"
+      lk <- if (hr == 1) res$looks_null else res$looks
+      ex <- res$expected[res$expected$hypothesis == h, ]
+      lab <- paste("binding", binding, h)
+      # the definitions, with the correlations from the event fractions
+      d <- lk$events
+      pr <- gs_prob(res$looks$z_lower, res$looks$z_upper, if (hr == 1) 0 else res$mean,
+                    sqrt(outer(d, d, pmin) / outer(d, d, pmax)))
+      expect_lt(max(abs(pr$prob_upper - as.numeric(pw$rejectPerStage))), 1e-6, label = lab)
+      expect_lt(max(abs(pr$prob_lower[1:2] - as.numeric(pw$futilityPerStage))), 1e-6,
+                label = lab)
+      ev <- .expected_values(pr$prob_upper, pr$prob_lower, lk$time, d, lk$enrolled)
+      expect_lt(abs(ev$events - as.numeric(pw$expectedNumberOfEvents)), 1e-4, label = lab)
+      expect_lt(abs(ev$enrolled - as.numeric(pw$expectedNumberOfSubjects)), 2e-3, label = lab)
+      expect_lt(abs(ev$study_duration - as.numeric(pw$studyDuration)), 5e-4, label = lab)
+      # the values of the package
+      expect_lt(max(abs(lk$time - as.numeric(pw$analysisTime))), 5e-4, label = lab)
+      expect_lt(max(abs(lk$prob_upper - as.numeric(pw$rejectPerStage))), 5e-5, label = lab)
+      expect_lt(max(abs(lk$prob_lower[1:2] - as.numeric(pw$futilityPerStage))), 5e-5,
+                label = lab)
+      expect_lt(abs(ex$events - as.numeric(pw$expectedNumberOfEvents)), 2e-3, label = lab)
+      expect_lt(abs(ex$enrolled - as.numeric(pw$expectedNumberOfSubjects)), 2e-3, label = lab)
+      expect_lt(abs(ex$study_duration - as.numeric(pw$studyDuration)), 5e-4, label = lab)
+    }
+  }
+})

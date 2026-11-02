@@ -57,7 +57,26 @@ An object of class \code{ms_power}, a list with
   \item{n, accrual_duration, study_duration, events}{Sample size,
     accrual duration, calendar time of the final analysis and expected
     events of the tested endpoint at the final analysis.}
+  \item{expected}{A data frame with the expected values when the trial
+    stops at the bounds (see Details), with one row per hypothesis
+    (\code{hypothesis}: \code{"design"} for the design scenario and
+    \code{"null"} for the null scenario): the probabilities of stopping at
+    an interim look for efficacy (\code{prob_efficacy_early}) and for
+    futility (\code{prob_futility_early}), and the expected
+    \code{study_duration}, \code{events} of the tested endpoint and
+    \code{enrolled} patients.}
+  \item{mean, sigma}{The mean vector and covariance matrix of the
+    statistics at the looks under the design scenario.}
+  \item{targets}{The numbers of events of the trigger endpoints at which the
+    event-driven looks take place (\code{NA} for calendar-driven looks).}
   \item{settings, scenario, looks_def, test}{The inputs.}
+  \item{looks_null}{A data frame with one row per look under the null
+    scenario: \code{look}, \code{time}, \code{enrolled}, \code{events}
+    and the probabilities of stopping for efficacy and for futility at the
+    look with the futility bounds applied (\code{prob_upper},
+    \code{prob_lower}).}
+  \item{sigma_null}{The correlation matrix of the statistics under the null
+    scenario.}
 }
 With two endpoints, \code{looks} has one row per endpoint and look at
 which the endpoint is tested, with the columns above and \code{endpoint},
@@ -83,7 +102,8 @@ the global null hypothesis and under each scenario of
 endpoint at its last look; \code{final_events} the final numbers of events
 of the trigger endpoints; and \code{mean} and \code{sigma} are the mean
 vector and covariance matrix of the statistics in the order of the rows of
-\code{looks}.
+\code{looks}. The expected values (\code{expected}, \code{looks_null},
+\code{sigma_null}) and \code{targets} are not given.
 }
 \description{
 Computes the analysis times, expected events, bounds, stopping
@@ -118,6 +138,28 @@ instead of 0.025 with 2:1 allocation and looks at 75 and 150 deaths.
 
 The hazard ratios at the bounds are \code{exp(-z / sqrt(p0 p1 d))}, where
 d is the expected number of events of the tested endpoint.
+
+The expected study duration, number of events of the tested endpoint and
+number of enrolled patients (\code{expected}) are the sums over the looks
+of the probability of stopping at the look times the calendar time, the
+expected events and the enrolled patients at the look, under the design
+scenario and under \code{\link{ms_null}} applied to the scenario (at the
+looks of the type I error, \code{looks_null}). The trial stops at an
+interim look when the statistic crosses the efficacy bound or falls below
+the futility bound, also when the futility bounds are non-binding, as in
+\code{gsProbability()} of gsDesign; the probability of stopping at the last
+look is one minus the probability of stopping earlier. With non-binding
+futility bounds the efficacy bounds do not depend on the futility bounds,
+so that the expected values without stopping for futility are those of the
+same design with \code{futility = "none"}. At an event-driven look the
+events are the target, and the calendar time and the enrolled patients are
+those at which the expected events reach the target: the variability of
+the analysis time and its correlation with the decision to stop are
+ignored, as in the expected study durations of rpact and lrstat. At a
+calendar-driven look the time is exact and the events are expected. A final
+look at \code{followup} after the end of accrual takes place under the null
+scenario when the expected events reach those of the design scenario, as
+for the type I error.
 
 When the looks have different triggers (see \code{\link{ms_looks}}), each
 trigger endpoint has its own final number of events, and a look driven by

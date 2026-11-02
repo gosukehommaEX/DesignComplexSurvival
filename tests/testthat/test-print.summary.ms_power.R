@@ -16,3 +16,12 @@ test_that("print.summary.ms_power shows the transition weights", {
   expect_output(print(summary(res)), "Bonferroni \\(weights 0.8, 0.2; transition weights 1, 1\\)")
   expect_output(print(summary(res)), "z_upper_recycled")
 })
+
+test_that("print.summary.ms_power prints the expected values of a design with one endpoint", {
+  res <- ms_power(scn_a(), n = 400, looks = ms_looks("os", fraction = c(0.5, 1)),
+                  test = ms_test(), events = 300)
+  expect_output(print(summary(res)), "Expected values when the trial stops at the bounds")
+  expect_output(print(summary(res)), "prob_efficacy_early")
+  out <- capture.output(print(summary(run_design("D3"))))
+  expect_false(any(grepl("Expected values", out)))
+})
