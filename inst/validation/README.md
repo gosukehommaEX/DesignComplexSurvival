@@ -1,8 +1,8 @@
 # Validation against independent routes
 
 The scripts in this folder compare the analytic results of
-DesignComplexSurvival with patient-level simulations and with the package
-PWEALL. The expected values of the unit tests are computed separately by the
+DesignComplexSurvival with patient-level simulations and with the packages
+PWEALL, lrstat, rpact and gsDesign. The expected values of the unit tests are computed separately by the
 Python scripts in `python/` (see `python/README.md`).
 
 ## How to run
@@ -16,8 +16,11 @@ source("inst/validation/run_all.R")
 
 FastSurvival and PWEALL are used only by these scripts, so they are not
 declared in DESCRIPTION. `run_all.R` records their versions in
-`results/summary.md`, together with the version of lrstat (in Suggests),
-which is used for the comparison with `lrstat::fseqbon()`.
+`results/summary.md`, together with the versions of lrstat, rpact and
+gsDesign (in Suggests), which are used for the comparisons with
+`lrstat::fseqbon()`, `lrstat::lrpower()`, `rpact::getPowerSurvival()`,
+`gsDesign::gsProbability()` and `gsDesign::gsCP()`; a comparison whose
+package is not installed is skipped and noted in `results/summary.md`.
 
 `python/simulate_ms.py` (scenarios V6-V10, about 17 minutes) is run in Python
 beforehand; its result `results/sim_python.csv` is part of the folder and was
@@ -43,6 +46,15 @@ same way; its result `results/sim_python_calendar.csv` is part of the folder:
 
 ```
 python3 inst/validation/python/simulate_calendar.py
+```
+
+The comparison of the expected values when the trial stops at the bounds
+uses `python/simulate_expected.py` (designs E1-E3, about 4 minutes), run
+beforehand in the same way; its result `results/sim_python_expected.csv` is
+part of the folder:
+
+```
+python3 inst/validation/python/simulate_expected.py
 ```
 
 The larger simulations of V2 and V7 under the null hypothesis use
@@ -165,6 +177,74 @@ with `lrstat::getBound()`.
 | L2 | V6 | 330 PFS events (PFS and OS), then 250 OS events (OS) | PFS, then OS (both O'Brien-Fleming type) | 0.8, 0.2 | c(1, 1) |
 | L3 | V3 | as L1 | OS (O'Brien-Fleming type, non-binding futility bound by O'Brien-Fleming type beta spending, beta 0.2), then PFS (Hwang-Shih-DeCani, gamma -4) | 0.6, 0.4 | c(0.5, 1) |
 
+## Expected values when the trial stops at the bounds (stage 4)
+
+`compare_expected.R` compares `ms_power()$expected` and the probabilities
+of stopping at each look under the design scenario (`looks`) and under the
+null scenario (`looks_null`) with
+
+- `rpact::getPowerSurvival()`: the design of the rpact vignette "Designing
+  Group Sequential Trials with Two Groups and a Survival Endpoint with rpact"
+  (387 OS events, O'Brien-Fleming type efficacy bounds) without futility
+  bounds (R0) and with the fixed futility bounds Z = 0 and 0.5, binding (R1)
+  and non-binding (R2), under the hazard ratios 0.7 and 1. rpact finds its
+  analysis times to about 2e-4 and takes the correlations from the event
+  fractions; the variant `events_corr` recomputes the probabilities of the
+  package with these correlations and checks the definitions at 1e-6;
+- the values printed in the same vignette for `getPowerSurvival()` (11) and
+  `getSampleSizeSurvival()` (16), recomputed as rpact computes them, with the
+  correlations of the event fractions (`gs_prob()` with the analysis times,
+  bounds and means of `ms_power()`; the number of events of
+  `getSampleSizeSurvival()` solved for the power 0.8 with these
+  correlations); the solution of `ms_size(solve_for = "events")` is an INFO
+  row;
+- `lrstat::lrpower()` (`typeOfComputation = "direct"`, design scenario only):
+  scenario V2 and a delayed effect in piecewise exponential form, without
+  and with non-binding futility bounds;
+- `gsDesign::gsProbability()`: proportional hazards designs of V1 with
+  futility bounds by beta spending (non-binding) and fixed (binding), with
+  the bounds and events of the package;
+- `python/simulate_expected.py`: 20000 trials under the alternative and
+  under the null hypothesis of each of the designs below, with the
+  O'Brien-Fleming type efficacy bounds and the non-binding futility bound
+  Z = 0 at the interim looks. Each trial stops at the first look at which
+  its log-rank statistic crosses a bound. The simulation also reports the
+  mean look times, events and enrolled patients at the looks and the
+  expected values without the correlation between the look time and the
+  decision to stop (INFO).
+
+| Design | Scenario | n | Looks |
+|---|---|---|---|
+| E1 | V1 | 400 | 150, 225 and 300 OS events |
+| E2 | V6 | 500 | 150 and 250 OS events |
+| E3 | V1 | 400 | calendar months 24, 30 and 36 |
+
+The expected values of the package take the analysis time of an
+event-driven look as the time at which the expected events reach the
+target. In E1 the first look (150 deaths) is expected at month 20.8 under
+the alternative and 19.4 under the null hypothesis, close to the end of
+accrual at month 20; the simulated look times vary around it, so that the
+mean number of enrolled patients at the look and at the stop is smaller than
+that of the package (registered in `explained.csv`). The other judged
+quantities agree within 4 standard errors.
+
+## Conditional power (stage 4)
+
+`compare_cond_power.R` compares `ms_cond_power()` with `gsDesign::gsCP()`:
+for the design of the gsDesign vignette "Conditional power and conditional
+error" (first interim analysis at 117 events, the conditional power at
+analysis 1 with the nominal p-value 0.04 under the interim estimate, the
+null hypothesis and the hazard ratio of the design), including the values
+printed in the vignette, and on a grid of three designs, both interim
+analyses, z = -1, 0, 1 and 2 and `under = "null"`, `"trend"` and `"hr"`.
+`under = "design"` takes the correlations from the information under the
+design scenario (`variance = "null"`), whereas `gsCP()` takes them from the
+events; these rows are INFO. For the same reason the futility bound of the
+vignette design at analysis 2 by beta spending is 0.9416 in the package and
+0.9413 in gsDesign (registered in `explained.csv`); the conditional powers of
+the vignette are therefore computed with the futility bounds of gsDesign
+(`futility = "fixed"`).
+
 ## Type I error at the looks driven by OS events
 
 Under the null hypothesis, the simulated rejection rates of the
@@ -214,6 +294,16 @@ number of deaths increases.
 | Recycling: probabilities of `gs_prob_mtp()` and `ms_power()` of rejecting each hypothesis at each look, the first, the second, both and at least one, and of stopping for futility, versus the proportions of the trials rejected by `lrstat::fseqbon()` | `4se_p` |
 | Recycling: efficacy bounds at the initial and at the recycled levels versus `lrstat::getBound()` | `abs:1e-5` |
 | Recycling: proportion of the trials in which the decisions of `fseqbon()` differ from the procedure applied directly with the bounds of the package | `abs:1e-4` |
+| Expected values, rpact: analysis times, stopping probabilities, expected events, patients and study duration (package; events correlations) | `abs:5e-4`, `abs:5e-5`, `abs:2e-3`, `abs:2e-3`, `abs:5e-4`; `abs:1e-6` for the probabilities and `abs:1e-4` for the events with the correlations of the events |
+| Expected values and conditional power, rpact and gsDesign vignettes: printed values | `abs`: half a unit of the last printed digit; `abs:1e-7` for the conditional powers at single analyses printed with seven or eight digits |
+| Expected values, lrstat: analysis times, events, efficacy bounds, stopping probabilities; expected events, patients and study duration | `abs:1e-4`, `abs:1e-5`; `rel:1e-5` |
+| Expected values, gsDesign: stopping probabilities and expected events under the null scenario; under the design scenario (package; correlations of the events) | `abs:1e-6`, `abs:1e-4`; `abs:2e-4`, `abs:5e-2`; `abs:1e-6`, `abs:1e-4` |
+| Expected values, simulation: probabilities of stopping (early, and at each look for each reason) | `4se_p` |
+| Expected values, simulation: expected study duration, events and enrolled patients | `4se` |
+| Expected values, simulation: efficacy bounds (`ref_gsd.py`) | `abs:1e-6` |
+| Expected values, simulation: look times, events and enrolled patients at the looks, expected values without the correlation of the look time and the decision | `info` |
+| Conditional power: `gsCP()` with the bounds of the package (`under` = `"null"`, `"trend"`, `"hr"`); efficacy bounds of the vignette design; futility bounds of the vignette design by beta spending | `abs:1e-5`; `abs:1e-5`; `abs:5e-4` |
+| Conditional power: `under = "design"` against `gsCP()` with the hazard ratio of the scenario | `info` |
 
 PASS, FAIL and INFO as in `inst/reproduce/`; a FAIL whose id is registered in
 `explained.csv` is EXPLAINED.
@@ -244,6 +334,9 @@ results are missing, when the perturbation check fails, or when an id of
 | `python/simulate_type1.py` | Larger simulations of V2 and V7 under the null hypothesis, writes `results/sim_python_type1.csv` (not read by `run_all.R`) |
 | `compare_pweall.R` | PWEALL versus the package (Luo et al. 2019, Examples 1-3; Barthel et al. 2006, Table IV, rows 5 and 12) |
 | `compare_graph_lrstat.R` | Graphical procedure with recycling of the level versus `lrstat::fseqbon()` and `lrstat::getBound()` |
+| `python/simulate_expected.py` | Python simulation of the expected values when the trial stops at the bounds (E1-E3), writes `results/sim_python_expected.csv` |
+| `compare_expected.R` | Expected values versus rpact, lrstat, gsDesign, the rpact vignette and the simulation (definitions of E1-E3) |
+| `compare_cond_power.R` | Conditional power versus `gsDesign::gsCP()` and the gsDesign vignette |
 | `run_all.R` | Runs the comparisons and writes the summaries |
 | `explained.csv` | Registered explanations (id, reason) |
-| `results/` | Outputs: `compare_simulation.csv`, `compare_two_endpoints.csv`, `compare_calendar.csv`, `compare_pweall.csv`, `compare_graph_lrstat.csv`, `summary.csv`, `summary.md`, `perturb.csv` (generated; do not edit) |
+| `results/` | Outputs: `compare_simulation.csv`, `compare_two_endpoints.csv`, `compare_calendar.csv`, `compare_pweall.csv`, `compare_graph_lrstat.csv`, `compare_expected.csv`, `compare_cond_power.csv`, `summary.csv`, `summary.md`, `perturb.csv` (generated; do not edit) |

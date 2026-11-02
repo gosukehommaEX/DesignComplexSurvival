@@ -1,0 +1,7 @@
+"id","source","quantity","criterion","explained_id","published","computed","diff","evidence","evidence_criterion","evidence_ref_id","evidence_extra","evidence_pass","judgement","computed_perturbed","evidence_perturbed","note"
+"OrtegaVilla2025-S3.1-original","OrtegaVilla2025","cond_power","abs:0.005","",0.36,0.362986507873542,0.00298650787354204,NA,NA,NA,NA,NA,"PASS",0.362986507873542,NA,"under = ""design"": 0.36148"
+"OrtegaVilla2025-S3.1-trend","OrtegaVilla2025","cond_power","abs:0.005","",0.01,0.0149350872627697,0.00493508726276974,NA,NA,NA,NA,NA,"PASS",0.0149350872627697,NA,""
+"OrtegaVilla2025-S3.2-original","OrtegaVilla2025","cond_power","abs:0.0005","",0.62,0.619940436275244,-5.95637247561287e-05,NA,NA,NA,NA,NA,"PASS",0.619940436275244,NA,"under = ""design"": 0.61895"
+"OrtegaVilla2025-S3.2-trend","OrtegaVilla2025","cond_power","info","",0.103,0.10302834425291,2.83442529098593e-05,NA,NA,NA,NA,NA,"INFO",0.10302834425291,NA,""
+"OrtegaVilla2025-S3.3-85","OrtegaVilla2025","cond_power","abs:0.0005","",0.258,0.257688749643354,-0.00031125035664592,NA,NA,NA,NA,NA,"PASS",0.257688749643354,NA,"under = ""design"": 0.25604"
+"OrtegaVilla2025-S3.3-80","OrtegaVilla2025","cond_power","abs:0.0005","",0.214,0.214206968141267,0.000206968141266695,NA,NA,NA,NA,NA,"PASS",0.214206968141267,NA,"under = ""design"": 0.21289"

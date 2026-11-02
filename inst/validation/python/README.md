@@ -88,6 +88,11 @@ variance at month 25 agree to about 1e-14 (`results/alt_check.csv`).
   hypothesis (V7, and scenario B with the group sizes of V2, exchanged and
   equal), with the functions of `simulate_ms.py`, written to
   `../results/sim_python_type1.csv` (see `../README.md`).
+* `simulate_expected.py`: patient-level simulation of the expected study
+  duration, events and enrolled patients when the trial stops at the
+  bounds (designs E1-E3 of version 0.4.0), with the functions of
+  `simulate_ms.py`, written to `../results/sim_python_expected.csv` (see
+  `../README.md`).
 * `danzer_check.py`: covariance estimator of Danzer et al. (2025) applied
   to large simulated trials under the global null hypothesis, written to
   `../results/danzer_check.csv`.
@@ -166,6 +171,7 @@ python3 simulate_ms.py                # validation scenarios V6-V8 (about 15 min
 python3 simulate_two.py               # PFS and OS together, V3, V4, V6, V7 (about 30 minutes)
 python3 danzer_check.py               # estimator of Danzer et al. (2025) (about 2 minutes)
 python3 simulate_type1.py             # V2 and V7 under the null hypothesis (about 11 minutes)
+python3 simulate_expected.py          # expected values when the trial stops at the bounds, E1-E3 (about 4 minutes)
 python3 expected_model5.py            # model options of stage 3 (about 10 minutes)
 python3 expected_graph.py             # recycling of the level, stage 3 (about 4 minutes)
 python3 expected_calendar.py          # switching from a calendar time, stage 3 (about 4 minutes)

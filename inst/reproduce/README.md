@@ -33,11 +33,13 @@ results file.
 | `reproduce_Barthel2006.R` | Barthel et al. (2006), Statistics in Medicine 25:2521-2542, Tables II-V (ART) |
 | `reproduce_Erdmann2025.R` | Erdmann et al. (2025), Biometrical Journal 67:e70017, Tables 2 and 3 (illness-death model; settings of the authors' R code) |
 | `reproduce_Glimm2010.R` | Glimm et al. (2010), Statistics in Medicine 29:219-228, Sections 2-5 (strategies (a), (b) and (d) by `gs_prob_mtp()`) |
+| `reproduce_KimTsiatis1990.R` | Kim and Tsiatis (1990), Biometrics 46:81-92, Tables 1-6 and Sections 5 and 6 (ECOG example: bounds, probabilities of stopping, real times, numbers of failures and patients, expected study durations, follow-up and power; expected values of `ms_power()` as INFO) |
 | `reproduce_Lakatos1988.R` | Lakatos (1988), Biometrics 44:229-241, Section 3 example and Tables 2-3 |
 | `reproduce_Lakatos2002.R` | Lakatos (2002), Statistics in Medicine 21:1969-1989, Tables VIII-IX |
 | `reproduce_Lu2021.R` | Lu (2021), Pharmaceutical Statistics, doi:10.1002/pst.2069, Tables 1-3 (lrstat) |
 | `reproduce_Luo2019.R` | Luo et al. (2019), Statistics in Medicine 38:192-209, Examples 1-3 (PWEALL) |
 | `reproduce_MaurerBretz2013.R` | Maurer and Bretz (2013), Statistics in Biopharmaceutical Research 5:311-320, Tables 1 and 2 and Section 4 (nominal levels and repeated p-values, ADDPLAN 6.0.1) |
+| `reproduce_OrtegaVilla2025.R` | Ortega-Villa et al. (2025), Statistics in Medicine 44:e70157, Sections 3.1-3.3 (conditional power by `ms_cond_power()`) |
 | `reproduce_Porcher2002.R` | Porcher et al. (2002), Controlled Clinical Trials 23:650-661, Tables 1-2 and the MAG90 example |
 | `reproduce_Shih1995.R` | Shih (1995), Controlled Clinical Trials 16:395-407, examples computed with SIZE |
 | `reproduce_Sugimoto2017.R` | Sugimoto et al. (2017), Statistics in Medicine 36:1363-1382, Tables III and VI (PFS and OS, rows with rho = 0) |
@@ -77,7 +79,16 @@ Where the article prints an input or a heading that appears to be a misprint
 the corrected reading is the evidence. The same applies to the values of
 Table 1 of Tamhane et al. (2010) that appear to be misprints
 (Tamhane2010-T1-OF1OF2-rho0.4-d and -delta,
-Tamhane2010-T1-OF1AH2-rho0.4-delta).
+Tamhane2010-T1-OF1AH2-rho0.4-delta), and to the expected number of
+patients under H0 printed by Kim and Tsiatis (1990), 251, more than the
+250 patients accrued (KimTsiatis1990-patients-H0).
+
+The tables of Kim and Tsiatis (1990) use one real time per analysis, found
+under H0, for the expected values under both hypotheses, whereas
+`ms_power()` uses under each hypothesis its own analysis times;
+`reproduce_KimTsiatis1990.R` computes the printed values with the
+convention of the article from the functions of the package and gives the
+values of `ms_power()$expected` as INFO rows (ids ending in `-pkg`).
 
 ## Checks made by run_all.R
 
@@ -92,10 +103,12 @@ power is recomputed at 1.1 times the published time. A value printed with one
 significant digit, whose change by 10 per cent is within the tolerance of its
 `abs` criterion (MaurerBretz2013-T1-a1-0.0125, -T1-a2-0.01875 and
 -S4-a1-0.025), is moved by three times the tolerance instead. Every row is expected
-to FAIL, except Barthel2006-T2-r2 and Tamhane2010-T1-OF1OF2-rho0.4-d, whose
+to FAIL, except Barthel2006-T2-r2, Tamhane2010-T1-OF1OF2-rho0.4-d,
+KimTsiatis1990-T4-0.8-PH0 and KimTsiatis1990-S5-OF-t1-Epat-H0, whose
 evidence is compared with a value printed in another row (the same design in
-Barthel et al.; the Delta_1 of the same cell in Tamhane et al.) and which are
-therefore expected to stay EXPLAINED.
+Barthel et al.; the Delta_1 of the same cell in Tamhane et al.; the same
+increment of the use function in Table 2 and the 250 patients of Table 1
+in Kim and Tsiatis) and which are therefore expected to stay EXPLAINED.
 
 ## Outputs (results/)
 
@@ -105,5 +118,5 @@ therefore expected to stay EXPLAINED.
 | `summary.csv` | All rows of all sources |
 | `summary.md` | Counts by source and judgement, FAIL, EXPLAINED (with reasons) and INFO rows, perturbation check, diagnostics, run times |
 | `perturb.csv` | Judgements of the perturbation check |
-| `diagnostics.csv` | Checks of the approximation of simultaneous entry by uniform accrual over 1e-6 times the study length |
+| `diagnostics.csv` | Checks of the approximation of simultaneous entry by uniform accrual over 1e-6 times the study length, and of the final efficacy bound (1.96) and the mean of the final statistic (theta) of the designs of Ortega-Villa et al. (2025) |
 | `helpers_<Source>.csv` | Values of the article-specific algorithms (SIZE chain, the K-interval formula of Porcher et al., formula (2) of Sugimoto et al.) for an independent check |
