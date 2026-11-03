@@ -8,3 +8,4 @@
 ^inst/validation/python/__pycache__$
 ^\.github$
 ^codecov\.yml$
+^CRAN-SUBMISSION$
