@@ -46,6 +46,14 @@ print(summary(res))
 #>            power type1_nonbinding    type1_binding 
 #>           0.8689           0.0250           0.0250 
 #> 
+#> Expected values when the trial stops at the bounds:
+#>  hypothesis prob_efficacy_early prob_futility_early study_duration events
+#>      design            0.215806                   0          35.52  267.6
+#>        null            0.001525                   0          34.93  299.8
+#>  enrolled
+#>       400
+#>       400
+#> 
 #> By look:
 #>  look  time enrolled events events_control events_treatment info_frac z_upper
 #>     1 20.47      400    150          84.58            65.42       0.5   2.963

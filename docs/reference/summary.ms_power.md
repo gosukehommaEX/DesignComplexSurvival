@@ -23,8 +23,10 @@ summary(object, ...)
 
 An object of class `summary.ms_power`: a list with the design overview
 (`overview`), the per-look table (`looks`) and the settings
-(`settings`); for two endpoints also the familywise error rates
-(`fwer`).
+(`settings`); for one endpoint also the expected values when the trial
+stops at the bounds (`expected`, see
+[`ms_power`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)),
+and for two endpoints the familywise error rates (`fwer`).
 
 ## Examples
 
@@ -44,6 +46,14 @@ summary(res)
 #>         400.0000          20.0000          39.6700         300.0000 
 #>            power type1_nonbinding    type1_binding 
 #>           0.8689           0.0250           0.0250 
+#> 
+#> Expected values when the trial stops at the bounds:
+#>  hypothesis prob_efficacy_early prob_futility_early study_duration events
+#>      design            0.215806                   0          35.52  267.6
+#>        null            0.001525                   0          34.93  299.8
+#>  enrolled
+#>       400
+#>       400
 #> 
 #> By look:
 #>  look  time enrolled events events_control events_treatment info_frac z_upper

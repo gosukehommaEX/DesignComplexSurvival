@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Simulation-Free Design of Complex Time-to-Event Trials">
-<meta name="description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
-<meta property="og:description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
+<meta name="description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. For designs with one endpoint, the expected study duration, numbers of events and enrolled patients when the trial stops at its bounds, the conditional power at an interim analysis, and plots of the bounds, the probabilities of stopping and the survival functions are also given. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
+<meta property="og:description" content="Computes the expected numbers of events, the mean, variance and covariance of the log-rank statistic over calendar time, and the power, type I error, required number of events, sample size, accrual duration and follow-up of two-group time-to-event trials, without patient-level simulation. Each group follows a multistate model (progression-free, progressed, switched, dead, and progression-free after a switch before progression) with piecewise constant intensities, which covers progression-free survival, overall survival and treatment switching before, at or after progression, with an effect of the switch on the death hazard or an accelerated failure time effect, together with piecewise uniform accrual, piecewise exponential dropout, a censoring of progression-free survival only, switching that starts at a calendar time and group sequential designs with efficacy bounds and binding or non-binding futility bounds. Progression-free and overall survival can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013 &lt;doi:10.1080/19466315.2013.807748&gt;), using the joint distribution of the two log-rank statistics over calendar time. For designs with one endpoint, the expected study duration, numbers of events and enrolled patients when the trial stops at its bounds, the conditional power at an interim analysis, and plots of the bounds, the probabilities of stopping and the survival functions are also given. The variance and covariance of the log-rank score under the alternative follow Luo et al. (2019) &lt;doi:10.1002/sim.7975&gt;.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,9 @@
 <li>switching may start at a calendar time, for example after an interim analysis (for the OS statistic);</li>
 <li>accrual is piecewise uniform (by rates or by proportions), dropout is piecewise exponential by group, and PFS may have a censoring of its own and be censored at a switch before progression;</li>
 <li>expected events, the mean, variance and covariance of the log-rank statistic over calendar time, group sequential bounds by alpha and beta spending (binding or non-binding futility), power, type I error, and the number of events, sample size, accrual duration or follow-up for a target power;</li>
-<li>progression-free survival (PFS) and overall survival (OS) can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013), with analyses driven by the events of either endpoint or by calendar time; the joint distribution of the two log-rank statistics gives the power of each endpoint, the probability of rejecting both or at least one hypothesis, and the familywise error rate.</li>
+<li>progression-free survival (PFS) and overall survival (OS) can be tested together with a group sequential fixed-sequence or Bonferroni procedure, the latter with recycling of the level after a rejection (Maurer and Bretz 2013), with analyses driven by the events of either endpoint or by calendar time; the joint distribution of the two log-rank statistics gives the power of each endpoint, the probability of rejecting both or at least one hypothesis, and the familywise error rate;</li>
+<li>for a design with one endpoint, the expected study duration and numbers of events and enrolled patients when the trial stops at its bounds, and the conditional power at an interim analysis under the design scenario, the null hypothesis, the current trend, a hazard ratio or another scenario;</li>
+<li>plots of the bounds, of the cumulative probabilities of stopping and of the survival functions of the groups.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -84,7 +86,7 @@
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
 </h2>
-<p>The articles on the package website (<a href="https://gosukehommaEX.github.io/DesignComplexSurvival/" class="uri">https://gosukehommaEX.github.io/DesignComplexSurvival/</a>) cover the workflow of a design, the multistate model and treatment switching, group sequential designs and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package.</p>
+<p>The articles on the package website (<a href="https://gosukehommaEX.github.io/DesignComplexSurvival/" class="uri">https://gosukehommaEX.github.io/DesignComplexSurvival/</a>) cover the workflow of a design, the multistate model and treatment switching, group sequential designs (with the expected duration, the conditional power and the plots of a design) and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package.</p>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -98,9 +100,10 @@
 <span>  treatment <span class="op">=</span> <span class="fu"><a href="reference/ms_model.html">ms_model</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>, death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">lam</span>, <span class="fl">0.65</span> <span class="op">*</span> <span class="va">lam</span><span class="op">)</span>, dropout <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span>,</span>
 <span>  accrual <span class="op">=</span> <span class="fu"><a href="reference/ms_accrual.html">ms_accrual</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ms_size.html">ms_size</a></span><span class="op">(</span><span class="va">scn</span>, looks <span class="op">=</span> <span class="fu"><a href="reference/ms_looks.html">ms_looks</a></span><span class="op">(</span><span class="st">"os"</span>, fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>        test <span class="op">=</span> <span class="fu"><a href="reference/ms_test.html">ms_test</a></span><span class="op">(</span>futility <span class="op">=</span> <span class="st">"beta"</span>, sf_fut <span class="op">=</span> <span class="st">"HSD"</span>, param_fut <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>        power <span class="op">=</span> <span class="fl">0.9</span>, solve_for <span class="op">=</span> <span class="st">"events"</span>, n <span class="op">=</span> <span class="fl">700</span><span class="op">)</span></span>
+<span><span class="va">des</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ms_size.html">ms_size</a></span><span class="op">(</span><span class="va">scn</span>, looks <span class="op">=</span> <span class="fu"><a href="reference/ms_looks.html">ms_looks</a></span><span class="op">(</span><span class="st">"os"</span>, fraction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>               test <span class="op">=</span> <span class="fu"><a href="reference/ms_test.html">ms_test</a></span><span class="op">(</span>futility <span class="op">=</span> <span class="st">"beta"</span>, sf_fut <span class="op">=</span> <span class="st">"HSD"</span>, param_fut <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span>,</span>
+<span>               power <span class="op">=</span> <span class="fl">0.9</span>, solve_for <span class="op">=</span> <span class="st">"events"</span>, n <span class="op">=</span> <span class="fl">700</span><span class="op">)</span></span>
+<span><span class="va">des</span></span>
 <span><span class="co">#&gt; Solved for the final number of events: 587.802 (target power 0.9)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Group sequential log-rank design</span></span>
@@ -116,8 +119,29 @@
 <span><span class="co">#&gt;     0.06203    0.02689   0.06203</span></span>
 <span><span class="co">#&gt;     0.46398    0.02760   0.52601</span></span>
 <span><span class="co">#&gt;     0.37413    0.04536   0.90014</span></span></code></pre></div>
-<p>PFS and OS tested together: PFS and OS are exponential in both groups (the model of Fleischer et al. 2009), with medians of 4 and 12 months in the control group and 6 and 16 months in the treatment group. PFS is tested at 300 PFS events, where OS is also tested, and OS again at 220 OS events. OS is tested only after PFS has been rejected (fixed sequence):</p>
+<p>The expected study duration, events and enrolled patients when the trial stops at the bounds, and the conditional power at the first interim analysis with the observed statistic 1.5 under the current trend:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">des</span><span class="op">$</span><span class="va">expected</span></span>
+<span><span class="co">#&gt;   hypothesis prob_efficacy_early prob_futility_early study_duration   events</span></span>
+<span><span class="co">#&gt; 1     design          0.52601131          0.05449458       44.32643 489.5941</span></span>
+<span><span class="co">#&gt; 2       null          0.00964929          0.76522251       34.26686 428.7172</span></span>
+<span><span class="co">#&gt;   enrolled</span></span>
+<span><span class="co">#&gt; 1 700.0000</span></span>
+<span><span class="co">#&gt; 2 692.9973</span></span>
+<span><span class="fu"><a href="reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span>, under <span class="op">=</span> <span class="st">"trend"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Conditional power of a group sequential log-rank design</span></span>
+<span><span class="co">#&gt;   Observed at look 1: z = 1.5</span></span>
+<span><span class="co">#&gt;   Distribution: current trend (hazard ratio 0.8395)</span></span>
+<span><span class="co">#&gt;   Conditional power: 0.5711</span></span>
+<span><span class="co">#&gt;   Without the futility bounds of the later interim looks: 0.5717</span></span>
+<span><span class="co">#&gt;  look  time events z_upper z_lower cond_mean cond_sd prob_upper prob_lower</span></span>
+<span><span class="co">#&gt;     2 35.51    441   2.359  0.7166     1.837  0.5774     0.1830    0.02614</span></span>
+<span><span class="co">#&gt;     3 58.66    588   2.014  2.0141     2.121  0.7071     0.3881    0.40272</span></span>
+<span><span class="co">#&gt;  cum_upper</span></span>
+<span><span class="co">#&gt;     0.1830</span></span>
+<span><span class="co">#&gt;     0.5711</span></span></code></pre></div>
+<p>PFS and OS tested together: PFS and OS are exponential in both groups (the model of Fleischer et al. 2009), with medians of 4 and 12 months in the control group and 6 and 16 months in the treatment group. PFS is tested at 300 PFS events, where OS is also tested, and OS again at 220 OS events. OS is tested only after PFS has been rejected (fixed sequence):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ms_scenario.html">ms_scenario</a></span><span class="op">(</span></span>
 <span>  control <span class="op">=</span> <span class="fu"><a href="reference/ms_fleischer.html">ms_fleischer</a></span><span class="op">(</span>median_pfs <span class="op">=</span> <span class="fl">4</span>, median_os <span class="op">=</span> <span class="fl">12</span><span class="op">)</span>,</span>
 <span>  treatment <span class="op">=</span> <span class="fu"><a href="reference/ms_fleischer.html">ms_fleischer</a></span><span class="op">(</span>median_pfs <span class="op">=</span> <span class="fl">6</span>, median_os <span class="op">=</span> <span class="fl">16</span><span class="op">)</span>,</span>
@@ -146,7 +170,7 @@
 <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
 </h2>
 <p>The tests compare the results with an independent Python implementation (<code>inst/validation/python/</code>, using matrix exponentials and adaptive quadrature) and, when the packages are installed, with gsDesign, gsDesign2, rpact and lrstat.</p>
-<p>The scripts in <code>inst/reproduce/</code> recompute sample sizes, numbers of events, analysis times, bounds and powers printed in 16 sources (articles and a statistical analysis plan). The scripts in <code>inst/validation/</code> compare the package with patient-level simulations of 15 scenarios (FastSurvival and a Python simulation; PFS and OS analyzed together in 6 of them, switching from a calendar time in 3), with the covariance estimator of Danzer et al. (2025) applied to large simulated trials under the null hypothesis, with the package PWEALL in 8 designs, and with the decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code> in 3 designs with recycling of the level. Each folder is run by its <code>run_all.R</code>, which judges every value as PASS (the criterion is met), EXPLAINED (the criterion is met after a registered explanation, such as an apparent misprint), FAIL, or INFO (not judged: a published value computed by a method that the package does not reproduce, or an asymptotic approximation compared with simulation):</p>
+<p>The scripts in <code>inst/reproduce/</code> recompute sample sizes, numbers of events, analysis times, bounds, powers, expected study durations and conditional powers printed in 18 sources (articles and a statistical analysis plan). The scripts in <code>inst/validation/</code> compare the package with patient-level simulations of 15 scenarios (FastSurvival and a Python simulation; PFS and OS analyzed together in 6 of them, switching from a calendar time in 3), with the covariance estimator of Danzer et al. (2025) applied to large simulated trials under the null hypothesis, with the package PWEALL in 8 designs, with the decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code> in 3 designs with recycling of the level, with rpact, lrstat and gsDesign for the expected values when the trial stops at the bounds in 9 designs, with <code><a href="https://keaven.github.io/gsDesign//reference/gsCP.html" class="external-link">gsDesign::gsCP()</a></code> for the conditional power in 4 designs, with the values printed in the vignettes of rpact and gsDesign, and with a patient-level simulation of the expected values in 3 designs. Each folder is run by its <code>run_all.R</code>, which judges every value as PASS (the criterion is met), EXPLAINED (the criterion is met after a registered explanation, such as an apparent misprint), FAIL, or INFO (not judged: a published value computed by a method that the package does not reproduce, or an asymptotic approximation compared with simulation):</p>
 <table class="table">
 <thead><tr>
 <th align="left">Folder</th>
@@ -159,23 +183,23 @@
 <tbody>
 <tr>
 <td align="left"><code>inst/reproduce/</code></td>
-<td align="right">257</td>
-<td align="right">79</td>
+<td align="right">485</td>
+<td align="right">91</td>
 <td align="right">0</td>
-<td align="right">191</td>
-<td align="right">527</td>
+<td align="right">204</td>
+<td align="right">780</td>
 </tr>
 <tr>
 <td align="left"><code>inst/validation/</code></td>
-<td align="right">1317</td>
+<td align="right">1726</td>
+<td align="right">3</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">2128</td>
-<td align="right">3445</td>
+<td align="right">2217</td>
+<td align="right">3946</td>
 </tr>
 </tbody>
 </table>
-<p><code>run_all.R</code> also multiplies the compared values by 1.1 and checks that the judgments change as expected. The criteria are described in the <code>README.md</code> of each folder and the registered explanations in its <code>explained.csv</code>. Every compared value is listed with its judgment in <code>results/summary.csv</code>, and <code>results/summary.md</code> summarizes the results. FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to rerun <code>inst/validation/</code>.</p>
+<p><code>run_all.R</code> also multiplies the compared values by 1.1 and checks that the judgments change as expected. The criteria are described in the <code>README.md</code> of each folder and the registered explanations in its <code>explained.csv</code>. Every compared value is listed with its judgment in <code>results/summary.csv</code>, and <code>results/summary.md</code> summarizes the results. FastSurvival and PWEALL are needed only to rerun <code>inst/validation/</code>, which also uses lrstat (0.3.4 or later), rpact and gsDesign.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

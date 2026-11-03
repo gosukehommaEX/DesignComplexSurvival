@@ -103,7 +103,7 @@ power is recomputed at 1.1 times the published time. A value printed with one
 significant digit, whose change by 10 per cent is within the tolerance of its
 `abs` criterion (MaurerBretz2013-T1-a1-0.0125, -T1-a2-0.01875 and
 -S4-a1-0.025), is moved by three times the tolerance instead. Every row is expected
-to FAIL, except Barthel2006-T2-r2, Tamhane2010-T1-OF1OF2-rho0.4-d,
+to FAIL, except Barthel2006-T2-r02, Tamhane2010-T1-OF1OF2-rho0.4-d,
 KimTsiatis1990-T4-0.8-PH0 and KimTsiatis1990-S5-OF-t1-Epat-H0, whose
 evidence is compared with a value printed in another row (the same design in
 Barthel et al.; the Delta_1 of the same cell in Tamhane et al.; the same

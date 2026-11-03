@@ -48,7 +48,13 @@ simulation:
   Bretz 2013), with analyses driven by the events of either endpoint or by
   calendar time; the joint distribution of the two log-rank statistics
   gives the power of each endpoint, the probability of rejecting both or at
-  least one hypothesis, and the familywise error rate.
+  least one hypothesis, and the familywise error rate;
+* for a design with one endpoint, the expected study duration and numbers of
+  events and enrolled patients when the trial stops at its bounds, and the
+  conditional power at an interim analysis under the design scenario, the
+  null hypothesis, the current trend, a hazard ratio or another scenario;
+* plots of the bounds, of the cumulative probabilities of stopping and of the
+  survival functions of the groups.
 
 ## Installation
 
@@ -62,8 +68,10 @@ remotes::install_github("gosukehommaEX/DesignComplexSurvival")
 The articles on the package website
 (<https://gosukehommaEX.github.io/DesignComplexSurvival/>) cover the
 workflow of a design, the multistate model and treatment switching, group
-sequential designs and the covariance of the statistics, PFS and OS tested
-together, switching from a calendar time, and the validation of the package.
+sequential designs (with the expected duration, the conditional power and
+the plots of a design) and the covariance of the statistics, PFS and OS
+tested together, switching from a calendar time, and the validation of the
+package.
 
 ## Examples
 
@@ -79,9 +87,19 @@ scn <- ms_scenario(
   treatment = ms_model(time = c(0, 6), death = c(lam, 0.65 * lam), dropout = 0.003),
   accrual = ms_accrual(time = c(0, 3), rate = c(10, 30))
 )
-ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
-        test = ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2),
-        power = 0.9, solve_for = "events", n = 700)
+des <- ms_size(scn, looks = ms_looks("os", fraction = c(0.5, 0.75, 1)),
+               test = ms_test(futility = "beta", sf_fut = "HSD", param_fut = -2),
+               power = 0.9, solve_for = "events", n = 700)
+des
+```
+
+The expected study duration, events and enrolled patients when the trial
+stops at the bounds, and the conditional power at the first interim analysis
+with the observed statistic 1.5 under the current trend:
+
+```{r example-expected}
+des$expected
+ms_cond_power(des, look = 1, z = 1.5, under = "trend")
 ```
 
 PFS and OS tested together: PFS and OS are exponential in both groups (the
@@ -123,6 +141,10 @@ n_pweall <- length(unique(validation$scenario[validation$source == "pweall"]))
 n_two <- length(unique(validation$scenario[validation$source == "python_two"]))
 n_calendar <- length(unique(validation$scenario[validation$source == "python_calendar"]))
 n_lrstat <- length(unique(validation$scenario[validation$source == "lrstat_fseqbon"]))
+n_expected <- length(unique(validation$scenario[validation$source %in%
+                                                  c("rpact", "lrstat_expected", "gsdesign_expected")]))
+n_cp <- length(unique(validation$scenario[validation$source %in% c("gsdesign_cp", "gsdesign_vignette")]))
+n_sim_expected <- length(unique(validation$scenario[validation$source == "python_expected"]))
 ```
 
 The tests compare the results with an independent Python implementation
@@ -131,15 +153,21 @@ quadrature) and, when the packages are installed, with gsDesign, gsDesign2,
 rpact and lrstat.
 
 The scripts in `inst/reproduce/` recompute sample sizes, numbers of events,
-analysis times, bounds and powers printed in `r n_sources` sources (articles
-and a statistical analysis plan). The scripts in `inst/validation/` compare
+analysis times, bounds, powers, expected study durations and conditional
+powers printed in `r n_sources` sources (articles and a statistical analysis
+plan). The scripts in `inst/validation/` compare
 the package with patient-level simulations of `r n_simulated` scenarios
 (FastSurvival and a Python simulation; PFS and OS analyzed together in
 `r n_two` of them, switching from a calendar time in `r n_calendar`), with
 the covariance estimator of Danzer et al. (2025) applied to large simulated
 trials under the null hypothesis, with the package PWEALL in `r n_pweall`
-designs, and with the decisions of `lrstat::fseqbon()` in `r n_lrstat`
-designs with recycling of the level. Each folder is run by its
+designs, with the decisions of `lrstat::fseqbon()` in `r n_lrstat`
+designs with recycling of the level, with rpact, lrstat and gsDesign for the
+expected values when the trial stops at the bounds in `r n_expected` designs,
+with `gsDesign::gsCP()` for the conditional power in `r n_cp` designs, with
+the values printed in the vignettes of rpact and gsDesign, and with a
+patient-level simulation of the expected values in `r n_sim_expected`
+designs. Each folder is run by its
 `run_all.R`, which judges every value as PASS (the criterion is met),
 EXPLAINED (the criterion is met after a registered explanation, such as an
 apparent misprint), FAIL, or INFO (not judged: a published value computed
@@ -155,5 +183,5 @@ judgments change as expected. The criteria are described in the
 `README.md` of each folder and the registered explanations in its
 `explained.csv`. Every compared value is listed with its judgment in
 `results/summary.csv`, and `results/summary.md` summarizes the results.
-FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to rerun
-`inst/validation/`.
+FastSurvival and PWEALL are needed only to rerun `inst/validation/`, which
+also uses lrstat (0.3.4 or later), rpact and gsDesign.

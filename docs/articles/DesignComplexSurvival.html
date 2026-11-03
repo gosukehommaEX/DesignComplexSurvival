@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,6 +97,11 @@ each, the probabilities of rejecting both or at least one hypothesis,
 and the familywise error rate.</li>
 <li>The number of events, sample size, accrual duration or follow-up
 needed for a target power.</li>
+<li>For a design with one endpoint, the expected study duration and the
+expected numbers of events and enrolled patients when the trial stops at
+its bounds, and the conditional power at an interim analysis.</li>
+<li>Plots of the bounds, of the cumulative probabilities of stopping and
+of the survival functions of the groups.</li>
 </ul>
 <p>The analyses can be driven by the events of progression-free survival
 (PFS) or overall survival (OS), take place at calendar times, or mix the
@@ -230,6 +235,19 @@ given by the user</td>
 <td>supported</td>
 </tr>
 <tr class="odd">
+<td>Expected values</td>
+<td>study duration, events and enrolled patients when the trial stops at
+the bounds, under the design and null scenarios (one endpoint)</td>
+<td>supported</td>
+</tr>
+<tr class="even">
+<td>Conditional power</td>
+<td>at an interim analysis, under the design scenario, the null
+hypothesis, the current trend, a hazard ratio or another scenario (one
+endpoint)</td>
+<td>supported</td>
+</tr>
+<tr class="odd">
 <td>Approximations</td>
 <td>mean of the statistic (two choices) and covariance (three
 choices)</td>
@@ -327,11 +345,18 @@ events for a power of 90 percent.</p>
 <p>The accrual ends at month 25.3. The final analysis needs 588 events
 and takes place at month 58.7. The type I error is 0.025 when the
 futility bounds are ignored.</p>
+<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> with <code>type = "survival"</code> draws the
+survival functions of the two groups of the scenario up to the final
+analysis; PFS is drawn in addition to OS when the model of a group has
+progression:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">des</span>, type <span class="op">=</span> <span class="st">"survival"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="DesignComplexSurvival_files/figure-html/delayed-survival-1.png" class="r-plt" alt="Overall survival functions of the control and treatment groups with the delayed treatment effect" width="576"></p>
 <p>The mean of the standardized statistic can be computed directly from
 the hazards (the default, following Yung and Liu 2020) or with the
 approximation of Schoenfeld (1981), which uses the event-weighted
 average of the log hazard ratio.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">t_fin</span> <span class="op">&lt;-</span> <span class="va">des</span><span class="op">$</span><span class="va">study_duration</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>direct <span class="op">=</span> <span class="fu"><a href="../reference/lr_moments.html">lr_moments</a></span><span class="op">(</span><span class="va">scn</span>, <span class="fl">700</span>, <span class="va">t_fin</span><span class="op">)</span><span class="op">$</span><span class="va">z_mean</span>,</span>
 <span>      schoenfeld <span class="op">=</span> <span class="fu"><a href="../reference/lr_moments.html">lr_moments</a></span><span class="op">(</span><span class="va">scn</span>, <span class="fl">700</span>, <span class="va">t_fin</span>, mean <span class="op">=</span> <span class="st">"schoenfeld"</span><span class="op">)</span><span class="op">$</span><span class="va">z_mean</span><span class="op">)</span></span>
@@ -344,7 +369,7 @@ average of the log hazard ratio.</p>
 </h2>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> gives an overview of the design, and
 <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> the table of the looks:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">des</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Group sequential log-rank design: summary</span></span>
 <span><span class="co">#&gt;   Tested endpoint: OS; trigger: os; mean: "direct"; variance: "null"</span></span>
@@ -355,6 +380,14 @@ average of the log hazard ratio.</p>
 <span><span class="co">#&gt;        700.00000         25.33000         58.66000        588.00000 </span></span>
 <span><span class="co">#&gt;            power type1_nonbinding    type1_binding </span></span>
 <span><span class="co">#&gt;          0.90010          0.02500          0.02482 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Expected values when the trial stops at the bounds:</span></span>
+<span><span class="co">#&gt;  hypothesis prob_efficacy_early prob_futility_early study_duration events</span></span>
+<span><span class="co">#&gt;      design            0.526011             0.05449          44.33  489.6</span></span>
+<span><span class="co">#&gt;        null            0.009649             0.76522          34.27  428.7</span></span>
+<span><span class="co">#&gt;  enrolled</span></span>
+<span><span class="co">#&gt;       700</span></span>
+<span><span class="co">#&gt;       693</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; By look:</span></span>
 <span><span class="co">#&gt;  look  time enrolled events events_control events_treatment info_frac z_upper</span></span>
@@ -375,11 +408,17 @@ average of the log hazard ratio.</p>
 <span><span class="co">#&gt; 1 25.44525    294 2.962588 0.7078215 -0.5039193 0.06202802</span></span>
 <span><span class="co">#&gt; 2 35.50958    441 2.359018 0.7987811  0.7165938 0.52601131</span></span>
 <span><span class="co">#&gt; 3 58.66078    588 2.014084 0.8469456  2.0140837 0.90014124</span></span></code></pre></div>
+<p>The summary also gives the expected study duration, events and
+enrolled patients when the trial stops at the bounds, under the design
+scenario and under the null scenario. <code>plot(des)</code> draws the
+bounds, and <code><a href="../reference/ms_cond_power.html">ms_cond_power()</a></code> gives the conditional power at
+an interim analysis; both are described in
+<code><a href="../articles/group-sequential.html">vignette("group-sequential")</a></code>.</p>
 <p><code><a href="../reference/ms_power.html">ms_power()</a></code> evaluates a design with a given final number
 of events, a given follow-up after the end of accrual, or analyses at
 calendar times. With the same looks and test and the final analysis 12
 months after the end of accrual:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pw12</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_power.html">ms_power</a></span><span class="op">(</span><span class="va">scn</span>, n <span class="op">=</span> <span class="fl">700</span>, looks <span class="op">=</span> <span class="va">looks</span>, test <span class="op">=</span> <span class="va">test</span>, followup <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>power <span class="op">=</span> <span class="va">pw12</span><span class="op">$</span><span class="va">power</span>, final_analysis <span class="op">=</span> <span class="va">pw12</span><span class="op">$</span><span class="va">study_duration</span>,</span>
 <span>  events <span class="op">=</span> <span class="va">pw12</span><span class="op">$</span><span class="va">events</span><span class="op">)</span></span>
@@ -398,8 +437,9 @@ at, after and before progression, the clocks of the post-progression
 intensities, and the censoring of PFS only.</li>
 <li>
 <code><a href="../articles/group-sequential.html">vignette("group-sequential")</a></code>: the timing of the
-analyses, the spending functions, the futility bounds and the
-approximations of the covariance of the statistics.</li>
+analyses, the spending functions, the futility bounds, the expected
+duration, events and sample size, the conditional power, the plots of a
+design and the approximations of the covariance of the statistics.</li>
 <li>
 <code><a href="../articles/two-endpoints.html">vignette("two-endpoints")</a></code>: PFS and OS tested together
 with a fixed-sequence or Bonferroni procedure, recycling of the level

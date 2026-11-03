@@ -11,11 +11,13 @@ and
 [`ms_test()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_test.md):
 when the analyses take place, how the efficacy and futility bounds are
 obtained, and which approximation of the distribution of the log-rank
-statistics is used. The scenario is the delayed treatment effect of the
-introductory article: the control group has exponential survival with a
-median of 12 months, the hazard ratio is 1 for 6 months and 0.65
-afterwards, and 700 patients are enrolled at 10 per month for 3 months
-and at 30 per month afterwards.
+statistics is used. It also shows the expected duration, events and
+sample size of a design that stops at its bounds, the conditional power
+at an interim analysis and the plots of a design. The scenario is the
+delayed treatment effect of the introductory article: the control group
+has exponential survival with a median of 12 months, the hazard ratio is
+1 for 6 months and 0.65 afterwards, and 700 patients are enrolled at 10
+per month for 3 months and at 30 per month afterwards.
 
 ``` r
 
@@ -146,6 +148,145 @@ estimated hazard ratio exceeds 1. Its power is 0.580, against 0.600
 without futility bounds: with a delayed effect, the early hazard ratio
 is close to 1, and the trial stops for futility at one of the interim
 analyses with probability 0.168.
+
+## Expected duration, events and sample size
+
+The power and the type I error do not depend on whether the trial stops
+at an interim analysis, but the duration of the trial and the numbers of
+events and enrolled patients do. For a design with one endpoint,
+[`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+and
+[`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)
+give in `expected` the expected values when the trial stops at the first
+bound that it crosses, under the design scenario and under the null
+scenario, and [`summary()`](https://rdrr.io/r/base/summary.html) prints
+them. For the design with the non-binding futility bounds by beta
+spending of the previous section:
+
+``` r
+
+des_nb <- fut$beta_nonbinding
+des_nb$expected
+#>   hypothesis prob_efficacy_early prob_futility_early study_duration   events
+#> 1     design         0.204438585          0.05449458       31.52549 387.3136
+#> 2       null         0.009649324          0.44062691       27.85223 353.7305
+#>   enrolled
+#> 1 693.2661
+#> 2 673.4042
+ex_d <- des_nb$expected[des_nb$expected$hypothesis == "design", ]
+ex_0 <- des_nb$expected[des_nb$expected$hypothesis == "null", ]
+```
+
+Under the design scenario the trial stops at an interim analysis for
+efficacy with probability 0.204 and for futility with probability 0.054,
+and its expected duration is 31.5 months, against 33.7 months to the
+final analysis. Under the null scenario the expected duration is 27.9
+months with 354 expected deaths. The trial is taken to stop also at the
+non-binding futility bounds, as in gsDesign; the expected values without
+stopping for futility are those of the same design with
+`futility = "none"`. The analysis times are those at which the expected
+events reach their targets, so that the variability of the analysis
+times is ignored, as in rpact and lrstat (see
+[`?ms_power`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md));
+[`vignette("validation")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/validation.md)
+compares the expected values with patient-level simulations.
+
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) draws the
+bounds of a design with one endpoint against the expected events or the
+calendar time (`x_axis = "time"`), on the scale of the statistic with
+its mean under the design scenario, of the hazard ratio (`scale = "hr"`)
+or of the nominal p-value (`scale = "p"`):
+
+``` r
+
+plot(des_nb, type = "bounds")
+```
+
+![Efficacy and futility bounds of the design on the scale of the
+standardized log-rank statistic against the expected deaths, with the
+mean of the statistic under the design
+scenario](group-sequential_files/figure-html/plot-bounds-1.png)
+
+With `type = "power"` it draws the cumulative probabilities of stopping
+for efficacy and for futility under the design scenario and the
+cumulative type I error:
+
+``` r
+
+plot(des_nb, type = "power", x_axis = "time")
+```
+
+![Cumulative probabilities of stopping for efficacy and for futility
+under the design scenario and cumulative type I error against calendar
+time](group-sequential_files/figure-html/plot-power-1.png)
+
+Each call returns the plotted values invisibly.
+
+## Conditional power at an interim analysis
+
+At an interim analysis,
+[`ms_cond_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_cond_power.md)
+gives the probability that the trial crosses an efficacy bound at a
+later analysis, given the observed statistic, before it crosses a
+futility bound (as `gsCP()` of gsDesign), and also the probability
+without the futility bounds of the later interim analyses. The
+distribution of the later statistics is chosen with `under`: the design
+scenario (`"design"`, the default), the null hypothesis (`"null"`, which
+gives the conditional type I error), the current trend (`"trend"`, a
+constant hazard ratio estimated from the observed statistic), a given
+hazard ratio (`"hr"`) or another scenario (`"scenario"`). With the
+statistic 1.5 observed at the first interim analysis of the design above
+(efficacy bound 2.963):
+
+``` r
+
+cp_trend <- ms_cond_power(des_nb, look = 1, z = 1.5, under = "trend")
+cp_trend
+#> Conditional power of a group sequential log-rank design
+#>   Observed at look 1: z = 1.5
+#>   Distribution: current trend (hazard ratio 0.813)
+#>   Conditional power: 0.5717
+#>   Without the futility bounds of the later interim looks: 0.5717
+#>  look  time events z_upper z_lower cond_mean cond_sd prob_upper prob_lower
+#>     2 26.54    315   2.359 -0.1784     1.837  0.5774     0.1830  0.0002406
+#>     3 33.66    420   2.014  2.0141     2.121  0.7071     0.3887  0.4280503
+#>  cum_upper
+#>     0.1830
+#>     0.5717
+```
+
+`"trend"` and `"hr"` assume proportional hazards, whereas `"design"` and
+`"scenario"` use the hazard ratio of a scenario over time, here 1 for 6
+months and 0.65 afterwards. A scenario with the hazard ratio 0.8 after 6
+months gives the conditional power if the late effect is smaller than
+planned:
+
+``` r
+
+scn_small <- ms_scenario(ms_model(death = lam, dropout = 0.003),
+                         ms_model(time = c(0, 6), death = c(lam, 0.8 * lam),
+                                  dropout = 0.003),
+                         accrual = ms_accrual(time = c(0, 3), rate = c(10, 30)))
+cp <- c(design = ms_cond_power(des_nb, look = 1, z = 1.5)$cond_power,
+        trend = cp_trend$cond_power,
+        hr_0.65 = ms_cond_power(des_nb, look = 1, z = 1.5, under = "hr",
+                                hr = 0.65)$cond_power,
+        scenario_0.8 = ms_cond_power(des_nb, look = 1, z = 1.5, under = "scenario",
+                                     scenario = scn_small)$cond_power,
+        null = ms_cond_power(des_nb, look = 1, z = 1.5, under = "null")$cond_power)
+round(cp, 3)
+#>       design        trend      hr_0.65 scenario_0.8         null 
+#>        0.803        0.572        0.963        0.418        0.097
+```
+
+The conditional power is 0.803 under the design scenario, 0.572 under
+the current trend (hazard ratio 0.813), 0.963 with the hazard ratio 0.65
+for the events after the interim analysis, and 0.418 if the hazard ratio
+after 6 months is 0.8. The bounds are those of the design: when the
+observed number of events differs from the planned one, the design is
+computed again with looks at the observed and the remaining planned
+events (see
+[`?ms_cond_power`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_cond_power.md)).
 
 ## The covariance of the statistics
 

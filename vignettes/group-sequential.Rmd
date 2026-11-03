@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6, fig.height = 4.5)
 ```
 
 ```{r setup}
@@ -24,7 +24,9 @@ f2s <- function(x) format(signif(x, 2), scientific = FALSE)
 This article describes the choices of `ms_looks()` and `ms_test()`: when the
 analyses take place, how the efficacy and futility bounds are obtained, and
 which approximation of the distribution of the log-rank statistics is used.
-The scenario is the delayed treatment effect of the introductory article:
+It also shows the expected duration, events and sample size of a design that
+stops at its bounds, the conditional power at an interim analysis and the
+plots of a design. The scenario is the delayed treatment effect of the introductory article:
 the control group has exponential survival with a median of 12 months, the
 hazard ratio is 1 for 6 months and 0.65 afterwards, and 700 patients are
 enrolled at 10 per month for 3 months and at 30 per month afterwards.
@@ -121,6 +123,105 @@ hazard ratio exceeds 1. Its power is `r f3(fut$fixed_hr$power)`, against
 hazard ratio is close to 1, and the trial stops for futility at one of the
 interim analyses with probability
 `r f3(sum(head(fut$fixed_hr$looks$prob_lower, -1)))`.
+
+## Expected duration, events and sample size
+
+The power and the type I error do not depend on whether the trial stops at
+an interim analysis, but the duration of the trial and the numbers of events
+and enrolled patients do. For a design with one endpoint, `ms_power()` and
+`ms_size()` give in `expected` the expected values when the trial stops at the
+first bound that it crosses, under the design scenario and under the null
+scenario, and `summary()` prints them. For the design with the non-binding
+futility bounds by beta spending of the previous section:
+
+```{r expected}
+des_nb <- fut$beta_nonbinding
+des_nb$expected
+ex_d <- des_nb$expected[des_nb$expected$hypothesis == "design", ]
+ex_0 <- des_nb$expected[des_nb$expected$hypothesis == "null", ]
+```
+
+Under the design scenario the trial stops at an interim analysis for
+efficacy with probability `r f3(ex_d$prob_efficacy_early)` and for futility
+with probability `r f3(ex_d$prob_futility_early)`, and its expected duration
+is `r round(ex_d$study_duration, 1)` months, against
+`r round(des_nb$study_duration, 1)` months to the final analysis. Under the
+null scenario the expected duration is `r round(ex_0$study_duration, 1)`
+months with `r round(ex_0$events)` expected deaths. The trial is taken to
+stop also at the non-binding futility bounds, as in gsDesign; the expected
+values without stopping for futility are those of the same design with
+`futility = "none"`. The analysis times are those at which the expected
+events reach their targets, so that the variability of the analysis times is
+ignored, as in rpact and lrstat (see `?ms_power`); `vignette("validation")`
+compares the expected values with patient-level simulations.
+
+`plot()` draws the bounds of a design with one endpoint against the expected
+events or the calendar time (`x_axis = "time"`), on the scale of the
+statistic with its mean under the design scenario, of the hazard ratio
+(`scale = "hr"`) or of the nominal p-value (`scale = "p"`):
+
+```{r plot-bounds, fig.alt = "Efficacy and futility bounds of the design on the scale of the standardized log-rank statistic against the expected deaths, with the mean of the statistic under the design scenario"}
+plot(des_nb, type = "bounds")
+```
+
+With `type = "power"` it draws the cumulative probabilities of stopping for
+efficacy and for futility under the design scenario and the cumulative type I
+error:
+
+```{r plot-power, fig.alt = "Cumulative probabilities of stopping for efficacy and for futility under the design scenario and cumulative type I error against calendar time"}
+plot(des_nb, type = "power", x_axis = "time")
+```
+
+Each call returns the plotted values invisibly.
+
+## Conditional power at an interim analysis
+
+At an interim analysis, `ms_cond_power()` gives the probability that the
+trial crosses an efficacy bound at a later analysis, given the observed
+statistic, before it crosses a futility bound (as `gsCP()` of gsDesign), and
+also the probability without the futility bounds of the later interim
+analyses. The distribution of the later statistics is chosen with `under`:
+the design scenario (`"design"`, the default), the null hypothesis
+(`"null"`, which gives the conditional type I error), the current trend
+(`"trend"`, a constant hazard ratio estimated from the observed statistic), a
+given hazard ratio (`"hr"`) or another scenario (`"scenario"`). With the
+statistic 1.5 observed at the first interim analysis of the design above
+(efficacy bound `r f3(des_nb$looks$z_upper[1])`):
+
+```{r cond-power}
+cp_trend <- ms_cond_power(des_nb, look = 1, z = 1.5, under = "trend")
+cp_trend
+```
+
+`"trend"` and `"hr"` assume proportional hazards, whereas `"design"` and
+`"scenario"` use the hazard ratio of a scenario over time, here 1 for 6
+months and 0.65 afterwards. A scenario with the hazard ratio 0.8 after 6
+months gives the conditional power if the late effect is smaller than
+planned:
+
+```{r cond-power-under}
+scn_small <- ms_scenario(ms_model(death = lam, dropout = 0.003),
+                         ms_model(time = c(0, 6), death = c(lam, 0.8 * lam),
+                                  dropout = 0.003),
+                         accrual = ms_accrual(time = c(0, 3), rate = c(10, 30)))
+cp <- c(design = ms_cond_power(des_nb, look = 1, z = 1.5)$cond_power,
+        trend = cp_trend$cond_power,
+        hr_0.65 = ms_cond_power(des_nb, look = 1, z = 1.5, under = "hr",
+                                hr = 0.65)$cond_power,
+        scenario_0.8 = ms_cond_power(des_nb, look = 1, z = 1.5, under = "scenario",
+                                     scenario = scn_small)$cond_power,
+        null = ms_cond_power(des_nb, look = 1, z = 1.5, under = "null")$cond_power)
+round(cp, 3)
+```
+
+The conditional power is `r f3(cp[["design"]])` under the design scenario,
+`r f3(cp[["trend"]])` under the current trend (hazard ratio
+`r f3(cp_trend$hr)`), `r f3(cp[["hr_0.65"]])` with the hazard ratio 0.65
+for the events after the interim analysis, and `r f3(cp[["scenario_0.8"]])` if the
+hazard ratio after 6 months is 0.8. The bounds are those of the design: when
+the observed number of events differs from the planned one, the design is
+computed again with looks at the observed and the remaining planned events
+(see `?ms_cond_power`).
 
 ## The covariance of the statistics
 

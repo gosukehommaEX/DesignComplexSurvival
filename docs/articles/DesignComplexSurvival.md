@@ -24,6 +24,11 @@ design with a single endpoint. The other articles are listed at the end.
   the familywise error rate.
 - The number of events, sample size, accrual duration or follow-up
   needed for a target power.
+- For a design with one endpoint, the expected study duration and the
+  expected numbers of events and enrolled patients when the trial stops
+  at its bounds, and the conditional power at an interim analysis.
+- Plots of the bounds, of the cumulative probabilities of stopping and
+  of the survival functions of the groups.
 
 The analyses can be driven by the events of progression-free survival
 (PFS) or overall survival (OS), take place at calendar times, or mix the
@@ -88,6 +93,8 @@ piecewise exponential by group, the same in all states, and
 | Two endpoints | PFS and OS by fixed sequence (two procedures) or Bonferroni, with recycling of the level after a rejection | supported |
 | Familywise error rate | under the global null hypothesis and under partial null scenarios given by the user | supported |
 | Solving for | number of events, sample size, accrual duration or follow-up | supported |
+| Expected values | study duration, events and enrolled patients when the trial stops at the bounds, under the design and null scenarios (one endpoint) | supported |
+| Conditional power | at an interim analysis, under the design scenario, the null hypothesis, the current trend, a hazard ratio or another scenario (one endpoint) | supported |
 | Approximations | mean of the statistic (two choices) and covariance (three choices) | supported |
 | Smooth hazards (Weibull), cure fractions, delays that vary between patients | piecewise constant approximation of the hazard of each group (one endpoint) | approximate |
 | Not covered | weighted log-rank tests, restricted mean survival time, stratification, non-inferiority and equivalence, a fixed follow-up for each patient, repeated switches back and forth, dropout that depends on the state, switching started by interim results, more than two groups | not supported |
@@ -182,6 +189,20 @@ The accrual ends at month 25.3. The final analysis needs 588 events and
 takes place at month 58.7. The type I error is 0.025 when the futility
 bounds are ignored.
 
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) with
+`type = "survival"` draws the survival functions of the two groups of
+the scenario up to the final analysis; PFS is drawn in addition to OS
+when the model of a group has progression:
+
+``` r
+
+plot(des, type = "survival")
+```
+
+![Overall survival functions of the control and treatment groups with
+the delayed treatment
+effect](DesignComplexSurvival_files/figure-html/delayed-survival-1.png)
+
 The mean of the standardized statistic can be computed directly from the
 hazards (the default, following Yung and Liu 2020) or with the
 approximation of Schoenfeld (1981), which uses the event-weighted
@@ -217,6 +238,14 @@ summary(des)
 #>            power type1_nonbinding    type1_binding 
 #>          0.90010          0.02500          0.02482 
 #> 
+#> Expected values when the trial stops at the bounds:
+#>  hypothesis prob_efficacy_early prob_futility_early study_duration events
+#>      design            0.526011             0.05449          44.33  489.6
+#>        null            0.009649             0.76522          34.27  428.7
+#>  enrolled
+#>       700
+#>       693
+#> 
 #> By look:
 #>  look  time enrolled events events_control events_treatment info_frac z_upper
 #>     1 25.45      700    294          156.3            137.7      0.50   2.963
@@ -237,6 +266,14 @@ as.data.frame(des)[, c("time", "events", "z_upper", "hr_upper", "z_lower",
 #> 2 35.50958    441 2.359018 0.7987811  0.7165938 0.52601131
 #> 3 58.66078    588 2.014084 0.8469456  2.0140837 0.90014124
 ```
+
+The summary also gives the expected study duration, events and enrolled
+patients when the trial stops at the bounds, under the design scenario
+and under the null scenario. `plot(des)` draws the bounds, and
+[`ms_cond_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_cond_power.md)
+gives the conditional power at an interim analysis; both are described
+in
+[`vignette("group-sequential")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/group-sequential.md).
 
 [`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
 evaluates a design with a given final number of events, a given
@@ -264,7 +301,9 @@ events, and the power is 0.707.
   only.
 - [`vignette("group-sequential")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/group-sequential.md):
   the timing of the analyses, the spending functions, the futility
-  bounds and the approximations of the covariance of the statistics.
+  bounds, the expected duration, events and sample size, the conditional
+  power, the plots of a design and the approximations of the covariance
+  of the statistics.
 - [`vignette("two-endpoints")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/two-endpoints.md):
   PFS and OS tested together with a fixed-sequence or Bonferroni
   procedure, recycling of the level and the familywise error rate.

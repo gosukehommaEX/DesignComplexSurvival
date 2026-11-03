@@ -1,5 +1,57 @@
 # Changelog
 
+## DesignComplexSurvival 0.4.0
+
+- [`ms_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_power.md)
+  and
+  [`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)
+  give, for a design with one endpoint, the expected study duration,
+  number of events and number of enrolled patients when the trial stops
+  at the bounds, under the design scenario and under the null scenario
+  (`expected`), the looks under the null scenario (`looks_null`), the
+  mean vector and covariance matrix of the statistics (`mean`, `sigma`,
+  `sigma_null`) and the event targets of the looks (`targets`). The
+  trial also stops at non-binding futility bounds, as in gsDesign.
+  [`summary()`](https://rdrr.io/r/base/summary.html) prints the expected
+  values. The other results are unchanged.
+- [`ms_cond_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_cond_power.md)
+  computes the conditional power at an interim look of a design with one
+  endpoint, given the observed statistic of the look (or the statistics
+  of the looks up to it), under the design scenario, the null hypothesis
+  (the conditional type I error), the current trend, a given hazard
+  ratio or a given scenario, with the futility bounds of the later
+  interim looks (as `gsCP()` of gsDesign) and without them.
+  [`print()`](https://rdrr.io/r/base/print.html) shows the result.
+- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) of an
+  `ms_power` object draws the bounds of a design with one endpoint on
+  the scale of the statistic, the hazard ratio or the nominal p-value,
+  the cumulative probabilities of stopping for efficacy and for futility
+  and the cumulative type I error, or the survival functions of OS and
+  PFS of the groups of the design scenario, with the colors of the
+  Okabe-Ito palette, and returns the plotted values. graphics and
+  grDevices are imported.
+- Reproduction (`inst/reproduce/`): the bounds, probabilities of
+  stopping, analysis times, numbers of failures and patients, expected
+  study durations and follow-up of the ECOG example of Kim and Tsiatis
+  (1990), and the conditional powers of Ortega-Villa et al. (2025).
+- Validation (`inst/validation/`): the expected values and the
+  probabilities of stopping are compared with
+  [`rpact::getPowerSurvival()`](https://docs.rpact.org/reference/getPowerSurvival.html),
+  [`lrstat::lrpower()`](https://kaifenglu.github.io/lrstat/reference/lrpower.html),
+  [`gsDesign::gsProbability()`](https://keaven.github.io/gsDesign//reference/gsProbability.html),
+  the examples printed in the rpact vignette and a patient-level
+  simulation (`python/simulate_expected.py`), and the conditional power
+  with
+  [`gsDesign::gsCP()`](https://keaven.github.io/gsDesign//reference/gsCP.html)
+  and the example printed in the gsDesign vignette.
+- Documentation:
+  [`vignette("group-sequential")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/group-sequential.md)
+  describes the expected values, the conditional power and the plots,
+  the introductory vignette plots the survival functions of a design,
+  and
+  [`vignette("validation")`](https://gosukehommaEX.github.io/DesignComplexSurvival/articles/validation.md)
+  lists the new comparisons.
+
 ## DesignComplexSurvival 0.3.3
 
 - Documentation: the introductory vignette gives an overview of the

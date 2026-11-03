@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,8 +72,10 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>summary.ms_power</code>: a list with the
   design overview (<code>overview</code>), the per-look table (<code>looks</code>) and
-  the settings (<code>settings</code>); for two endpoints also the familywise
-  error rates (<code>fwer</code>).</p>
+  the settings (<code>settings</code>); for one endpoint also the expected values
+  when the trial stops at the bounds (<code>expected</code>, see
+  <code><a href="ms_power.html">ms_power</a></code>), and for two endpoints the familywise error rates
+  (<code>fwer</code>).</p>
     </div>
 
     <div class="section level2">
@@ -93,6 +95,14 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>         400.0000          20.0000          39.6700         300.0000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            power type1_nonbinding    type1_binding </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           0.8689           0.0250           0.0250 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Expected values when the trial stops at the bounds:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  hypothesis prob_efficacy_early prob_futility_early study_duration events</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      design            0.215806                   0          35.52  267.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        null            0.001525                   0          34.93  299.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  enrolled</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       400</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       400</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> By look:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  look  time enrolled events events_control events_treatment info_frac z_upper</span>

@@ -23,6 +23,20 @@
   and PFS of the groups of the design scenario, with the colors of the
   Okabe-Ito palette, and returns the plotted values. graphics and grDevices
   are imported.
+* Reproduction (`inst/reproduce/`): the bounds, probabilities of stopping,
+  analysis times, numbers of failures and patients, expected study durations
+  and follow-up of the ECOG example of Kim and Tsiatis (1990), and the
+  conditional powers of Ortega-Villa et al. (2025).
+* Validation (`inst/validation/`): the expected values and the probabilities
+  of stopping are compared with `rpact::getPowerSurvival()`,
+  `lrstat::lrpower()`, `gsDesign::gsProbability()`, the examples printed in
+  the rpact vignette and a patient-level simulation
+  (`python/simulate_expected.py`), and the conditional power with
+  `gsDesign::gsCP()` and the example printed in the gsDesign vignette.
+* Documentation: `vignette("group-sequential")` describes the expected
+  values, the conditional power and the plots, the introductory vignette
+  plots the survival functions of a design, and `vignette("validation")`
+  lists the new comparisons.
 
 # DesignComplexSurvival 0.3.3
 

@@ -18,7 +18,7 @@
 #    finds its analysis times to about 2e-4 and takes the correlations of the
 #    statistics from the event fractions, whereas variance = "null" takes
 #    them from the information under the design scenario (stopping
-#    probabilities differ by about 1.2e-5 under the hazard ratio 0.7; see
+#    probabilities differ by 1e-5 to 2e-5 under the hazard ratio 0.7; see
 #    tests/testthat/test-ms_power.R). Variant "package": the values of the
 #    package (analysis times abs:5e-4, stopping probabilities abs:5e-5,
 #    expected events and patients abs:2e-3, expected study duration
@@ -68,10 +68,9 @@
 #    probabilities. Under the null scenario both use the correlations of the
 #    events (abs:1e-6 for the probabilities, abs:1e-4 for the events); under
 #    the design scenario the package uses those of the information
-#    (abs:2e-4 and abs:5e-2, above the differences of about 7e-5 and 0.01
-#    that the reference implementation gives for P1), and the variant
-#    "events_corr" those of the
-#    events (abs:1e-6 and abs:1e-4).
+#    (abs:5e-4 and abs:5e-2, above the differences of up to 2e-4 for the
+#    probabilities, at the third look of P2, and 0.01 for the events), and
+#    the variant "events_corr" those of the events (abs:1e-6 and abs:1e-4).
 # 5. Simulation (source "python_expected"; python/simulate_expected.py,
 #    results/sim_python_expected.csv): designs E1-E3 defined here and,
 #    independently, in Python. Judged (4se_p): the probabilities of stopping
@@ -364,7 +363,7 @@ compare_expected_gsdesign <- function(rw) {
       pr <- gs_prob(lk$z_lower, lk$z_upper, if (j == 1) 0 else res$mean,
                     val_corr_events(lk$events))
       ev <- val_expected_from(pr$prob_upper, pr$prob_lower, lk$time, lk$events, lk$enrolled)
-      tol_p <- if (j == 1) "abs:1e-6" else "abs:2e-4"
+      tol_p <- if (j == 1) "abs:1e-6" else "abs:5e-4"
       tol_e <- if (j == 1) "abs:1e-4" else "abs:5e-2"
       for (k in 1:3) {
         rw$emit("gsdesign_expected", nm, h, "event", k, NA_real_, "stop_efficacy", "package",

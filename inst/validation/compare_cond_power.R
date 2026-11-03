@@ -10,7 +10,7 @@
 # ratio hr to theta = -log(hr) sqrt(p0 p1). Under "design" the package takes
 # the correlations from the information under the design scenario
 # (variance = "null"), which differ from the event fractions when the hazard
-# ratio is not 1, so that these rows are INFO (differences of about 1e-3).
+# ratio is not 1, so that these rows are INFO (differences of 2e-4 to 6e-3).
 #
 # 1. The design of the gsDesign vignette "Conditional power and conditional
 #    error" (source "gsdesign_vignette"): gsSurv(hr = 0.7, lambdaC =

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,18 @@
       <small>Source: <a href="https://github.com/gosukehommaEX/DesignComplexSurvival/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="designcomplexsurvival-040">DesignComplexSurvival 0.4.0<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-040"></a></h2>
+<ul><li>
+<code><a href="../reference/ms_power.html">ms_power()</a></code> and <code><a href="../reference/ms_size.html">ms_size()</a></code> give, for a design with one endpoint, the expected study duration, number of events and number of enrolled patients when the trial stops at the bounds, under the design scenario and under the null scenario (<code>expected</code>), the looks under the null scenario (<code>looks_null</code>), the mean vector and covariance matrix of the statistics (<code>mean</code>, <code>sigma</code>, <code>sigma_null</code>) and the event targets of the looks (<code>targets</code>). The trial also stops at non-binding futility bounds, as in gsDesign. <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints the expected values. The other results are unchanged.</li>
+<li>
+<code><a href="../reference/ms_cond_power.html">ms_cond_power()</a></code> computes the conditional power at an interim look of a design with one endpoint, given the observed statistic of the look (or the statistics of the looks up to it), under the design scenario, the null hypothesis (the conditional type I error), the current trend, a given hazard ratio or a given scenario, with the futility bounds of the later interim looks (as <code>gsCP()</code> of gsDesign) and without them. <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows the result.</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> of an <code>ms_power</code> object draws the bounds of a design with one endpoint on the scale of the statistic, the hazard ratio or the nominal p-value, the cumulative probabilities of stopping for efficacy and for futility and the cumulative type I error, or the survival functions of OS and PFS of the groups of the design scenario, with the colors of the Okabe-Ito palette, and returns the plotted values. graphics and grDevices are imported.</li>
+<li>Reproduction (<code>inst/reproduce/</code>): the bounds, probabilities of stopping, analysis times, numbers of failures and patients, expected study durations and follow-up of the ECOG example of Kim and Tsiatis (1990), and the conditional powers of Ortega-Villa et al. (2025).</li>
+<li>Validation (<code>inst/validation/</code>): the expected values and the probabilities of stopping are compared with <code><a href="https://docs.rpact.org/reference/getPowerSurvival.html" class="external-link">rpact::getPowerSurvival()</a></code>, <code><a href="https://kaifenglu.github.io/lrstat/reference/lrpower.html" class="external-link">lrstat::lrpower()</a></code>, <code><a href="https://keaven.github.io/gsDesign//reference/gsProbability.html" class="external-link">gsDesign::gsProbability()</a></code>, the examples printed in the rpact vignette and a patient-level simulation (<code>python/simulate_expected.py</code>), and the conditional power with <code><a href="https://keaven.github.io/gsDesign//reference/gsCP.html" class="external-link">gsDesign::gsCP()</a></code> and the example printed in the gsDesign vignette.</li>
+<li>Documentation: <code><a href="../articles/group-sequential.html">vignette("group-sequential")</a></code> describes the expected values, the conditional power and the plots, the introductory vignette plots the survival functions of a design, and <code><a href="../articles/validation.html">vignette("validation")</a></code> lists the new comparisons.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.3" id="designcomplexsurvival-033">DesignComplexSurvival 0.3.3<a class="anchor" aria-label="anchor" href="#designcomplexsurvival-033"></a></h2>
 <ul><li>Documentation: the introductory vignette gives an overview of the model and of what can be specified, with a diagram of the states, and covers the workflow of a design with one endpoint; five new vignettes describe the multistate model and treatment switching, group sequential designs and the covariance of the statistics, PFS and OS tested together, switching from a calendar time, and the validation of the package. The pkgdown site lists them under Articles.</li>

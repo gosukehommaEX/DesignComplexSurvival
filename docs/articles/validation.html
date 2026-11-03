@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,11 +84,15 @@ with an independent Python implementation
 adaptive quadrature) and, when the packages are installed, with
 gsDesign, gsDesign2, rpact and lrstat;</li>
 <li>the scripts in <code>inst/reproduce/</code> recompute sample sizes,
-numbers of events, analysis times, bounds and powers printed in articles
-and a statistical analysis plan;</li>
+numbers of events, analysis times, bounds, powers, expected study
+durations and conditional powers printed in articles and a statistical
+analysis plan;</li>
 <li>the scripts in <code>inst/validation/</code> compare the package
 with patient-level simulations, with the package PWEALL and with the
-decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code>.</li>
+decisions of <code><a href="https://kaifenglu.github.io/lrstat/reference/fseqbon.html" class="external-link">lrstat::fseqbon()</a></code>, and the expected values
+when the trial stops at the bounds and the conditional power with rpact,
+lrstat and gsDesign and with the examples printed in the vignettes of
+rpact and gsDesign.</li>
 </ul>
 <p>The last two folders are run by their <code>run_all.R</code>, which
 judges every value as PASS (the criterion is met), EXPLAINED (the
@@ -113,7 +117,7 @@ the package, and this article reads them:</p>
 <div class="section level2">
 <h2 id="reproduction-of-published-results">Reproduction of published results<a class="anchor" aria-label="anchor" href="#reproduction-of-published-results"></a>
 </h2>
-<p>The scripts recompute 527 printed values from 16 sources. Each value
+<p>The scripts recompute 780 printed values from 18 sources. Each value
 has a criterion that reflects the rounding of the printed value, for
 example rounding up for a sample size or agreement to the printed digits
 for a power.</p>
@@ -154,6 +158,14 @@ for a power.</p>
 <td align="right">23</td>
 </tr>
 <tr class="even">
+<td align="left">KimTsiatis1990</td>
+<td align="right">223</td>
+<td align="right">12</td>
+<td align="right">0</td>
+<td align="right">12</td>
+<td align="right">247</td>
+</tr>
+<tr class="odd">
 <td align="left">Lakatos1988</td>
 <td align="right">2</td>
 <td align="right">0</td>
@@ -161,7 +173,7 @@ for a power.</p>
 <td align="right">16</td>
 <td align="right">18</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Lakatos2002</td>
 <td align="right">0</td>
 <td align="right">0</td>
@@ -169,7 +181,7 @@ for a power.</p>
 <td align="right">16</td>
 <td align="right">16</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Lu2021</td>
 <td align="right">19</td>
 <td align="right">1</td>
@@ -177,7 +189,7 @@ for a power.</p>
 <td align="right">24</td>
 <td align="right">44</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Luo2019</td>
 <td align="right">29</td>
 <td align="right">15</td>
@@ -185,13 +197,21 @@ for a power.</p>
 <td align="right">4</td>
 <td align="right">48</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">MaurerBretz2013</td>
 <td align="right">11</td>
 <td align="right">4</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">15</td>
+</tr>
+<tr class="even">
+<td align="left">OrtegaVilla2025</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">6</td>
 </tr>
 <tr class="odd">
 <td align="left">Porcher2002</td>
@@ -259,10 +279,20 @@ for a power.</p>
 </tr>
 </tbody>
 </table>
-<p>In total 257 values pass, 79 are explained, 0 fail and 191 are not
+<p>In total 485 values pass, 91 are explained, 0 fail and 204 are not
 judged. The sources, criteria and registered explanations are listed in
 the <code>README.md</code> and <code>explained.csv</code> of
 <code>inst/reproduce/</code>.</p>
+<p>The expected study durations, numbers of failures and patients and
+the probabilities of stopping of Kim and Tsiatis (1990) are computed
+with the conventions of the article (for both hypotheses the analysis
+times found under the null hypothesis, and the correlations of the
+statistics from the information times) from the bounds, means, analysis
+times and expected events of the package; the expected values of
+<code><a href="../reference/ms_power.html">ms_power()</a></code>, which use under each hypothesis its own
+analysis times and the correlations of the information, are given next
+to them as INFO rows. The conditional powers of Ortega-Villa et
+al. (2025) are those of <code><a href="../reference/ms_cond_power.html">ms_cond_power()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="comparison-with-simulations-and-other-software">Comparison with simulations and other software<a class="anchor" aria-label="anchor" href="#comparison-with-simulations-and-other-software"></a>
@@ -274,26 +304,34 @@ the <code>README.md</code> and <code>explained.csv</code> of
 <span>            python_calendar <span class="op">=</span> <span class="st">"Python simulation, switching from a calendar time"</span>,</span>
 <span>            danzer <span class="op">=</span> <span class="st">"Estimator of Danzer et al. (2025)"</span>,</span>
 <span>            pweall <span class="op">=</span> <span class="st">"PWEALL"</span>,</span>
-<span>            lrstat_fseqbon <span class="op">=</span> <span class="st">"lrstat::fseqbon()"</span><span class="op">)</span></span>
+<span>            lrstat_fseqbon <span class="op">=</span> <span class="st">"lrstat::fseqbon()"</span>,</span>
+<span>            rpact <span class="op">=</span> <span class="st">"rpact::getPowerSurvival(), expected values"</span>,</span>
+<span>            rpact_vignette <span class="op">=</span> <span class="st">"Values printed in the rpact vignette"</span>,</span>
+<span>            lrstat_expected <span class="op">=</span> <span class="st">"lrstat::lrpower(), expected values"</span>,</span>
+<span>            gsdesign_expected <span class="op">=</span> <span class="st">"gsDesign::gsProbability(), expected values"</span>,</span>
+<span>            python_expected <span class="op">=</span> <span class="st">"Python simulation, expected values"</span>,</span>
+<span>            gsdesign_cp <span class="op">=</span> <span class="st">"gsDesign::gsCP(), conditional power"</span>,</span>
+<span>            gsdesign_vignette <span class="op">=</span> <span class="st">"Values printed in the gsDesign vignette"</span><span class="op">)</span></span>
 <span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu">count</span><span class="op">(</span><span class="va">vd</span>, <span class="st">"source"</span><span class="op">)</span></span>
 <span><span class="va">n_scen</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">vd</span><span class="op">$</span><span class="va">scenario</span>, <span class="va">vd</span><span class="op">$</span><span class="va">source</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>Route <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">labels</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span>,</span>
 <span>                            <span class="va">labels</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>             Scenarios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">n_scen</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>, <span class="va">tab</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tab</span><span class="op">)</span> <span class="op">==</span> <span class="st">"Scenarios"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"Scenarios or designs"</span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">tab</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="54%">
-<col width="10%">
+<col width="49%">
+<col width="20%">
+<col width="4%">
+<col width="9%">
+<col width="4%">
+<col width="4%">
 <col width="5%">
-<col width="10%">
-<col width="5%">
-<col width="5%">
-<col width="6%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Route</th>
-<th align="right">Scenarios</th>
+<th align="right">Scenarios or designs</th>
 <th align="right">PASS</th>
 <th align="right">EXPLAINED</th>
 <th align="right">FAIL</th>
@@ -318,6 +356,42 @@ the <code>README.md</code> and <code>explained.csv</code> of
 <td align="right">0</td>
 <td align="right">448</td>
 <td align="right">748</td>
+</tr>
+<tr class="odd">
+<td align="left">gsDesign::gsCP(), conditional power</td>
+<td align="right">3</td>
+<td align="right">72</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">16</td>
+<td align="right">88</td>
+</tr>
+<tr class="even">
+<td align="left">gsDesign::gsProbability(), expected values</td>
+<td align="right">2</td>
+<td align="right">32</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">32</td>
+</tr>
+<tr class="odd">
+<td align="left">Values printed in the gsDesign vignette</td>
+<td align="right">1</td>
+<td align="right">29</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">lrstat::lrpower(), expected values</td>
+<td align="right">4</td>
+<td align="right">64</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">64</td>
 </tr>
 <tr class="odd">
 <td align="left">lrstat::fseqbon()</td>
@@ -356,6 +430,15 @@ the <code>README.md</code> and <code>explained.csv</code> of
 <td align="right">222</td>
 </tr>
 <tr class="odd">
+<td align="left">Python simulation, expected values</td>
+<td align="right">3</td>
+<td align="right">70</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">72</td>
+<td align="right">144</td>
+</tr>
+<tr class="even">
 <td align="left">Python simulation, PFS and OS together</td>
 <td align="right">6</td>
 <td align="right">174</td>
@@ -364,20 +447,40 @@ the <code>README.md</code> and <code>explained.csv</code> of
 <td align="right">872</td>
 <td align="right">1046</td>
 </tr>
+<tr class="odd">
+<td align="left">rpact::getPowerSurvival(), expected values</td>
+<td align="right">3</td>
+<td align="right">115</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">115</td>
+</tr>
+<tr class="even">
+<td align="left">Values printed in the rpact vignette</td>
+<td align="right">2</td>
+<td align="right">27</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">28</td>
+</tr>
 </tbody>
 </table>
 <p>The quantities with exact counterparts in the package (expected
 numbers of events and dropouts by group at calendar times, state
 occupation probabilities, survival functions, bounds, the per-patient
-covariances of the statistics, and the quantities of PWEALL and lrstat)
-are judged. The criteria are <code>4se</code> (within 4 Monte Carlo
-standard errors), <code>4se_p</code> (within 4 standard errors computed
-from the package value), and <code>abs:x</code> or <code>rel:x</code>
-(absolute or relative difference at most x):</p>
+covariances of the statistics, the quantities of PWEALL, lrstat, rpact
+and gsDesign, the values printed in their vignettes, and the expected
+values and probabilities of stopping of the simulations) are judged. The
+criteria are <code>4se</code> (within 4 Monte Carlo standard errors),
+<code>4se_p</code> (within 4 standard errors computed from the package
+value), and <code>abs:x</code> or <code>rel:x</code> (absolute or
+relative difference at most x):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">judged</span> <span class="op">&lt;-</span> <span class="va">vd</span><span class="op">[</span><span class="va">vd</span><span class="op">$</span><span class="va">judgement</span> <span class="op">!=</span> <span class="st">"INFO"</span>, <span class="op">]</span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>criterion <span class="op">=</span> <span class="va">judged</span><span class="op">$</span><span class="va">criterion</span>,</span>
-<span>                                 judgement <span class="op">=</span> <span class="va">judged</span><span class="op">$</span><span class="va">judgement</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">crit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>criterion <span class="op">=</span> <span class="va">judged</span><span class="op">$</span><span class="va">criterion</span>, judgement <span class="op">=</span> <span class="va">judged</span><span class="op">$</span><span class="va">judgement</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">crit</span><span class="op">[</span><span class="va">crit</span><span class="op">$</span><span class="va">Freq</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="op">]</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">criterion</th>
@@ -387,33 +490,103 @@ from the package value), and <code>abs:x</code> or <code>rel:x</code>
 <tbody>
 <tr class="odd">
 <td align="left">4se</td>
+<td align="left">EXPLAINED</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">abs:0.00005</td>
+<td align="left">EXPLAINED</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">4se</td>
 <td align="left">PASS</td>
-<td align="right">396</td>
+<td align="right">412</td>
 </tr>
 <tr class="even">
 <td align="left">4se_p</td>
 <td align="left">PASS</td>
-<td align="right">568</td>
+<td align="right">606</td>
 </tr>
 <tr class="odd">
+<td align="left">abs:0.00000005</td>
+<td align="left">PASS</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">abs:0.00005</td>
+<td align="left">PASS</td>
+<td align="right">14</td>
+</tr>
+<tr class="odd">
+<td align="left">abs:0.0005</td>
+<td align="left">PASS</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
 <td align="left">abs:0.002</td>
 <td align="left">PASS</td>
 <td align="right">46</td>
 </tr>
-<tr class="even">
-<td align="left">abs:1e-4</td>
+<tr class="odd">
+<td align="left">abs:0.005</td>
 <td align="left">PASS</td>
-<td align="right">12</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">abs:0.05</td>
+<td align="left">PASS</td>
+<td align="right">6</td>
 </tr>
 <tr class="odd">
-<td align="left">abs:1e-5</td>
+<td align="left">abs:0.5</td>
 <td align="left">PASS</td>
-<td align="right">22</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
+<td align="left">abs:1e-10</td>
+<td align="left">PASS</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">abs:1e-4</td>
+<td align="left">PASS</td>
+<td align="right">58</td>
+</tr>
+<tr class="even">
+<td align="left">abs:1e-5</td>
+<td align="left">PASS</td>
+<td align="right">131</td>
+</tr>
+<tr class="odd">
 <td align="left">abs:1e-6</td>
 <td align="left">PASS</td>
-<td align="right">146</td>
+<td align="right">204</td>
+</tr>
+<tr class="even">
+<td align="left">abs:1e-7</td>
+<td align="left">PASS</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">abs:2e-3</td>
+<td align="left">PASS</td>
+<td align="right">18</td>
+</tr>
+<tr class="even">
+<td align="left">abs:5e-2</td>
+<td align="left">PASS</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
+<td align="left">abs:5e-4</td>
+<td align="left">PASS</td>
+<td align="right">42</td>
+</tr>
+<tr class="even">
+<td align="left">abs:5e-5</td>
+<td align="left">PASS</td>
+<td align="right">26</td>
 </tr>
 <tr class="odd">
 <td align="left">rel:0.002</td>
@@ -421,13 +594,18 @@ from the package value), and <code>abs:x</code> or <code>rel:x</code>
 <td align="right">115</td>
 </tr>
 <tr class="even">
+<td align="left">rel:1e-5</td>
+<td align="left">PASS</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
 <td align="left">rel:1e-6</td>
 <td align="left">PASS</td>
 <td align="right">12</td>
 </tr>
 </tbody>
 </table>
-<p>In total 1,317 values pass and 0 fail.</p>
+<p>In total 1,726 values pass, 3 are explained and 0 fail.</p>
 <p>The mean, standard deviation and correlation of the log-rank
 statistics, the power and the type I error are asymptotic approximations
 and are recorded as INFO with the difference in units of the standard
@@ -437,8 +615,8 @@ error:</p>
 <span><span class="va">z</span> <span class="op">&lt;-</span> <span class="va">info</span><span class="op">$</span><span class="va">diff</span> <span class="op">/</span> <span class="va">info</span><span class="op">$</span><span class="va">se_used</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">z</span>, breaks <span class="op">=</span> <span class="fl">40</span>, main <span class="op">=</span> <span class="st">""</span>, xlab <span class="op">=</span> <span class="st">"(simulation - package) / standard error"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="validation_files/figure-html/info-z-1.png" class="r-plt" alt="Histogram of the differences between the package and the simulations in standard errors for the rows that are not judged" width="576"></p>
-<p>Of the 2,084 INFO rows with a standard error, 1,672 are within 2
-standard errors and 82 differ by more than 4. These rows, by quantity
+<p>Of the 2,102 INFO rows with a standard error, 1,679 are within 2
+standard errors and 86 differ by more than 4. These rows, by quantity
 and by the approximation compared (column <code>variant</code>), and the
 ten largest differences:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -446,12 +624,16 @@ ten largest differences:</p>
 <span><span class="va">big</span><span class="op">$</span><span class="va">variant</span><span class="op">[</span><span class="va">big</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="st">""</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"(none)"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>quantity <span class="op">=</span> <span class="va">big</span><span class="op">$</span><span class="va">quantity</span><span class="op">)</span></span>
 <span><span class="co">#&gt; quantity</span></span>
-<span><span class="co">#&gt;   dropouts     events     reject reject_any       time          z     z_corr </span></span>
-<span><span class="co">#&gt;          2         14          1          1          4         45         15</span></span>
+<span><span class="co">#&gt;         dropouts enrolled_at_look           events        look_time </span></span>
+<span><span class="co">#&gt;                2                2               14                2 </span></span>
+<span><span class="co">#&gt;           reject       reject_any             time                z </span></span>
+<span><span class="co">#&gt;                1                1                4               45 </span></span>
+<span><span class="co">#&gt;           z_corr </span></span>
+<span><span class="co">#&gt;               15</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>variant <span class="op">=</span> <span class="va">big</span><span class="op">$</span><span class="va">variant</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; variant</span></span>
 <span><span class="co">#&gt;       sd;variance=alternative                        (none) </span></span>
-<span><span class="co">#&gt;                            29                            18 </span></span>
+<span><span class="co">#&gt;                            29                            22 </span></span>
 <span><span class="co">#&gt;               mean=schoenfeld                 variance=null </span></span>
 <span><span class="co">#&gt;                            14                            10 </span></span>
 <span><span class="co">#&gt;          variance=alternative     at the expected look time </span></span>
@@ -463,36 +645,65 @@ ten largest differences:</p>
 <span><span class="va">big</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="va">big</span><span class="op">$</span><span class="va">diff</span> <span class="op">/</span> <span class="va">big</span><span class="op">$</span><span class="va">se_used</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">big</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">big</span><span class="op">$</span><span class="va">z</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"source"</span>, <span class="st">"scenario"</span>, <span class="st">"hypothesis"</span>, <span class="st">"quantity"</span>,</span>
 <span>                               <span class="st">"endpoint"</span>, <span class="st">"variant"</span>, <span class="st">"simulated"</span>, <span class="st">"package"</span>, <span class="st">"z"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt;            source scenario  hypothesis   quantity endpoint</span></span>
-<span><span class="co">#&gt; 1248 fastsurvival       V2 alternative          z       os</span></span>
-<span><span class="co">#&gt; 958        python      V10 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 1230 fastsurvival       V2 alternative          z       os</span></span>
-<span><span class="co">#&gt; 1907   python_two       V3 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 1346 fastsurvival       V3 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 1260 fastsurvival       V2 alternative reject_any       os</span></span>
-<span><span class="co">#&gt; 732        python       V9 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 1380 fastsurvival       V3 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 292        python       V7 alternative          z      pfs</span></span>
-<span><span class="co">#&gt; 66         python       V6 alternative          z      pfs</span></span>
-<span><span class="co">#&gt;                            variant simulated   package         z</span></span>
-<span><span class="co">#&gt; 1248               mean=schoenfeld 1.4264613 1.3513964 10.381964</span></span>
-<span><span class="co">#&gt; 958        sd;variance=alternative 1.0083516 0.9573579 10.114019</span></span>
-<span><span class="co">#&gt; 1230               mean=schoenfeld 1.1849950 1.1163385  9.654073</span></span>
-<span><span class="co">#&gt; 1907       sd;variance=alternative 0.9970766 0.9493231  9.578462</span></span>
-<span><span class="co">#&gt; 1346       sd;variance=alternative 0.9938818 0.9464569  9.543124</span></span>
-<span><span class="co">#&gt; 1260 mean=schoenfeld;variance=null 0.2990000 0.2686105  9.387361</span></span>
-<span><span class="co">#&gt; 732        sd;variance=alternative 1.0039841 0.9577295  9.213971</span></span>
-<span><span class="co">#&gt; 1380       sd;variance=alternative 0.9950837 0.9493231  9.197109</span></span>
-<span><span class="co">#&gt; 292        sd;variance=alternative 1.0023645 0.9579162  8.868467</span></span>
-<span><span class="co">#&gt; 66         sd;variance=alternative 1.0014083 0.9572628  8.816463</span></span></code></pre></div>
+<span><span class="co">#&gt;               source scenario  hypothesis         quantity endpoint</span></span>
+<span><span class="co">#&gt; 3697 python_expected       E1 alternative enrolled_at_look       os</span></span>
+<span><span class="co">#&gt; 3723 python_expected       E1        null enrolled_at_look       os</span></span>
+<span><span class="co">#&gt; 1248    fastsurvival       V2 alternative                z       os</span></span>
+<span><span class="co">#&gt; 958           python      V10 alternative                z      pfs</span></span>
+<span><span class="co">#&gt; 1230    fastsurvival       V2 alternative                z       os</span></span>
+<span><span class="co">#&gt; 1907      python_two       V3 alternative                z      pfs</span></span>
+<span><span class="co">#&gt; 1346    fastsurvival       V3 alternative                z      pfs</span></span>
+<span><span class="co">#&gt; 1260    fastsurvival       V2 alternative       reject_any       os</span></span>
+<span><span class="co">#&gt; 732           python       V9 alternative                z      pfs</span></span>
+<span><span class="co">#&gt; 1380    fastsurvival       V3 alternative                z      pfs</span></span>
+<span><span class="co">#&gt;                            variant   simulated     package          z</span></span>
+<span><span class="co">#&gt; 3697                        (none) 398.7106500 400.0000000 -45.073428</span></span>
+<span><span class="co">#&gt; 3723                        (none) 385.4789500 387.0634114 -18.151801</span></span>
+<span><span class="co">#&gt; 1248               mean=schoenfeld   1.4264613   1.3513964  10.381964</span></span>
+<span><span class="co">#&gt; 958        sd;variance=alternative   1.0083516   0.9573579  10.114019</span></span>
+<span><span class="co">#&gt; 1230               mean=schoenfeld   1.1849950   1.1163385   9.654073</span></span>
+<span><span class="co">#&gt; 1907       sd;variance=alternative   0.9970766   0.9493231   9.578462</span></span>
+<span><span class="co">#&gt; 1346       sd;variance=alternative   0.9938818   0.9464569   9.543124</span></span>
+<span><span class="co">#&gt; 1260 mean=schoenfeld;variance=null   0.2990000   0.2686105   9.387361</span></span>
+<span><span class="co">#&gt; 732        sd;variance=alternative   1.0039841   0.9577295   9.213971</span></span>
+<span><span class="co">#&gt; 1380       sd;variance=alternative   0.9950837   0.9493231   9.197109</span></span></code></pre></div>
 <p>The standard deviation of the statistic with
 <code>variance = "alternative"</code> does not include the variability
 of the estimated variance (see
 <code><a href="../articles/group-sequential.html">vignette("group-sequential")</a></code>), and the Schoenfeld
 approximation of the mean (<code>mean = "schoenfeld"</code>) is less
 accurate when the hazard ratio changes over time, as in V2 (see the
-introductory article,
-<code><a href="../articles/DesignComplexSurvival.html">vignette("DesignComplexSurvival")</a></code>).</p>
+introductory article, <code><a href="../articles/DesignComplexSurvival.html">vignette("DesignComplexSurvival")</a></code>).
+The numbers of enrolled patients at the first look of the simulated
+design E1 (source <code>python_expected</code>) differ for the reason
+given in the next section.</p>
+</div>
+<div class="section level2">
+<h2 id="expected-values-and-conditional-power">Expected values and conditional power<a class="anchor" aria-label="anchor" href="#expected-values-and-conditional-power"></a>
+</h2>
+<p>Under the design scenario, <code>variance = "null"</code> takes the
+correlations of the statistics from the information, whereas rpact and
+gsDesign take them from the event fractions. The stopping probabilities
+of the package are therefore compared with rpact and
+<code><a href="https://keaven.github.io/gsDesign//reference/gsProbability.html" class="external-link">gsDesign::gsProbability()</a></code> with tolerances above the
+differences that this causes, and the probabilities recomputed from the
+bounds and means of the package with the correlations of the event
+fractions are compared at 1e-6, which checks the definitions. The
+conditional powers under the design scenario are INFO rows, and those
+under the null hypothesis, the current trend and a hazard ratio, which
+use the correlations of the events, are compared with
+<code>gsCP()</code> at 1e-5. The values printed in the rpact vignette
+are recomputed with the correlations of the event fractions, as rpact
+computes them, and the conditional powers printed in the gsDesign
+vignette with the futility bounds of gsDesign. The explained values are
+the expected numbers of enrolled patients of the simulated design E1,
+whose first analysis is expected close to the end of accrual, so that
+the variability of its time lowers the simulated mean number of enrolled
+patients, which the package ignores, and the futility bound by beta
+spending of the gsDesign vignette at the second analysis, which gsDesign
+computes with the correlations of the event fractions. The designs and
+tolerances are listed in the <code>README.md</code> of
+<code>inst/validation/</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="type-i-error-with-unequal-allocation">Type I error with unequal allocation<a class="anchor" aria-label="anchor" href="#type-i-error-with-unequal-allocation"></a>
@@ -507,12 +718,12 @@ events (see the last section of
 <div class="section level2">
 <h2 id="rerunning-the-checks">Rerunning the checks<a class="anchor" aria-label="anchor" href="#rerunning-the-checks"></a>
 </h2>
-<p>FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to
-rerun <code>inst/validation/</code>. The <code>README.md</code> of each
-folder describes how to run the scripts, the criteria and the files.
-Every compared value is listed with its judgment in
-<code>results/summary.csv</code>, and <code>results/summary.md</code>
-summarizes the results.</p>
+<p>FastSurvival and PWEALL are needed only to rerun
+<code>inst/validation/</code>, which also uses lrstat (0.3.4 or later),
+rpact and gsDesign. The <code>README.md</code> of each folder describes
+how to run the scripts, the criteria and the files. Every compared value
+is listed with its judgment in <code>results/summary.csv</code>, and
+<code>results/summary.md</code> summarizes the results.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -521,6 +732,11 @@ summarizes the results.</p>
 type I error level in event-driven group-sequential designs with a
 closed testing procedure for progression-free and overall survival.
 arXiv:2512.08658.</p>
+<p>Kim K, Tsiatis AA (1990). Study duration for clinical trials with
+survival response and early stopping rule. Biometrics 46:81-92.</p>
+<p>Ortega-Villa AM, Grieco MC, Rubenstein K, Wang J, Proschan MA (2025).
+Futility monitoring in clinical trials. Statistics in Medicine
+44:e70157.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -27,9 +27,13 @@ Description: Computes the expected numbers of events, the mean, variance and
     tested together with a group sequential fixed-sequence or Bonferroni
     procedure, the latter with recycling of the level after a rejection
     (Maurer and Bretz 2013 <doi:10.1080/19466315.2013.807748>), using the
-    joint distribution of the two log-rank statistics over calendar time. The
-    variance and covariance of the log-rank score under the alternative
-    follow Luo et al. (2019) <doi:10.1002/sim.7975>.
+    joint distribution of the two log-rank statistics over calendar time. For
+    designs with one endpoint, the expected study duration, numbers of events
+    and enrolled patients when the trial stops at its bounds, the conditional
+    power at an interim analysis, and plots of the bounds, the probabilities
+    of stopping and the survival functions are also given. The variance and
+    covariance of the log-rank score under the alternative follow Luo et al.
+    (2019) <doi:10.1002/sim.7975>.
 License: GPL (>= 2)
 URL: https://gosukehommaEX.github.io/DesignComplexSurvival/,
     https://github.com/gosukehommaEX/DesignComplexSurvival

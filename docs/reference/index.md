@@ -55,26 +55,45 @@
 - [`ms_size()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_size.md)
   : Number of events, sample size, accrual duration or follow-up for a
   target power
+- [`ms_cond_power()`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/ms_cond_power.md)
+  : Conditional power at an interim look
 
 ## Methods
 
 - [`print(`*`<ms_model>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_model.md)
   : Print an ms_model object
+
 - [`print(`*`<ms_accrual>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_accrual.md)
   : Print an ms_accrual object
+
 - [`print(`*`<ms_scenario>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_scenario.md)
   : Print an ms_scenario object
+
 - [`print(`*`<ms_looks>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_looks.md)
   : Print an ms_looks object
+
 - [`print(`*`<ms_test>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_test.md)
   : Print an ms_test object
+
 - [`print(`*`<ms_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_power.md)
   : Print an ms_power object
+
+- [`plot(`*`<ms_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/plot.ms_power.md)
+  : Plot an ms_power object
+
 - [`summary(`*`<ms_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/summary.ms_power.md)
   : Summarize an ms_power object
+
 - [`print(`*`<summary.ms_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.summary.ms_power.md)
   : Print a summary.ms_power object
+
 - [`as.data.frame(`*`<ms_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/as.data.frame.ms_power.md)
   : Per-look results of an ms_power object as a data frame
+
 - [`print(`*`<ms_size>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_size.md)
   : Print an ms_size object
+
+- [`print(`*`<ms_cond_power>`*`)`](https://gosukehommaEX.github.io/DesignComplexSurvival/reference/print.ms_cond_power.md)
+  :
+
+  Print an `ms_cond_power` object

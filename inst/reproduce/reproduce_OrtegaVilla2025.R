@@ -21,8 +21,8 @@
 # and correlation sqrt(t) of the Brownian motion are those of formula (3);
 # the current trend is under = "trend". The value of under = "design", which
 # takes the correlation from the information under the design scenario
-# (variance = "null") and differs from sqrt(t) in the fourth decimal, is
-# given in the note.
+# (variance = "null") instead of sqrt(t) and differs from the conditional
+# power of formula (3) by 0.001 to 0.002, is given in the note.
 #
 # The conditional power 0.103 under the current trend in Section 3.2 was
 # taken by the authors from Hanna et al. and used to deduce the interim

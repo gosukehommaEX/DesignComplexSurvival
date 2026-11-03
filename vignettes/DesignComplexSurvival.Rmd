@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 6, fig.height = 4.5)
 ```
 
 ```{r setup}
@@ -34,6 +34,11 @@ endpoint. The other articles are listed at the end.
   familywise error rate.
 * The number of events, sample size, accrual duration or follow-up needed for
   a target power.
+* For a design with one endpoint, the expected study duration and the
+  expected numbers of events and enrolled patients when the trial stops at
+  its bounds, and the conditional power at an interim analysis.
+* Plots of the bounds, of the cumulative probabilities of stopping and of the
+  survival functions of the groups.
 
 The analyses can be driven by the events of progression-free survival (PFS)
 or overall survival (OS), take place at calendar times, or mix the two. The
@@ -144,6 +149,8 @@ the same in all states, and `dropout_pfs` adds a censoring of PFS only.
 | Two endpoints | PFS and OS by fixed sequence (two procedures) or Bonferroni, with recycling of the level after a rejection | supported |
 | Familywise error rate | under the global null hypothesis and under partial null scenarios given by the user | supported |
 | Solving for | number of events, sample size, accrual duration or follow-up | supported |
+| Expected values | study duration, events and enrolled patients when the trial stops at the bounds, under the design and null scenarios (one endpoint) | supported |
+| Conditional power | at an interim analysis, under the design scenario, the null hypothesis, the current trend, a hazard ratio or another scenario (one endpoint) | supported |
 | Approximations | mean of the statistic (two choices) and covariance (three choices) | supported |
 | Smooth hazards (Weibull), cure fractions, delays that vary between patients | piecewise constant approximation of the hazard of each group (one endpoint) | approximate |
 | Not covered | weighted log-rank tests, restricted mean survival time, stratification, non-inferiority and equivalence, a fixed follow-up for each patient, repeated switches back and forth, dropout that depends on the state, switching started by interim results, more than two groups | not supported |
@@ -208,6 +215,14 @@ analysis needs `r des$events` events and takes place at month
 `r signif(des$type1[["nonbinding"]], 3)` when the futility bounds are
 ignored.
 
+`plot()` with `type = "survival"` draws the survival functions of the two
+groups of the scenario up to the final analysis; PFS is drawn in addition to
+OS when the model of a group has progression:
+
+```{r delayed-survival, fig.alt = "Overall survival functions of the control and treatment groups with the delayed treatment effect"}
+plot(des, type = "survival")
+```
+
 The mean of the standardized statistic can be computed directly from the
 hazards (the default, following Yung and Liu 2020) or with the approximation
 of Schoenfeld (1981), which uses the event-weighted average of the log hazard
@@ -230,6 +245,12 @@ as.data.frame(des)[, c("time", "events", "z_upper", "hr_upper", "z_lower",
                        "cum_power")]
 ```
 
+The summary also gives the expected study duration, events and enrolled
+patients when the trial stops at the bounds, under the design scenario and
+under the null scenario. `plot(des)` draws the bounds, and
+`ms_cond_power()` gives the conditional power at an interim analysis; both
+are described in `vignette("group-sequential")`.
+
 `ms_power()` evaluates a design with a given final number of events, a given
 follow-up after the end of accrual, or analyses at calendar times. With the
 same looks and test and the final analysis 12 months after the end of
@@ -251,8 +272,9 @@ events, and the power is `r round(pw12$power, 3)`.
   before progression, the clocks of the post-progression intensities, and
   the censoring of PFS only.
 * `vignette("group-sequential")`: the timing of the analyses, the spending
-  functions, the futility bounds and the approximations of the covariance of
-  the statistics.
+  functions, the futility bounds, the expected duration, events and sample
+  size, the conditional power, the plots of a design and the approximations
+  of the covariance of the statistics.
 * `vignette("two-endpoints")`: PFS and OS tested together with a
   fixed-sequence or Bonferroni procedure, recycling of the level and the
   familywise error rate.

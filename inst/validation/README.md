@@ -203,7 +203,10 @@ null scenario (`looks_null`) with
   and with non-binding futility bounds;
 - `gsDesign::gsProbability()`: proportional hazards designs of V1 with
   futility bounds by beta spending (non-binding) and fixed (binding), with
-  the bounds and events of the package;
+  the bounds and events of the package. Under the design scenario the
+  package takes the correlations from the information, so that its stopping
+  probabilities differ from gsDesign by up to 2e-4 (third look of the design
+  with fixed futility bounds) and its expected events by up to 0.01;
 - `python/simulate_expected.py`: 20000 trials under the alternative and
   under the null hypothesis of each of the designs below, with the
   O'Brien-Fleming type efficacy bounds and the non-binding futility bound
@@ -297,7 +300,7 @@ number of deaths increases.
 | Expected values, rpact: analysis times, stopping probabilities, expected events, patients and study duration (package; events correlations) | `abs:5e-4`, `abs:5e-5`, `abs:2e-3`, `abs:2e-3`, `abs:5e-4`; `abs:1e-6` for the probabilities and `abs:1e-4` for the events with the correlations of the events |
 | Expected values and conditional power, rpact and gsDesign vignettes: printed values | `abs`: half a unit of the last printed digit; `abs:1e-7` for the conditional powers at single analyses printed with seven or eight digits |
 | Expected values, lrstat: analysis times, events, efficacy bounds, stopping probabilities; expected events, patients and study duration | `abs:1e-4`, `abs:1e-5`; `rel:1e-5` |
-| Expected values, gsDesign: stopping probabilities and expected events under the null scenario; under the design scenario (package; correlations of the events) | `abs:1e-6`, `abs:1e-4`; `abs:2e-4`, `abs:5e-2`; `abs:1e-6`, `abs:1e-4` |
+| Expected values, gsDesign: stopping probabilities and expected events under the null scenario; under the design scenario (package; correlations of the events) | `abs:1e-6`, `abs:1e-4`; `abs:5e-4`, `abs:5e-2`; `abs:1e-6`, `abs:1e-4` |
 | Expected values, simulation: probabilities of stopping (early, and at each look for each reason) | `4se_p` |
 | Expected values, simulation: expected study duration, events and enrolled patients | `4se` |
 | Expected values, simulation: efficacy bounds (`ref_gsd.py`) | `abs:1e-6` |

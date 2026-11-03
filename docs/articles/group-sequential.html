@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,11 +79,14 @@
 <p>This article describes the choices of <code><a href="../reference/ms_looks.html">ms_looks()</a></code> and
 <code><a href="../reference/ms_test.html">ms_test()</a></code>: when the analyses take place, how the efficacy
 and futility bounds are obtained, and which approximation of the
-distribution of the log-rank statistics is used. The scenario is the
-delayed treatment effect of the introductory article: the control group
-has exponential survival with a median of 12 months, the hazard ratio is
-1 for 6 months and 0.65 afterwards, and 700 patients are enrolled at 10
-per month for 3 months and at 30 per month afterwards.</p>
+distribution of the log-rank statistics is used. It also shows the
+expected duration, events and sample size of a design that stops at its
+bounds, the conditional power at an interim analysis and the plots of a
+design. The scenario is the delayed treatment effect of the introductory
+article: the control group has exponential survival with a median of 12
+months, the hazard ratio is 1 for 6 months and 0.65 afterwards, and 700
+patients are enrolled at 10 per month for 3 months and at 30 per month
+afterwards.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">12</span></span>
 <span><span class="va">scn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_scenario.html">ms_scenario</a></span><span class="op">(</span><span class="fu"><a href="../reference/ms_model.html">ms_model</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">lam</span>, dropout <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span>,</span>
@@ -192,6 +195,116 @@ is close to 1, and the trial stops for futility at one of the interim
 analyses with probability 0.168.</p>
 </div>
 <div class="section level2">
+<h2 id="expected-duration-events-and-sample-size">Expected duration, events and sample size<a class="anchor" aria-label="anchor" href="#expected-duration-events-and-sample-size"></a>
+</h2>
+<p>The power and the type I error do not depend on whether the trial
+stops at an interim analysis, but the duration of the trial and the
+numbers of events and enrolled patients do. For a design with one
+endpoint, <code><a href="../reference/ms_power.html">ms_power()</a></code> and <code><a href="../reference/ms_size.html">ms_size()</a></code> give in
+<code>expected</code> the expected values when the trial stops at the
+first bound that it crosses, under the design scenario and under the
+null scenario, and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> prints them. For the design
+with the non-binding futility bounds by beta spending of the previous
+section:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">des_nb</span> <span class="op">&lt;-</span> <span class="va">fut</span><span class="op">$</span><span class="va">beta_nonbinding</span></span>
+<span><span class="va">des_nb</span><span class="op">$</span><span class="va">expected</span></span>
+<span><span class="co">#&gt;   hypothesis prob_efficacy_early prob_futility_early study_duration   events</span></span>
+<span><span class="co">#&gt; 1     design         0.204438585          0.05449458       31.52549 387.3136</span></span>
+<span><span class="co">#&gt; 2       null         0.009649324          0.44062691       27.85223 353.7305</span></span>
+<span><span class="co">#&gt;   enrolled</span></span>
+<span><span class="co">#&gt; 1 693.2661</span></span>
+<span><span class="co">#&gt; 2 673.4042</span></span>
+<span><span class="va">ex_d</span> <span class="op">&lt;-</span> <span class="va">des_nb</span><span class="op">$</span><span class="va">expected</span><span class="op">[</span><span class="va">des_nb</span><span class="op">$</span><span class="va">expected</span><span class="op">$</span><span class="va">hypothesis</span> <span class="op">==</span> <span class="st">"design"</span>, <span class="op">]</span></span>
+<span><span class="va">ex_0</span> <span class="op">&lt;-</span> <span class="va">des_nb</span><span class="op">$</span><span class="va">expected</span><span class="op">[</span><span class="va">des_nb</span><span class="op">$</span><span class="va">expected</span><span class="op">$</span><span class="va">hypothesis</span> <span class="op">==</span> <span class="st">"null"</span>, <span class="op">]</span></span></code></pre></div>
+<p>Under the design scenario the trial stops at an interim analysis for
+efficacy with probability 0.204 and for futility with probability 0.054,
+and its expected duration is 31.5 months, against 33.7 months to the
+final analysis. Under the null scenario the expected duration is 27.9
+months with 354 expected deaths. The trial is taken to stop also at the
+non-binding futility bounds, as in gsDesign; the expected values without
+stopping for futility are those of the same design with
+<code>futility = "none"</code>. The analysis times are those at which
+the expected events reach their targets, so that the variability of the
+analysis times is ignored, as in rpact and lrstat (see
+<code><a href="../reference/ms_power.html">?ms_power</a></code>); <code><a href="../articles/validation.html">vignette("validation")</a></code> compares
+the expected values with patient-level simulations.</p>
+<p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> draws the bounds of a design with one endpoint
+against the expected events or the calendar time
+(<code>x_axis = "time"</code>), on the scale of the statistic with its
+mean under the design scenario, of the hazard ratio
+(<code>scale = "hr"</code>) or of the nominal p-value
+(<code>scale = "p"</code>):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">des_nb</span>, type <span class="op">=</span> <span class="st">"bounds"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="group-sequential_files/figure-html/plot-bounds-1.png" class="r-plt" alt="Efficacy and futility bounds of the design on the scale of the standardized log-rank statistic against the expected deaths, with the mean of the statistic under the design scenario" width="576"></p>
+<p>With <code>type = "power"</code> it draws the cumulative
+probabilities of stopping for efficacy and for futility under the design
+scenario and the cumulative type I error:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">des_nb</span>, type <span class="op">=</span> <span class="st">"power"</span>, x_axis <span class="op">=</span> <span class="st">"time"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="group-sequential_files/figure-html/plot-power-1.png" class="r-plt" alt="Cumulative probabilities of stopping for efficacy and for futility under the design scenario and cumulative type I error against calendar time" width="576"></p>
+<p>Each call returns the plotted values invisibly.</p>
+</div>
+<div class="section level2">
+<h2 id="conditional-power-at-an-interim-analysis">Conditional power at an interim analysis<a class="anchor" aria-label="anchor" href="#conditional-power-at-an-interim-analysis"></a>
+</h2>
+<p>At an interim analysis, <code><a href="../reference/ms_cond_power.html">ms_cond_power()</a></code> gives the
+probability that the trial crosses an efficacy bound at a later
+analysis, given the observed statistic, before it crosses a futility
+bound (as <code>gsCP()</code> of gsDesign), and also the probability
+without the futility bounds of the later interim analyses. The
+distribution of the later statistics is chosen with <code>under</code>:
+the design scenario (<code>"design"</code>, the default), the null
+hypothesis (<code>"null"</code>, which gives the conditional type I
+error), the current trend (<code>"trend"</code>, a constant hazard ratio
+estimated from the observed statistic), a given hazard ratio
+(<code>"hr"</code>) or another scenario (<code>"scenario"</code>). With
+the statistic 1.5 observed at the first interim analysis of the design
+above (efficacy bound 2.963):</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cp_trend</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des_nb</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span>, under <span class="op">=</span> <span class="st">"trend"</span><span class="op">)</span></span>
+<span><span class="va">cp_trend</span></span>
+<span><span class="co">#&gt; Conditional power of a group sequential log-rank design</span></span>
+<span><span class="co">#&gt;   Observed at look 1: z = 1.5</span></span>
+<span><span class="co">#&gt;   Distribution: current trend (hazard ratio 0.813)</span></span>
+<span><span class="co">#&gt;   Conditional power: 0.5717</span></span>
+<span><span class="co">#&gt;   Without the futility bounds of the later interim looks: 0.5717</span></span>
+<span><span class="co">#&gt;  look  time events z_upper z_lower cond_mean cond_sd prob_upper prob_lower</span></span>
+<span><span class="co">#&gt;     2 26.54    315   2.359 -0.1784     1.837  0.5774     0.1830  0.0002406</span></span>
+<span><span class="co">#&gt;     3 33.66    420   2.014  2.0141     2.121  0.7071     0.3887  0.4280503</span></span>
+<span><span class="co">#&gt;  cum_upper</span></span>
+<span><span class="co">#&gt;     0.1830</span></span>
+<span><span class="co">#&gt;     0.5717</span></span></code></pre></div>
+<p><code>"trend"</code> and <code>"hr"</code> assume proportional
+hazards, whereas <code>"design"</code> and <code>"scenario"</code> use
+the hazard ratio of a scenario over time, here 1 for 6 months and 0.65
+afterwards. A scenario with the hazard ratio 0.8 after 6 months gives
+the conditional power if the late effect is smaller than planned:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">scn_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_scenario.html">ms_scenario</a></span><span class="op">(</span><span class="fu"><a href="../reference/ms_model.html">ms_model</a></span><span class="op">(</span>death <span class="op">=</span> <span class="va">lam</span>, dropout <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span>,</span>
+<span>                         <span class="fu"><a href="../reference/ms_model.html">ms_model</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>, death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">lam</span>, <span class="fl">0.8</span> <span class="op">*</span> <span class="va">lam</span><span class="op">)</span>,</span>
+<span>                                  dropout <span class="op">=</span> <span class="fl">0.003</span><span class="op">)</span>,</span>
+<span>                         accrual <span class="op">=</span> <span class="fu"><a href="../reference/ms_accrual.html">ms_accrual</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>design <span class="op">=</span> <span class="fu"><a href="../reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des_nb</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span><span class="op">$</span><span class="va">cond_power</span>,</span>
+<span>        trend <span class="op">=</span> <span class="va">cp_trend</span><span class="op">$</span><span class="va">cond_power</span>,</span>
+<span>        hr_0.65 <span class="op">=</span> <span class="fu"><a href="../reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des_nb</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span>, under <span class="op">=</span> <span class="st">"hr"</span>,</span>
+<span>                                hr <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span><span class="op">$</span><span class="va">cond_power</span>,</span>
+<span>        scenario_0.8 <span class="op">=</span> <span class="fu"><a href="../reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des_nb</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span>, under <span class="op">=</span> <span class="st">"scenario"</span>,</span>
+<span>                                     scenario <span class="op">=</span> <span class="va">scn_small</span><span class="op">)</span><span class="op">$</span><span class="va">cond_power</span>,</span>
+<span>        null <span class="op">=</span> <span class="fu"><a href="../reference/ms_cond_power.html">ms_cond_power</a></span><span class="op">(</span><span class="va">des_nb</span>, look <span class="op">=</span> <span class="fl">1</span>, z <span class="op">=</span> <span class="fl">1.5</span>, under <span class="op">=</span> <span class="st">"null"</span><span class="op">)</span><span class="op">$</span><span class="va">cond_power</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cp</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       design        trend      hr_0.65 scenario_0.8         null </span></span>
+<span><span class="co">#&gt;        0.803        0.572        0.963        0.418        0.097</span></span></code></pre></div>
+<p>The conditional power is 0.803 under the design scenario, 0.572 under
+the current trend (hazard ratio 0.813), 0.963 with the hazard ratio 0.65
+for the events after the interim analysis, and 0.418 if the hazard ratio
+after 6 months is 0.8. The bounds are those of the design: when the
+observed number of events differs from the planned one, the design is
+computed again with looks at the observed and the remaining planned
+events (see <code><a href="../reference/ms_cond_power.html">?ms_cond_power</a></code>).</p>
+</div>
+<div class="section level2">
 <h2 id="the-covariance-of-the-statistics">The covariance of the statistics<a class="anchor" aria-label="anchor" href="#the-covariance-of-the-statistics"></a>
 </h2>
 <p>The argument <code>variance</code> of <code><a href="../reference/ms_test.html">ms_test()</a></code> (and of
@@ -205,7 +318,7 @@ With <code>"studentized"</code>, the covariance is the asymptotic
 covariance of the statistic that is computed in practice, standardized
 by the estimated variance and, for event-driven analyses, taken at a
 random analysis time.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>alternative <span class="op">=</span> <span class="st">"alternative"</span>, studentized <span class="op">=</span> <span class="st">"studentized"</span><span class="op">)</span>,</span>
 <span>             <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="../reference/lr_moments.html">lr_moments</a></span><span class="op">(</span><span class="va">scn</span>, n <span class="op">=</span> <span class="fl">700</span>, calendar_time <span class="op">=</span> <span class="va">pw</span><span class="op">$</span><span class="va">looks</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>                                    variance <span class="op">=</span> <span class="va">v</span><span class="op">)</span><span class="op">)</span></span>
@@ -238,7 +351,7 @@ the log-rank statistics. With unequal allocation and few events the
 statistic is skewed. In a design with 2:1 allocation (100 control and
 200 treatment patients), looks at 75 and 150 deaths and O’Brien-Fleming
 bounds, the package gives the type I error</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ctl_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_model.html">ms_model</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">6</span><span class="op">)</span>, death <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.04</span><span class="op">)</span>, dropout <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
 <span><span class="va">scn_b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ms_scenario.html">ms_scenario</a></span><span class="op">(</span><span class="va">ctl_b</span>, <span class="va">ctl_b</span>, allocation <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>                     accrual <span class="op">=</span> <span class="fu"><a href="../reference/ms_accrual.html">ms_accrual</a></span><span class="op">(</span>time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span>, rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -250,7 +363,7 @@ bounds, the package gives the type I error</p>
 <code>inst/validation/python/simulate_type1.py</code> (both groups with
 the control model) give the rejection rates in the direction of benefit
 and in the opposite direction:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"validation"</span>, <span class="st">"results"</span>, <span class="st">"sim_python_type1.csv"</span>,</span>
 <span>                                   package <span class="op">=</span> <span class="st">"DesignComplexSurvival"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">rate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span>, <span class="va">q</span><span class="op">)</span> <span class="va">sim</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">sim</span><span class="op">$</span><span class="va">variant</span> <span class="op">==</span> <span class="va">v</span> <span class="op">&amp;</span> <span class="va">sim</span><span class="op">$</span><span class="va">quantity</span> <span class="op">==</span> <span class="va">q</span><span class="op">]</span></span>

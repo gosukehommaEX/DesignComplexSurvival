@@ -11,7 +11,7 @@ size, without simulation."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">DesignComplexSurvival</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,8 +136,37 @@ an event-driven final look, instead of <code>events</code>).</p></dd>
     accrual duration, calendar time of the final analysis and expected
     events of the tested endpoint at the final analysis.</p></dd>
 
+  <dt>expected</dt>
+<dd><p>A data frame with the expected values when the trial
+    stops at the bounds (see Details), with one row per hypothesis
+    (<code>hypothesis</code>: <code>"design"</code> for the design scenario and
+    <code>"null"</code> for the null scenario): the probabilities of stopping at
+    an interim look for efficacy (<code>prob_efficacy_early</code>) and for
+    futility (<code>prob_futility_early</code>), and the expected
+    <code>study_duration</code>, <code>events</code> of the tested endpoint and
+    <code>enrolled</code> patients.</p></dd>
+
+  <dt>mean, sigma</dt>
+<dd><p>The mean vector and covariance matrix of the
+    statistics at the looks under the design scenario.</p></dd>
+
+  <dt>targets</dt>
+<dd><p>The numbers of events of the trigger endpoints at which the
+    event-driven looks take place (<code>NA</code> for calendar-driven looks).</p></dd>
+
   <dt>settings, scenario, looks_def, test</dt>
 <dd><p>The inputs.</p></dd>
+
+  <dt>looks_null</dt>
+<dd><p>A data frame with one row per look under the null
+    scenario: <code>look</code>, <code>time</code>, <code>enrolled</code>, <code>events</code>
+    and the probabilities of stopping for efficacy and for futility at the
+    look with the futility bounds applied (<code>prob_upper</code>,
+    <code>prob_lower</code>).</p></dd>
+
+  <dt>sigma_null</dt>
+<dd><p>The correlation matrix of the statistics under the null
+    scenario.</p></dd>
 
 
 </dl><p>With two endpoints, <code>looks</code> has one row per endpoint and look at
@@ -164,7 +193,8 @@ the global null hypothesis and under each scenario of
 endpoint at its last look; <code>final_events</code> the final numbers of events
 of the trigger endpoints; and <code>mean</code> and <code>sigma</code> are the mean
 vector and covariance matrix of the statistics in the order of the rows of
-<code>looks</code>.</p>
+<code>looks</code>. The expected values (<code>expected</code>, <code>looks_null</code>,
+<code>sigma_null</code>) and <code>targets</code> are not given.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -192,6 +222,27 @@ simulation (<code>inst/validation</code> of the source package), about 0.028
 instead of 0.025 with 2:1 allocation and looks at 75 and 150 deaths.</p>
 <p>The hazard ratios at the bounds are <code>exp(-z / sqrt(p0 p1 d))</code>, where
 d is the expected number of events of the tested endpoint.</p>
+<p>The expected study duration, number of events of the tested endpoint and
+number of enrolled patients (<code>expected</code>) are the sums over the looks
+of the probability of stopping at the look times the calendar time, the
+expected events and the enrolled patients at the look, under the design
+scenario and under <code><a href="ms_null.html">ms_null</a></code> applied to the scenario (at the
+looks of the type I error, <code>looks_null</code>). The trial stops at an
+interim look when the statistic crosses the efficacy bound or falls below
+the futility bound, also when the futility bounds are non-binding, as in
+<code>gsProbability()</code> of gsDesign; the probability of stopping at the last
+look is one minus the probability of stopping earlier. With non-binding
+futility bounds the efficacy bounds do not depend on the futility bounds,
+so that the expected values without stopping for futility are those of the
+same design with <code>futility = "none"</code>. At an event-driven look the
+events are the target, and the calendar time and the enrolled patients are
+those at which the expected events reach the target: the variability of
+the analysis time and its correlation with the decision to stop are
+ignored, as in the expected study durations of rpact and lrstat. At a
+calendar-driven look the time is exact and the events are expected. A final
+look at <code>followup</code> after the end of accrual takes place under the null
+scenario when the expected events reach those of the design scenario, as
+for the type I error.</p>
 <p>When the looks have different triggers (see <code><a href="ms_looks.html">ms_looks</a></code>), each
 trigger endpoint has its own final number of events, and a look driven by
 it takes place when its expected number of events reaches the fraction of

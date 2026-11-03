@@ -26,11 +26,13 @@ The results of the package are checked in three ways:
   and adaptive quadrature) and, when the packages are installed, with
   gsDesign, gsDesign2, rpact and lrstat;
 * the scripts in `inst/reproduce/` recompute sample sizes, numbers of events,
-  analysis times, bounds and powers printed in articles and a statistical
-  analysis plan;
+  analysis times, bounds, powers, expected study durations and conditional
+  powers printed in articles and a statistical analysis plan;
 * the scripts in `inst/validation/` compare the package with patient-level
   simulations, with the package PWEALL and with the decisions of
-  `lrstat::fseqbon()`.
+  `lrstat::fseqbon()`, and the expected values when the trial stops at the
+  bounds and the conditional power with rpact, lrstat and gsDesign and with
+  the examples printed in the vignettes of rpact and gsDesign.
 
 The last two folders are run by their `run_all.R`, which judges every value
 as PASS (the criterion is met), EXPLAINED (the criterion is met after a
@@ -71,6 +73,16 @@ In total `r sum(rp$judgement == "PASS")` values pass,
 not judged. The sources, criteria and registered explanations are listed in
 the `README.md` and `explained.csv` of `inst/reproduce/`.
 
+The expected study durations, numbers of failures and patients and the
+probabilities of stopping of Kim and Tsiatis (1990) are computed with the
+conventions of the article (for both hypotheses the analysis times found
+under the null hypothesis, and the correlations of the statistics from the
+information times) from the bounds, means, analysis times and expected
+events of the package; the expected values of `ms_power()`, which use under
+each hypothesis its own analysis times and the correlations of the
+information, are given next to them as INFO rows. The conditional powers of
+Ortega-Villa et al. (2025) are those of `ms_cond_power()`.
+
 ## Comparison with simulations and other software
 
 ```{r validation-table}
@@ -80,30 +92,41 @@ labels <- c(fastsurvival = "FastSurvival simulation",
             python_calendar = "Python simulation, switching from a calendar time",
             danzer = "Estimator of Danzer et al. (2025)",
             pweall = "PWEALL",
-            lrstat_fseqbon = "lrstat::fseqbon()")
+            lrstat_fseqbon = "lrstat::fseqbon()",
+            rpact = "rpact::getPowerSurvival(), expected values",
+            rpact_vignette = "Values printed in the rpact vignette",
+            lrstat_expected = "lrstat::lrpower(), expected values",
+            gsdesign_expected = "gsDesign::gsProbability(), expected values",
+            python_expected = "Python simulation, expected values",
+            gsdesign_cp = "gsDesign::gsCP(), conditional power",
+            gsdesign_vignette = "Values printed in the gsDesign vignette")
 tab <- count(vd, "source")
 n_scen <- tapply(vd$scenario, vd$source, function(x) length(unique(x)))
 tab <- cbind(Route = ifelse(is.na(labels[rownames(tab)]), rownames(tab),
                             labels[rownames(tab)]),
              Scenarios = as.vector(n_scen[rownames(tab)]), tab)
+names(tab)[names(tab) == "Scenarios"] <- "Scenarios or designs"
 knitr::kable(tab, row.names = FALSE)
 ```
 
 The quantities with exact counterparts in the package (expected numbers of
 events and dropouts by group at calendar times, state occupation
 probabilities, survival functions, bounds, the per-patient covariances of the
-statistics, and the quantities of PWEALL and lrstat) are judged. The criteria
+statistics, the quantities of PWEALL, lrstat, rpact and gsDesign, the values
+printed in their vignettes, and the expected values and probabilities of
+stopping of the simulations) are judged. The criteria
 are `4se` (within 4 Monte Carlo standard errors), `4se_p` (within 4 standard
 errors computed from the package value), and `abs:x` or `rel:x` (absolute or
 relative difference at most x):
 
 ```{r validation-criteria}
 judged <- vd[vd$judgement != "INFO", ]
-knitr::kable(as.data.frame(table(criterion = judged$criterion,
-                                 judgement = judged$judgement)))
+crit <- as.data.frame(table(criterion = judged$criterion, judgement = judged$judgement))
+knitr::kable(crit[crit$Freq > 0, ], row.names = FALSE)
 ```
 
-In total `r nf(sum(vd$judgement == "PASS"))` values pass and
+In total `r nf(sum(vd$judgement == "PASS"))` values pass,
+`r sum(vd$judgement == "EXPLAINED")` are explained and
 `r sum(vd$judgement == "FAIL")` fail.
 
 The mean, standard deviation and correlation of the log-rank statistics, the
@@ -136,6 +159,31 @@ not include the variability of the estimated variance (see
 `vignette("group-sequential")`), and the Schoenfeld approximation of the mean
 (`mean = "schoenfeld"`) is less accurate when the hazard ratio changes over
 time, as in V2 (see the introductory article, `vignette("DesignComplexSurvival")`).
+The numbers of enrolled patients at the first look of the simulated design E1
+(source `python_expected`) differ for the reason given in the next section.
+
+## Expected values and conditional power
+
+Under the design scenario, `variance = "null"` takes the correlations of the
+statistics from the information, whereas rpact and gsDesign take them from the
+event fractions. The stopping probabilities of the package are therefore
+compared with rpact and `gsDesign::gsProbability()` with tolerances above the
+differences that this causes, and the probabilities recomputed from the bounds
+and means of the package with the correlations of the event fractions are
+compared at 1e-6, which checks the definitions. The conditional powers under
+the design scenario are INFO rows, and those under the null hypothesis, the
+current trend and a hazard ratio, which use the correlations of the events,
+are compared with `gsCP()` at 1e-5. The values printed in the rpact vignette
+are recomputed with the correlations of the event fractions, as rpact computes
+them, and the conditional powers printed in the gsDesign vignette with the
+futility bounds of gsDesign. The explained values are the expected numbers of
+enrolled patients of the simulated design E1, whose first analysis is expected
+close to the end of accrual, so that the variability of its time lowers the
+simulated mean number of enrolled patients, which the package ignores, and the
+futility bound by beta spending of the gsDesign vignette at the second
+analysis, which gsDesign computes with the correlations of the event
+fractions. The designs and tolerances are listed in the `README.md` of
+`inst/validation/`.
 
 ## Type I error with unequal allocation
 
@@ -147,14 +195,20 @@ last section of `vignette("group-sequential")`).
 
 ## Rerunning the checks
 
-FastSurvival, PWEALL and lrstat (0.3.4 or later) are needed only to rerun
-`inst/validation/`. The `README.md` of each folder describes how to run the
-scripts, the criteria and the files. Every compared value is listed with its
-judgment in `results/summary.csv`, and `results/summary.md` summarizes the
-results.
+FastSurvival and PWEALL are needed only to rerun `inst/validation/`, which
+also uses lrstat (0.3.4 or later), rpact and gsDesign. The `README.md` of each
+folder describes how to run the scripts, the criteria and the files. Every
+compared value is listed with its judgment in `results/summary.csv`, and
+`results/summary.md` summarizes the results.
 
 ## References
 
 Danzer MF, Rufibach K, Beyersmann J, Schmidt R (2025). Exhausting the type I
 error level in event-driven group-sequential designs with a closed testing
 procedure for progression-free and overall survival. arXiv:2512.08658.
+
+Kim K, Tsiatis AA (1990). Study duration for clinical trials with survival
+response and early stopping rule. Biometrics 46:81-92.
+
+Ortega-Villa AM, Grieco MC, Rubenstein K, Wang J, Proschan MA (2025).
+Futility monitoring in clinical trials. Statistics in Medicine 44:e70157.

@@ -27,12 +27,12 @@
 # ms_events() under ms_null(). ms_power() itself takes the correlations
 # under the design scenario from the information (variance = "null"), whose
 # fractions differ from t here (0.205 at t = 0.2 for the design of Table 1),
-# so that its power differs from that of the article's model in the fourth
-# decimal; it is given in the notes. The expected values of the package
-# (ms_power()$expected), which use under each hypothesis its own analysis
-# times (under H0 at the numbers of failures of the design scenario) and the
-# correlations of the information, are given as INFO rows next to the
-# printed values (ids ending in -pkg).
+# so that its power differs from that of the article's model by up to 0.004
+# (Pocock type, t(2)); it is given in the notes. The expected values of the
+# package (ms_power()$expected), which use under each hypothesis its own
+# analysis times (under H0 at the numbers of failures of the design
+# scenario) and the correlations of the information, are given as INFO rows
+# next to the printed values (ids ending in -pkg).
 #
 # The numbers of failures and patients are printed rounded up (criterion
 # ceil). The follow-up is judged by the power at the printed follow-up
