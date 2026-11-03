@@ -25,8 +25,8 @@ Description: Computes the expected numbers of events, the mean, variance and
     and group sequential designs with efficacy bounds and binding or
     non-binding futility bounds. Progression-free and overall survival can be
     tested together with a group sequential fixed-sequence or Bonferroni
-    procedure, the latter with recycling of the level after a rejection
-    (Maurer and Bretz 2013 <doi:10.1080/19466315.2013.807748>), using the
+    procedure, the latter with recycling of the level after a rejection as
+    in Maurer and Bretz (2013) <doi:10.1080/19466315.2013.807748>, using the
     joint distribution of the two log-rank statistics over calendar time. For
     designs with one endpoint, the expected study duration, numbers of events
     and enrolled patients when the trial stops at its bounds, the conditional
